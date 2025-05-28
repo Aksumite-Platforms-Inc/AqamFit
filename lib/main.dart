@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import '.dart_tool/flutter_gen/gen_l10n/app_localizations.dart' as S;
 import 'navigation/app_router.dart'; // Import the app router
 import 'providers/locale_provider.dart';
 import 'theme/app_theme.dart'; // Import the AppTheme
@@ -32,12 +31,10 @@ class AxumFitApp extends StatelessWidget {
       routerConfig: router, // Set the routerConfig
       // home: SplashScreen(), // Removed home property
       localizationsDelegates: [
-        S.AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: S.AppLocalizations.supportedLocales,
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:aksumfit/.dart_tool/flutter_gen/gen_l10n/app_localizations.dart' as S;
 
 import '../widgets/home_progress_item.dart';
 import '../widgets/home_quick_action.dart';
@@ -8,12 +7,6 @@ import '../widgets/home_achievement_card.dart';
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final localizations = S.AppLocalizations.of(context);
-    if (localizations != null) {
-      print(localizations.helloWorld);
-    } else {
-      print("Localizations not found");
-    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Good Morning, Alex!'),
