@@ -5,7 +5,6 @@ import '../models/challenge.dart';
 import '../widgets/social_stat_item.dart';
 import '../widgets/challenge_card.dart';
 import '../widgets/leaderboard_list_item.dart';
-import '../widgets/activity_feed_item.dart';
 
 class SocialScreen extends StatefulWidget {
   @override
@@ -21,7 +20,11 @@ class _SocialScreenState extends State<SocialScreen> {
     LeaderboardEntry('Sarah M.', 3240, 1, 'assets/avatar1.png'),
     LeaderboardEntry('Mike R.', 2890, 2, 'assets/avatar2.png'),
     LeaderboardEntry(
-        'You', 2450, 3, 'assets/avatar3.png'), // Assuming current user
+      'You',
+      2450,
+      3,
+      'assets/avatar3.png',
+    ), // Assuming current user
     LeaderboardEntry('Emma K.', 2210, 4, 'assets/avatar4.png'),
     LeaderboardEntry('John D.', 1980, 5, 'assets/avatar5.png'),
   ];
@@ -90,9 +93,10 @@ class _SocialScreenState extends State<SocialScreen> {
                         icon: Icons.local_fire_department,
                       ),
                       SocialStatItem(
-                          label: 'Points',
-                          value: '$totalPoints',
-                          icon: Icons.stars),
+                        label: 'Points',
+                        value: '$totalPoints',
+                        icon: Icons.stars,
+                      ),
                       SocialStatItem(
                         label: 'Rank',
                         value: '#$weeklyRank',
@@ -115,8 +119,9 @@ class _SocialScreenState extends State<SocialScreen> {
               ),
             ),
             SizedBox(height: 16),
-            ...challenges
-                .map((challenge) => ChallengeCard(challenge: challenge)),
+            ...challenges.map(
+              (challenge) => ChallengeCard(challenge: challenge),
+            ),
             SizedBox(height: 24),
 
             // Leaderboard
@@ -143,9 +148,10 @@ class _SocialScreenState extends State<SocialScreen> {
                 ],
               ),
               child: Column(
-                children: leaderboard
-                    .map((entry) => LeaderboardListItem(entry: entry))
-                    .toList(),
+                children:
+                    leaderboard
+                        .map((entry) => LeaderboardListItem(entry: entry))
+                        .toList(),
               ),
             ),
             SizedBox(height: 24),
@@ -193,4 +199,51 @@ class _SocialScreenState extends State<SocialScreen> {
   // _buildLeaderboardItem removed
 
   // _buildActivityItem removed
+}
+
+Widget _buildActivityItem(String activity, String time, IconData icon) {
+  return Container(
+    margin: EdgeInsets.only(bottom: 12),
+    padding: EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 5,
+          offset: Offset(0, 1),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Color(0xFF9C27B0).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Icon(icon, color: Color(0xFF9C27B0), size: 20),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                activity,
+                style: TextStyle(fontSize: 14, color: Color(0xFF2D3748)),
+              ),
+              Text(
+                time,
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }
