@@ -254,8 +254,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildMenuOption(String title, IconData icon, VoidCallback onTap,
-      {bool isHighlighted = false}) {
+  Widget _buildMenuOption(
+    String title,
+    IconData icon,
+    VoidCallback onTap, {
+    bool isHighlighted = false,
+  }) {
     return Container(
       margin: EdgeInsets.only(bottom: 8),
       child: ListTile(
@@ -293,45 +297,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // _buildAchievementItem removed
 
   // _buildMenuOption removed
-
-  Widget _buildMenuOption(
-    String title,
-    IconData icon,
-    VoidCallback onTap, {
-    bool isHighlighted = false,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        onTap: onTap,
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color:
-                isHighlighted
-                    ? Color(0xFFFFD700).withOpacity(0.1)
-                    : Color(0xFF1E88E5).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Icon(
-            icon,
-            color: isHighlighted ? Color(0xFFFFD700) : Color(0xFF1E88E5),
-            size: 20,
-          ),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: isHighlighted ? FontWeight.bold : FontWeight.w500,
-            color: isHighlighted ? Color(0xFFFFD700) : Color(0xFF2D3748),
-          ),
-        ),
-        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
-      ),
-    );
-  }
 
   void _showSettingsDialog() {
     final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
