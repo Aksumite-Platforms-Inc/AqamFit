@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/features/explore/widgets/explore_search_bar.dart';
 import 'package:aksumfit/features/explore/widgets/category_tile.dart';
+import 'package:aksumfit/features/explore/widgets/challenge_tile.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -65,6 +66,35 @@ class ExploreScreen extends StatelessWidget {
                     "Challenge Tiles Placeholder",
                     style: GoogleFonts.inter(color: Colors.white70, fontSize: 16),
                   ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24.0, bottom: 12.0),
+                      child: Text(
+                        "Active Challenges",
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    const ChallengeTile(
+                      title: "30-Day Abs Challenge",
+                      description: "Get ready to sculpt your core with daily targeted workouts.",
+                    ),
+                    const SizedBox(height: 16),
+                    const ChallengeTile(
+                      title: "Mindfulness Journey",
+                      description: "Join our 2-week meditation and mindfulness program.",
+                    ),
+                    const SizedBox(height: 16),
+                    const ChallengeTile(
+                      title: "Run Your First 5K",
+                      description: "A guided plan to get you across the finish line.",
+                    ),
+                  ],
                 ),
                 // Add more placeholders as needed
               ],
