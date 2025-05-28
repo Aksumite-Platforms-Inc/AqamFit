@@ -1,40 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+import '.dart_tool/flutter_gen/gen_l10n/app_localizations.dart' as S;
 import 'navigation/app_router.dart'; // Import the app router
+import 'providers/locale_provider.dart';
+import 'theme/app_theme.dart'; // Import the AppTheme
 
 // Removed import 'screens/splash_screen.dart'; - router handles this
 
 void main() {
-  runApp(AxumFitApp());
+  final localeProvider = LocaleProvider(); // Create instance
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => localeProvider,
+      child: AxumFitApp(),
+    ),
+  );
 }
 
 class AxumFitApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp.router(
       // Changed to MaterialApp.router
       title: 'AxumFit',
+      locale: localeProvider.locale, // Pass locale
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF1E88E5)),
-        // scaffoldBackgroundColor: Color(0xFFF8F9FA), // Removed for M3 default
-        appBarTheme: AppBarTheme(
-          // backgroundColor: Colors.white, // Removed for M3 default
-          // foregroundColor: Color(0xFF2D3748), // Removed for M3 default
-          elevation: 0,
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          // backgroundColor: Colors.white, // Removed for M3 default
-          // selectedItemColor: Color(0xFF1E88E5), // Removed for M3 default
-          // unselectedItemColor: Colors.grey[600], // Removed for M3 default
-          type: BottomNavigationBarType.fixed,
-        ),
-        // No explicit textTheme here to inherit M3 defaults first
-      ),
+      theme: AppTheme.lightTheme, // Use the AppTheme
       routerConfig: router, // Set the routerConfig
       // home: SplashScreen(), // Removed home property
+      localizationsDelegates: [
+        S.AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: S.AppLocalizations.supportedLocales,
     );
   }
 }

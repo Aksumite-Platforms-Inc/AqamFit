@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/locale_provider.dart';
+import 'package:aksumfit/.dart_tool/flutter_gen/gen_l10n/app_localizations.dart' as S;
+
 
 import '../widgets/profile_stat_card.dart';
 import '../widgets/profile_achievement_item.dart';
 import '../widgets/profile_menu_option.dart';
+import '../services/api_service.dart';
+import '../repositories/user_repository.dart';
+import '../models/user.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -10,12 +17,49 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String userName = 'Alex Johnson';
-  String userEmail = 'alex.johnson@email.com';
-  int totalWorkouts = 47;
-  double totalDistance = 125.6;
-  int caloriesBurned = 18450;
-  int currentStreak = 7;
+  late final UserRepository _userRepository;
+  bool _isLoading = true;
+
+  String userName = 'Loading...';
+  String userEmail = 'Loading...';
+  String? profileImageUrl;
+  int totalWorkouts = 0; // Default value
+  double totalDistance = 0.0; // Default value
+  int caloriesBurned = 0; // Default value
+  int currentStreak = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _userRepository = UserRepository(apiService: ApiService());
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final user = await _userRepository.getMyProfile();
+    if (user != null && mounted) {
+      setState(() {
+        userName = user.name;
+        userEmail = user.email;
+        profileImageUrl = user.profileImageUrl;
+        currentStreak = user.streakCount;
+        // Mock data for other fields for now, as they are not in the User model from getMyProfile
+        totalWorkouts = 47; // Placeholder
+        totalDistance = 125.6; // Placeholder
+        caloriesBurned = 18450; // Placeholder
+        _isLoading = false;
+      });
+    } else if (mounted) {
+      setState(() {
+        userName = 'Failed to load';
+        userEmail = 'Failed to load';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +77,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
             // Profile Header
             Container(
               width: double.infinity,
@@ -52,14 +98,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.white,
-                    child: Text(
-                      userName[0], // Assuming userName is not empty
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E88E5),
-                      ),
-                    ),
+                    backgroundImage: profileImageUrl != null && profileImageUrl!.isNotEmpty
+                        ? NetworkImage(profileImageUrl!)
+                        : null,
+                    child: (profileImageUrl == null || profileImageUrl!.isEmpty) && userName.isNotEmpty
+                        ? Text(
+                            userName[0].toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1E88E5),
+                            ),
+                          )
+                        : null,
                   ),
                   SizedBox(height: 16),
                   Text(
@@ -206,18 +257,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // _buildMenuOption removed
 
   void _showSettingsDialog() {
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Settings'),
-          content: Text('Settings options will be available soon!'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Close'),
-            ),
-          ],
+        return StatefulBuilder( // Add StatefulBuilder
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(S.AppLocalizations.of(context)?.helloWorld ?? 'Settings'), // Example of using localized string
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  RadioListTile<Locale>(
+                    title: const Text('English'),
+                    value: const Locale('en'),
+                    groupValue: localeProvider.locale,
+                    onChanged: (Locale? value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        setState(() {}); // Update dialog state
+                      }
+                    },
+                  ),
+                  RadioListTile<Locale>(
+                    title: const Text('Amharic'),
+                    value: const Locale('am'),
+                    groupValue: localeProvider.locale,
+                    onChanged: (Locale? value) {
+                      if (value != null) {
+                        localeProvider.setLocale(value);
+                        setState(() {}); // Update dialog state
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Close'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
