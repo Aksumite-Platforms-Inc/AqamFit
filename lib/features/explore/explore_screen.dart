@@ -60,6 +60,12 @@ class ExploreScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    "Challenge Tiles Placeholder",
+                    style: GoogleFonts.inter(color: Colors.white70, fontSize: 16),
+                  ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
