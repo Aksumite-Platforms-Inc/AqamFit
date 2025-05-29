@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:axum_app/features/home/home_screen.dart';
+import 'package:axum_app/features/explore/explore_screen.dart';
+import 'package:axum_app/features/workout/workout_screen.dart';
+import 'package:axum_app/features/progress/progress_screen.dart';
+import 'package:axum_app/features/profile/profile_screen.dart';
 
-import 'home_screen.dart';
-import 'workout_screen.dart';
-import 'nutrition_screen.dart';
-import 'social_screen.dart';
-import 'profile_screen.dart';
+class MainScaffold extends StatefulWidget {
+  const MainScaffold({super.key});
 
-class MainScreen extends StatefulWidget {
   @override
-  _MainScreenState createState() => _MainScreenState();
+  _MainScaffoldState createState() => _MainScaffoldState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
   late PageController _pageController;
 
@@ -37,11 +38,11 @@ class _MainScreenState extends State<MainScreen> {
             _currentIndex = index;
           });
         },
-        children: [
+        children: const [
           HomeScreen(),
+          ExploreScreen(),
           WorkoutScreen(),
-          NutritionScreen(),
-          SocialScreen(),
+          ProgressScreen(),
           ProfileScreen(),
         ],
       ),
@@ -57,18 +58,20 @@ class _MainScreenState extends State<MainScreen> {
             curve: Curves.easeInOut,
           );
         },
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
+            icon: Icon(Icons.explore_outlined),
+            label: 'Explore',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center_outlined),
             label: 'Workout',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant),
-            label: 'Nutrition',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Social'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+              icon: Icon(Icons.show_chart_outlined), label: 'Progress'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
       ),
     );

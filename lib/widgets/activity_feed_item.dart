@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart'; // Import GoogleFonts
 
 class ActivityFeedItem extends StatelessWidget {
   final String activity;
@@ -14,17 +15,20 @@ class ActivityFeedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme colorScheme = theme.colorScheme;
+
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        color: colorScheme.surfaceVariant, // Use theme color
+        borderRadius: BorderRadius.circular(12.0), // Slightly more rounded
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: theme.shadowColor.withOpacity(0.05), // Use theme shadow color
             blurRadius: 5,
-            offset: Offset(0, 1),
+            offset: const Offset(0, 2), // Adjusted offset
           ),
         ],
       ),
@@ -34,25 +38,35 @@ class ActivityFeedItem extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Color(0xFF9C27B0)
-                  .withOpacity(0.1), // Example color from SocialScreen
+              color: colorScheme.tertiary.withOpacity(0.1), // Use theme color (tertiary)
               borderRadius: BorderRadius.circular(20),
             ),
-            child:
-                Icon(icon, color: Color(0xFF9C27B0), size: 20), // Example color
+            child: Icon(
+              icon,
+              color: colorScheme.tertiary, // Use theme color (tertiary)
+              size: 20,
+            ),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   activity,
-                  style: TextStyle(fontSize: 14, color: Color(0xFF2D3748)),
+                  style: GoogleFonts.inter( // Use GoogleFonts
+                    fontSize: 14,
+                    color: colorScheme.onSurfaceVariant, // Use theme color
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
+                const SizedBox(height: 2), // Add a small space
                 Text(
                   time,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: GoogleFonts.inter( // Use GoogleFonts
+                    fontSize: 12,
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.7), // Use theme color
+                  ),
                 ),
               ],
             ),
