@@ -34,7 +34,10 @@ class ExploreScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0, top: 8.0), // Added top padding similar to original placeholder
+                      padding: const EdgeInsets.only(
+                          bottom: 12.0,
+                          top:
+                              8.0), // Added top padding similar to original placeholder
                       child: Text(
                         "Categories",
                         style: GoogleFonts.inter(
@@ -52,10 +55,16 @@ class ExploreScreen extends StatelessWidget {
                       crossAxisSpacing: 16.0,
                       childAspectRatio: 1.2,
                       children: const [
-                        CategoryTile(categoryName: "Strength", icon: Icons.fitness_center),
-                        CategoryTile(categoryName: "Cardio", icon: Icons.directions_run),
-                        CategoryTile(categoryName: "Yoga", icon: Icons.self_improvement),
-                        CategoryTile(categoryName: "Flexibility", icon: Icons.accessibility_new),
+                        CategoryTile(
+                            categoryName: "Strength",
+                            icon: Icons.fitness_center),
+                        CategoryTile(
+                            categoryName: "Cardio", icon: Icons.directions_run),
+                        CategoryTile(
+                            categoryName: "Yoga", icon: Icons.self_improvement),
+                        CategoryTile(
+                            categoryName: "Flexibility",
+                            icon: Icons.accessibility_new),
                       ],
                     ),
                   ],
@@ -64,8 +73,10 @@ class ExploreScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Text(
                     "Challenge Tiles Placeholder",
-                    style: GoogleFonts.inter(color: Colors.white70, fontSize: 16),
+                    style:
+                        GoogleFonts.inter(color: Colors.white70, fontSize: 16),
                   ),
+                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -82,17 +93,20 @@ class ExploreScreen extends StatelessWidget {
                     ),
                     const ChallengeTile(
                       title: "30-Day Abs Challenge",
-                      description: "Get ready to sculpt your core with daily targeted workouts.",
+                      description:
+                          "Get ready to sculpt your core with daily targeted workouts.",
                     ),
                     const SizedBox(height: 16),
                     const ChallengeTile(
                       title: "Mindfulness Journey",
-                      description: "Join our 2-week meditation and mindfulness program.",
+                      description:
+                          "Join our 2-week meditation and mindfulness program.",
                     ),
                     const SizedBox(height: 16),
                     const ChallengeTile(
                       title: "Run Your First 5K",
-                      description: "A guided plan to get you across the finish line.",
+                      description:
+                          "A guided plan to get you across the finish line.",
                     ),
                   ],
                 ),

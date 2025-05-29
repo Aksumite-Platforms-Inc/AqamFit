@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart'; // Import GoRouter
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,37 +51,37 @@ class AxumFitApp extends StatelessWidget {
       // Typography
       textTheme: GoogleFonts.interTextTheme(
         ThemeData.dark().textTheme.copyWith(
-          displayLarge: GoogleFonts.inter(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-          ),
-          displayMedium: GoogleFonts.inter(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-          headlineLarge: GoogleFonts.inter(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-          headlineMedium: GoogleFonts.inter(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-          bodyLarge: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-            color: Colors.white70,
-          ),
-          bodyMedium: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Colors.white60,
-          ),
-        ),
+              displayLarge: GoogleFonts.inter(
+                fontSize: 32,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+              displayMedium: GoogleFonts.inter(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+              headlineLarge: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+              headlineMedium: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+              bodyLarge: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Colors.white70,
+              ),
+              bodyMedium: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.white60,
+              ),
+            ),
       ),
 
       // App Bar
@@ -111,7 +112,8 @@ class AxumFitApp extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 4,
           shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           textStyle: GoogleFonts.inter(
             fontSize: 16,
@@ -328,7 +330,11 @@ class _SplashScreenState extends State<SplashScreen>
                     children: [
                       ShaderMask(
                         shaderCallback: (bounds) => const LinearGradient(
-                          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFF06B6D4)],
+                          colors: [
+                            Color(0xFF6366F1),
+                            Color(0xFF8B5CF6),
+                            Color(0xFF06B6D4)
+                          ],
                         ).createShader(bounds),
                         child: Text(
                           'AxumFit',
@@ -339,9 +345,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 8),
-
                       Text(
                         'AI Powered Fitness',
                         style: GoogleFonts.inter(
@@ -442,9 +446,7 @@ class OnboardingScreen extends StatelessWidget {
                           color: Colors.white,
                         ),
                       ),
-
                       const SizedBox(height: 40),
-
                       Text(
                         'Welcome to the Future\nof Fitness',
                         textAlign: TextAlign.center,
@@ -455,9 +457,7 @@ class OnboardingScreen extends StatelessWidget {
                           height: 1.2,
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
                       Text(
                         'AI-powered workouts, smart nutrition tracking,\nand social gamification that adapts to your goals.',
                         textAlign: TextAlign.center,
@@ -480,6 +480,7 @@ class OnboardingScreen extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () {
                           // Navigate to sign up
+                          context.go('/onboarding');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF6366F1),
@@ -499,15 +500,14 @@ class OnboardingScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
                     SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: OutlinedButton(
                         onPressed: () {
                           // Navigate to sign in
+                          context.go('/main');
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white,
