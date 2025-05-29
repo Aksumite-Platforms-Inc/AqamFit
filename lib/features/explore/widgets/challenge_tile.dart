@@ -4,38 +4,43 @@ import 'package:google_fonts/google_fonts.dart';
 class ChallengeTile extends StatelessWidget {
   final String title;
   final String description;
+  final String? participationStats; // Added optional parameter
 
   const ChallengeTile({
     super.key,
     required this.title,
     required this.description,
+    this.participationStats, // Added to constructor
   });
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context); // Get theme
+    final ColorScheme colorScheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () {
         // TODO: Implement challenge tap functionality
       },
       child: Card(
-        color: const Color(0xFF1E293B),
+        // Removed explicit color, will use theme's cardColor or surfaceVariant
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
         elevation: 2.0,
-        // Clip the child container to respect the card's rounded corners
-        clipBehavior: Clip.antiAlias, 
+        clipBehavior: Clip.antiAlias,
         child: Container(
-          height: 120,
+          // Removed fixed height: 120
           decoration: BoxDecoration(
-            // The card's color will be the background. 
-            // If an image is added, it would go here.
-            borderRadius: BorderRadius.circular(12.0), 
+            // Consider using a gradient or subtle pattern if desired
+            color: colorScheme.surfaceVariant, // Using theme color
+            borderRadius: BorderRadius.circular(12.0),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              // mainAxisAlignment: MainAxisAlignment.end, // Adjusted to allow for dynamic height
+              mainAxisSize: MainAxisSize.min, // Allow column to determine height
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -43,7 +48,7 @@ class ChallengeTile extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colorScheme.onSurfaceVariant, // Use theme color
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -51,11 +56,30 @@ class ChallengeTile extends StatelessWidget {
                   description,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: colorScheme.onSurfaceVariant.withOpacity(0.8), // Use theme color
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 8), // Added SizedBox
+                if (participationStats != null && participationStats!.isNotEmpty)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.people_alt_outlined,
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        participationStats!,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),

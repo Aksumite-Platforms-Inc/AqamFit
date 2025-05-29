@@ -169,6 +169,18 @@ class AxumFitApp extends StatelessWidget {
         color: Color(0xFF334155),
         thickness: 1,
       ),
+
+      // Chip Theme
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xFF334155), // surfaceVariant or similar
+        selectedColor: const Color(0xFF6366F1), // primary
+        labelStyle: GoogleFonts.inter(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: GoogleFonts.inter(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600), // For selected chip
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        side: BorderSide.none, // No border for a cleaner look
+        showCheckmark: false, // Hide the default checkmark
+      ),
     );
   }
 }

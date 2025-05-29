@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:axum_app/features/home/home_screen.dart';
 import 'package:axum_app/features/explore/explore_screen.dart';
 import 'package:axum_app/features/workout/workout_screen.dart';
-import 'package:axum_app/features/progress/progress_screen.dart';
+import 'package:axum_app/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
+import 'package:axum_app/features/nutrition/presentation/screens/nutrition_screen.dart';
+import 'package:axum_app/features/social/presentation/screens/social_screen.dart';
 import 'package:axum_app/features/profile/profile_screen.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -42,7 +44,9 @@ class _MainScaffoldState extends State<MainScaffold> {
           HomeScreen(),
           ExploreScreen(),
           WorkoutScreen(),
-          ProgressScreen(),
+          ProgressScreen(),  // Added ProgressScreen
+          NutritionScreen(),
+          SocialScreen(),
           ProfileScreen(),
         ],
       ),
@@ -69,7 +73,17 @@ class _MainScaffoldState extends State<MainScaffold> {
             label: 'Workout',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.show_chart_outlined), label: 'Progress'),
+            icon: Icon(Icons.show_chart_outlined), // Progress Icon
+            label: 'Progress',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_menu_outlined),
+            label: 'Nutrition',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_alt_outlined),
+            label: 'Social',
+          ),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
