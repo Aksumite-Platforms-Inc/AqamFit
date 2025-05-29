@@ -76,7 +76,10 @@ class ExploreScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0, top: 8.0), // Added top padding similar to original placeholder
+                      padding: const EdgeInsets.only(
+                          bottom: 12.0,
+                          top:
+                              8.0), // Added top padding similar to original placeholder
                       child: Text(
                         "Categories",
                         style: GoogleFonts.inter(
@@ -103,7 +106,14 @@ class ExploreScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                // Removed Padding with "Challenge Tiles Placeholder"
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    "Challenge Tiles Placeholder",
+                    style:
+                        GoogleFonts.inter(color: Colors.white70, fontSize: 16),
+                  ),
+                ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
