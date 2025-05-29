@@ -18,33 +18,47 @@ class CategoryTile extends StatelessWidget {
         // TODO: Implement category tap functionality
       },
       child: Card(
-        color: const Color(0xFF1E293B),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
         elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 40,
-                color: const Color(0xFF6366F1),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                categoryName,
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+        clipBehavior: Clip.antiAlias, // Ensure gradient respects card's shape
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0), // Match Card's shape
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).colorScheme.surfaceVariant,
+                Theme.of(context).colorScheme.surface,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min, // Changed to mainAxisSize.min
+              mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 40,
+                  color: Theme.of(context).colorScheme.primary, // Use theme color for icon
                 ),
-                textAlign: TextAlign.center, // Ensure text is centered if it wraps
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  categoryName,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant, // Use theme color for text
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:go_router/go_router.dart'; // Import GoRouter
+import 'package:axum_app/navigation/app_router.dart';
+// =======
+// import 'package:go_router/go_router.dart'; // Import GoRouter
+// >>>>>>> main
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,11 +25,11 @@ class AxumFitApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'AxumFit - AI Powered Fitness',
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(),
-      home: const SplashScreen(),
+      routerConfig: router,
     );
   }
 
@@ -170,367 +173,359 @@ class AxumFitApp extends StatelessWidget {
         color: Color(0xFF334155),
         thickness: 1,
       ),
-    );
-  }
-}
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+      // Chip Theme
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0xFF334155), // surfaceVariant or similar
+        selectedColor: const Color(0xFF6366F1), // primary
+        labelStyle: GoogleFonts.inter(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: GoogleFonts.inter(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600), // For selected chip
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        side: BorderSide.none, // No border for a cleaner look
+        showCheckmark: false, // Hide the default checkmark
+// =======
+//   @override
+//   void initState() {
+//     super.initState();
+//     _initializeAnimations();
+//     _startAnimationSequence();
+//   }
 
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
+//   void _initializeAnimations() {
+//     _fadeController = AnimationController(
+//       duration: const Duration(milliseconds: 1500),
+//       vsync: this,
+//     );
 
-class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _scaleController;
-  late AnimationController _slideController;
+//     _scaleController = AnimationController(
+//       duration: const Duration(milliseconds: 1200),
+//       vsync: this,
+//     );
 
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-  late Animation<Offset> _slideAnimation;
+//     _slideController = AnimationController(
+//       duration: const Duration(milliseconds: 1000),
+//       vsync: this,
+//     );
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeAnimations();
-    _startAnimationSequence();
-  }
+//     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+//       CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
+//     );
 
-  void _initializeAnimations() {
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
+//     _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+//       CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
+//     );
 
-    _scaleController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
+//     _slideAnimation = Tween<Offset>(
+//       begin: const Offset(0, 0.3),
+//       end: Offset.zero,
+//     ).animate(
+//       CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
+//     );
+//   }
 
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
+//   void _startAnimationSequence() async {
+//     await Future.delayed(const Duration(milliseconds: 300));
+//     _fadeController.forward();
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut),
-    );
+//     await Future.delayed(const Duration(milliseconds: 200));
+//     _scaleController.forward();
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _scaleController, curve: Curves.elasticOut),
-    );
+//     await Future.delayed(const Duration(milliseconds: 300));
+//     _slideController.forward();
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
-    );
-  }
+//     // Navigate to next screen after animations
+//     await Future.delayed(const Duration(milliseconds: 2000));
+//     if (mounted) {
+//       Navigator.pushReplacement(
+//         context,
+//         PageRouteBuilder(
+//           pageBuilder: (context, animation, secondaryAnimation) =>
+//               const OnboardingScreen(),
+//           transitionsBuilder: (context, animation, secondaryAnimation, child) {
+//             return FadeTransition(opacity: animation, child: child);
+//           },
+//           transitionDuration: const Duration(milliseconds: 800),
+//         ),
+//       );
+//     }
+//   }
 
-  void _startAnimationSequence() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _fadeController.forward();
+//   @override
+//   void dispose() {
+//     _fadeController.dispose();
+//     _scaleController.dispose();
+//     _slideController.dispose();
+//     super.dispose();
+//   }
 
-    await Future.delayed(const Duration(milliseconds: 200));
-    _scaleController.forward();
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Container(
+//         decoration: const BoxDecoration(
+//           gradient: LinearGradient(
+//             begin: Alignment.topLeft,
+//             end: Alignment.bottomRight,
+//             colors: [
+//               Color(0xFF0F172A),
+//               Color(0xFF1E293B),
+//               Color(0xFF334155),
+//             ],
+//           ),
+//         ),
+//         child: Center(
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               // Logo Animation
+//               AnimatedBuilder(
+//                 animation: Listenable.merge([_fadeAnimation, _scaleAnimation]),
+//                 builder: (context, child) {
+//                   return FadeTransition(
+//                     opacity: _fadeAnimation,
+//                     child: ScaleTransition(
+//                       scale: _scaleAnimation,
+//                       child: Container(
+//                         width: 120,
+//                         height: 120,
+//                         decoration: const BoxDecoration(
+//                           gradient: LinearGradient(
+//                             colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+//                           ),
+//                           shape: BoxShape.circle,
+//                           boxShadow: [
+//                             BoxShadow(
+//                               color: Color(0xFF6366F1),
+//                               blurRadius: 30,
+//                               spreadRadius: 5,
+//                             ),
+//                           ],
+//                         ),
+//                         child: const Icon(
+//                           Icons.fitness_center,
+//                           size: 60,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                     ),
+//                   );
+//                 },
+//               ),
 
-    await Future.delayed(const Duration(milliseconds: 300));
-    _slideController.forward();
+//               const SizedBox(height: 32),
 
-    // Navigate to next screen after animations
-    await Future.delayed(const Duration(milliseconds: 2000));
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const OnboardingScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 800),
-        ),
-      );
-    }
-  }
+//               // App Name Animation
+//               SlideTransition(
+//                 position: _slideAnimation,
+//                 child: FadeTransition(
+//                   opacity: _fadeAnimation,
+//                   child: Column(
+//                     children: [
+//                       ShaderMask(
+//                         shaderCallback: (bounds) => const LinearGradient(
+//                           colors: [
+//                             Color(0xFF6366F1),
+//                             Color(0xFF8B5CF6),
+//                             Color(0xFF06B6D4)
+//                           ],
+//                         ).createShader(bounds),
+//                         child: Text(
+//                           'AxumFit',
+//                           style: GoogleFonts.inter(
+//                             fontSize: 48,
+//                             fontWeight: FontWeight.w900,
+//                             color: Colors.white,
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 8),
+//                       Text(
+//                         'AI Powered Fitness',
+//                         style: GoogleFonts.inter(
+//                           fontSize: 18,
+//                           fontWeight: FontWeight.w400,
+//                           color: Colors.white70,
+//                           letterSpacing: 2,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
 
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    _scaleController.dispose();
-    _slideController.dispose();
-    super.dispose();
-  }
+//               const SizedBox(height: 60),
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0F172A),
-              Color(0xFF1E293B),
-              Color(0xFF334155),
-            ],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo Animation
-              AnimatedBuilder(
-                animation: Listenable.merge([_fadeAnimation, _scaleAnimation]),
-                builder: (context, child) {
-                  return FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                          ),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xFF6366F1),
-                              blurRadius: 30,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.fitness_center,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+//               // Loading Animation
+//               FadeTransition(
+//                 opacity: _fadeAnimation,
+//                 child: Column(
+//                   children: [
+//                     SizedBox(
+//                       width: 40,
+//                       height: 40,
+//                       child: CircularProgressIndicator(
+//                         strokeWidth: 3,
+//                         valueColor: AlwaysStoppedAnimation<Color>(
+//                           Colors.white.withOpacity(0.7),
+//                         ),
+//                       ),
+//                     ),
+//                     const SizedBox(height: 16),
+//                     Text(
+//                       'Preparing your fitness journey...',
+//                       style: GoogleFonts.inter(
+//                         fontSize: 14,
+//                         color: Colors.white54,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-              const SizedBox(height: 32),
+// class OnboardingScreen extends StatelessWidget {
+//   const OnboardingScreen({super.key});
 
-              // App Name Animation
-              SlideTransition(
-                position: _slideAnimation,
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Column(
-                    children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [
-                            Color(0xFF6366F1),
-                            Color(0xFF8B5CF6),
-                            Color(0xFF06B6D4)
-                          ],
-                        ).createShader(bounds),
-                        child: Text(
-                          'AxumFit',
-                          style: GoogleFonts.inter(
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'AI Powered Fitness',
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white70,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Container(
+//         decoration: const BoxDecoration(
+//           gradient: LinearGradient(
+//             begin: Alignment.topLeft,
+//             end: Alignment.bottomRight,
+//             colors: [
+//               Color(0xFF0F172A),
+//               Color(0xFF1E293B),
+//             ],
+//           ),
+//         ),
+//         child: SafeArea(
+//           child: Padding(
+//             padding: const EdgeInsets.all(24.0),
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 // Hero Content
+//                 Expanded(
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       Container(
+//                         width: 200,
+//                         height: 200,
+//                         decoration: BoxDecoration(
+//                           gradient: const LinearGradient(
+//                             colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+//                           ),
+//                           borderRadius: BorderRadius.circular(100),
+//                           boxShadow: [
+//                             BoxShadow(
+//                               color: const Color(0xFF6366F1).withOpacity(0.3),
+//                               blurRadius: 40,
+//                               spreadRadius: 10,
+//                             ),
+//                           ],
+//                         ),
+//                         child: const Icon(
+//                           Icons.psychology,
+//                           size: 100,
+//                           color: Colors.white,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 40),
+//                       Text(
+//                         'Welcome to the Future\nof Fitness',
+//                         textAlign: TextAlign.center,
+//                         style: GoogleFonts.inter(
+//                           fontSize: 32,
+//                           fontWeight: FontWeight.w800,
+//                           color: Colors.white,
+//                           height: 1.2,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 16),
+//                       Text(
+//                         'AI-powered workouts, smart nutrition tracking,\nand social gamification that adapts to your goals.',
+//                         textAlign: TextAlign.center,
+//                         style: GoogleFonts.inter(
+//                           fontSize: 16,
+//                           color: Colors.white70,
+//                           height: 1.5,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
 
-              const SizedBox(height: 60),
-
-              // Loading Animation
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 3,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white.withOpacity(0.7),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Preparing your fitness journey...',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Colors.white54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0F172A),
-              Color(0xFF1E293B),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Hero Content
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 200,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                          ),
-                          borderRadius: BorderRadius.circular(100),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF6366F1).withOpacity(0.3),
-                              blurRadius: 40,
-                              spreadRadius: 10,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.psychology,
-                          size: 100,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                      Text(
-                        'Welcome to the Future\nof Fitness',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'AI-powered workouts, smart nutrition tracking,\nand social gamification that adapts to your goals.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          color: Colors.white70,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Action Buttons
-                Column(
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Navigate to sign up
-                          context.go('/onboarding');
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6366F1),
-                          foregroundColor: Colors.white,
-                          elevation: 8,
-                          shadowColor: const Color(0xFF6366F1).withOpacity(0.4),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          'Start Your Journey',
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Navigate to sign in
-                          context.go('/main');
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.white30),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          'I Already Have an Account',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+//                 // Action Buttons
+//                 Column(
+//                   children: [
+//                     SizedBox(
+//                       width: double.infinity,
+//                       height: 56,
+//                       child: ElevatedButton(
+//                         onPressed: () {
+//                           // Navigate to sign up
+//                           context.go('/onboarding');
+//                         },
+//                         style: ElevatedButton.styleFrom(
+//                           backgroundColor: const Color(0xFF6366F1),
+//                           foregroundColor: Colors.white,
+//                           elevation: 8,
+//                           shadowColor: const Color(0xFF6366F1).withOpacity(0.4),
+//                           shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(16),
+//                           ),
+//                         ),
+//                         child: Text(
+//                           'Start Your Journey',
+//                           style: GoogleFonts.inter(
+//                             fontSize: 18,
+//                             fontWeight: FontWeight.w600,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     const SizedBox(height: 16),
+//                     SizedBox(
+//                       width: double.infinity,
+//                       height: 56,
+//                       child: OutlinedButton(
+//                         onPressed: () {
+//                           // Navigate to sign in
+//                           context.go('/main');
+//                         },
+//                         style: OutlinedButton.styleFrom(
+//                           foregroundColor: Colors.white,
+//                           side: const BorderSide(color: Colors.white30),
+//                           shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(16),
+//                           ),
+//                         ),
+//                         child: Text(
+//                           'I Already Have an Account',
+//                           style: GoogleFonts.inter(
+//                             fontSize: 16,
+//                             fontWeight: FontWeight.w500,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+// >>>>>>> main
       ),
     );
   }
