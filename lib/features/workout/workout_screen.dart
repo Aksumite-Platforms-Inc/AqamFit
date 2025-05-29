@@ -65,9 +65,41 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
         leading: IconButton( // Use leading for back/close button if appropriate
           icon: const Icon(Icons.close),
-          onPressed: () {
-            // TODO: Confirm and end workout, navigate to summary
-            context.go('/main'); // For now, just navigates back to main
+          onPressed: () async { // Made onPressed async for showDialog
+            final bool? shouldFinish = await showDialog<bool>(
+              context: context,
+              builder: (BuildContext dialogContext) {
+                return AlertDialog(
+                  title: Text(
+                    "Finish Workout?",
+                    style: GoogleFonts.inter(color: theme.colorScheme.onSurface),
+                  ),
+                  content: Text(
+                    "Are you sure you want to end your workout?",
+                    style: GoogleFonts.inter(color: theme.colorScheme.onSurface.withOpacity(0.8)),
+                  ),
+                  backgroundColor: theme.colorScheme.surfaceVariant, // Themed background
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)),
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(false); // Pops dialog, returns false
+                      },
+                    ),
+                    TextButton(
+                      child: Text("Finish", style: GoogleFonts.inter(color: theme.colorScheme.error)), // Using error color for finish
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop(true); // Pops dialog, returns true
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+
+            if (shouldFinish == true && context.mounted) { // Check if context is still mounted
+              context.go('/workout-summary');
+            }
           },
         ),
       ),

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CategoryTile extends StatelessWidget {
-  final String categoryName;
+class AxumfitCategoryCard extends StatelessWidget { // Renamed class
+  final String title; // Renamed categoryName to title
   final IconData icon;
+  final VoidCallback onTap; // Added onTap parameter
 
-  const CategoryTile({
+  const AxumfitCategoryCard({
     super.key,
-    required this.categoryName,
+    required this.title, // Updated parameter name
     required this.icon,
+    required this.onTap, // Made onTap required
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // TODO: Implement category tap functionality
-      },
+      onTap: onTap, // Use the passed onTap callback
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
@@ -49,7 +49,7 @@ class CategoryTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  categoryName,
+                  title, // Use title parameter
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

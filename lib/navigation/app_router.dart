@@ -8,8 +8,10 @@ import '../features/nutrition/presentation/screens/log_meal_screen.dart';
 import '../features/workout/workout_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/explore/presentation/screens/exercise_library_screen.dart';
-import '../features/nutrition/presentation/screens/nutrition_screen.dart'; // Import NutritionScreen
-import '../features/social/presentation/screens/social_screen.dart'; // Import SocialScreen
+import '../features/nutrition/presentation/screens/nutrition_screen.dart';
+import '../features/social/presentation/screens/social_screen.dart';
+import '../features/workout/presentation/screens/workout_summary_screen.dart';
+import '../features/profile/presentation/screens/settings_screen.dart'; // Import SettingsScreen
 
 final GoRouter router = GoRouter(
   initialLocation: '/splash',
@@ -53,6 +55,14 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/social',
       builder: (context, state) => const SocialScreen(),
+    ),
+    GoRoute(
+      path: '/workout-summary',
+      builder: (context, state) => const WorkoutSummaryScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => const SettingsScreen(),
     ),
   ],
 );
