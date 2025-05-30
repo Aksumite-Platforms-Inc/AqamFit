@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart'; // Added for CupertinoPage
 import 'package:flutter/material.dart'; // For Widget type, if needed, and for context
 import 'package:go_router/go_router.dart';
 import '../features/onboarding/presentation/splash_screen.dart';
@@ -18,51 +19,87 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(
       path: '/splash',
-      builder: (context, state) => SplashScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: SplashScreen(),
+      ),
     ),
     GoRoute(
       path: '/onboarding',
-      builder: (context, state) => OnboardingScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: OnboardingScreen(),
+      ),
     ),
     GoRoute(
       path: '/main',
-      builder: (context, state) => const MainScaffold(), // Updated builder
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const MainScaffold(),
+      ),
     ),
     GoRoute(
       path: '/notifications',
-      builder: (context, state) => const NotificationScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const NotificationScreen(),
+      ),
     ),
     GoRoute(
       path: '/log-meal',
-      builder: (context, state) => const LogMealScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const LogMealScreen(),
+      ),
     ),
     GoRoute(
       path: '/workout',
-      builder: (context, state) => const WorkoutScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const WorkoutScreen(),
+      ),
     ),
     GoRoute(
       path: '/progress',
-      builder: (context, state) => const ProgressScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const ProgressScreen(),
+      ),
     ),
     GoRoute(
       path: '/exercise-library',
-      builder: (context, state) => const ExerciseLibraryScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const ExerciseLibraryScreen(),
+      ),
     ),
     GoRoute(
       path: '/nutrition',
-      builder: (context, state) => const NutritionScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const NutritionScreen(),
+      ),
     ),
     GoRoute(
       path: '/social',
-      builder: (context, state) => const SocialScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const SocialScreen(),
+      ),
     ),
     GoRoute(
       path: '/workout-summary',
-      builder: (context, state) => const WorkoutSummaryScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const WorkoutSummaryScreen(),
+      ),
     ),
     GoRoute(
       path: '/settings',
-      builder: (context, state) => const SettingsScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const SettingsScreen(),
+      ),
     ),
   ],
 );
