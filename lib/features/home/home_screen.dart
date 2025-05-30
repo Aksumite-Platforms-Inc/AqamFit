@@ -114,20 +114,20 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const QuickActionTile(
+                  QuickActionTile(
                     icon: CupertinoIcons.sportscourt,
                     label: "Start Workout",
                     onTapRoute: '/workout', // Added route
                   ),
-                  const QuickActionTile(
-                    icon: CupertinoIcons.food_fork_drink,
+                  QuickActionTile(
+                    icon: CupertinoIcons.cart, // Replaced invalid food_fork_drink with cart
                     label: "Log Meal",
                     onTapRoute: '/log-meal', // Added route
                   ),
-                  const QuickActionTile(
+                  QuickActionTile(
                     icon: CupertinoIcons.chart_bar_square_fill,
                     label: "View Progress",
                     onTapRoute: '/progress', // Added route

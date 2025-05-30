@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:axum_app/features/home/home_screen.dart';
-import 'package:axum_app/features/explore/explore_screen.dart';
-import 'package:axum_app/features/workout/workout_screen.dart';
-import 'package:axum_app/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
-import 'package:axum_app/features/nutrition/presentation/screens/nutrition_screen.dart';
-import 'package:axum_app/features/social/presentation/screens/social_screen.dart';
-import 'package:axum_app/features/profile/profile_screen.dart';
+import 'package:aksumfit/features/home/home_screen.dart';
+import 'package:aksumfit/features/explore/explore_screen.dart';
+import 'package:aksumfit/features/workout/workout_screen.dart';
+import 'package:aksumfit/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
+import 'package:aksumfit/features/nutrition/presentation/screens/nutrition_screen.dart';
+import 'package:aksumfit/features/social/presentation/screens/social_screen.dart';
+import 'package:aksumfit/features/profile/profile_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});

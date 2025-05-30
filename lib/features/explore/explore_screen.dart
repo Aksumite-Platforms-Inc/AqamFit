@@ -98,7 +98,7 @@ class ExploreScreen extends StatelessWidget {
                         AxumfitCategoryCard(title: "Strength", icon: CupertinoIcons.flame_fill, onTap: () { print("Category card tapped: Strength"); }),
                         AxumfitCategoryCard(title: "Cardio", icon: CupertinoIcons.tuningfork, onTap: () { print("Category card tapped: Cardio"); }),
                         AxumfitCategoryCard(title: "Yoga", icon: CupertinoIcons.loop_thick, onTap: () { print("Category card tapped: Yoga"); }),
-                        AxumfitCategoryCard(title: "Flexibility", icon: CupertinoIcons.stretch_out_figure, onTap: () { print("Category card tapped: Flexibility"); }),
+                        AxumfitCategoryCard(title: "Flexibility", icon: CupertinoIcons.person_2, onTap: () { print("Category card tapped: Flexibility"); }),
                         AxumfitCategoryCard(title: "HIIT", icon: CupertinoIcons.timer_fill, onTap: () { print("Category card tapped: HIIT"); }),
                       ],
                     ),

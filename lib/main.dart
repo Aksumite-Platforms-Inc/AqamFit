@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:axum_app/navigation/app_router.dart';
+import 'package:aksumfit/navigation/app_router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

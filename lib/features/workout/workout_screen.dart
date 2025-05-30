@@ -16,7 +16,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   int _currentExerciseIndex = 0;
   // Updated _exercises data
   final List<Map<String, dynamic>> _exercises = [
-    {'name': 'Jumping Jacks', 'duration': '30s', 'imagePlaceholder': CupertinoIcons.figure_walk},
+    {'name': 'Jumping Jacks', 'duration': '30s', 'imagePlaceholder': CupertinoIcons.person_2_fill},
     {'name': 'Push Ups', 'reps': '10-12', 'sets': '3', 'imagePlaceholder': CupertinoIcons.flame_fill},
     {'name': 'Squats', 'reps': '12-15', 'sets': '3', 'imagePlaceholder': CupertinoIcons.person_alt},
     {'name': 'Plank', 'duration': '60s', 'imagePlaceholder': CupertinoIcons.loop_thick},
