@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/features/explore/widgets/explore_search_bar.dart';
-import 'package:aksumfit/features/explore/widgets/category_tile.dart';
+import 'package:aksumfit/shared/widgets/axumfit_category_card.dart'; // Updated import
 import 'package:aksumfit/features/explore/widgets/challenge_tile.dart';
 import 'package:aksumfit/features/explore/widgets/featured_trainer_card.dart';
 import 'package:go_router/go_router.dart'; // Ensure GoRouter is imported
@@ -76,10 +76,7 @@ class ExploreScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(
-                          bottom: 12.0,
-                          top:
-                              8.0), // Added top padding similar to original placeholder
+                      padding: const EdgeInsets.only(bottom: 12.0, top: 8.0), // Added top padding similar to original placeholder
                       child: Text(
                         "Categories",
                         style: GoogleFonts.inter(
@@ -96,24 +93,17 @@ class ExploreScreen extends StatelessWidget {
                       mainAxisSpacing: 16.0,
                       crossAxisSpacing: 16.0,
                       childAspectRatio: 1.2, // Adjust as needed for 5 items or make dynamic
-                      children: const [
-                        CategoryTile(categoryName: "Strength", icon: Icons.fitness_center),
-                        CategoryTile(categoryName: "Cardio", icon: Icons.directions_run),
-                        CategoryTile(categoryName: "Yoga", icon: Icons.self_improvement),
-                        CategoryTile(categoryName: "Flexibility", icon: Icons.accessibility_new),
-                        CategoryTile(categoryName: "HIIT", icon: Icons.timer_outlined), // Added HIIT
+                      children: [
+                        AxumfitCategoryCard(title: "Strength", icon: Icons.fitness_center, onTap: () { print("Category card tapped: Strength"); }),
+                        AxumfitCategoryCard(title: "Cardio", icon: Icons.directions_run, onTap: () { print("Category card tapped: Cardio"); }),
+                        AxumfitCategoryCard(title: "Yoga", icon: Icons.self_improvement, onTap: () { print("Category card tapped: Yoga"); }),
+                        AxumfitCategoryCard(title: "Flexibility", icon: Icons.accessibility_new, onTap: () { print("Category card tapped: Flexibility"); }),
+                        AxumfitCategoryCard(title: "HIIT", icon: Icons.timer_outlined, onTap: () { print("Category card tapped: HIIT"); }),
                       ],
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Text(
-                    "Challenge Tiles Placeholder",
-                    style:
-                        GoogleFonts.inter(color: Colors.white70, fontSize: 16),
-                  ),
-                ),
+                // Removed Padding with "Challenge Tiles Placeholder"
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
