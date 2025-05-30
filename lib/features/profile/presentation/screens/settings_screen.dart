@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -27,7 +28,7 @@ class SettingsScreen extends StatelessWidget {
               "Notifications",
               style: GoogleFonts.inter(color: colorScheme.onSurface),
             ),
-            leading: Icon(Icons.notifications_outlined, color: colorScheme.secondary),
+            leading: Icon(CupertinoIcons.bell, color: colorScheme.secondary),
             onTap: () {
               // TODO: Navigate to Notification Settings
               print("Notifications tapped");
@@ -38,7 +39,7 @@ class SettingsScreen extends StatelessWidget {
               "Account & Privacy",
               style: GoogleFonts.inter(color: colorScheme.onSurface),
             ),
-            leading: Icon(Icons.shield_outlined, color: colorScheme.secondary),
+            leading: Icon(CupertinoIcons.shield_lefthalf_fill, color: colorScheme.secondary),
             onTap: () {
               // TODO: Navigate to Account & Privacy Settings
               print("Account & Privacy tapped");
@@ -49,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
               "App Appearance",
               style: GoogleFonts.inter(color: colorScheme.onSurface),
             ),
-            leading: Icon(Icons.palette_outlined, color: colorScheme.secondary),
+            leading: Icon(CupertinoIcons.slider_horizontal_3, color: colorScheme.secondary),
             onTap: () {
               // TODO: Navigate to App Appearance Settings
               print("App Appearance tapped");

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -50,7 +51,7 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
                 ScaleTransition(
                   scale: _scaleAnimation,
                   child: Icon(
-                    Icons.local_fire_department_rounded,
+                    CupertinoIcons.flame_fill,
                     color: colorScheme.tertiary, // Using theme color
                     size: 24, // Adjusted size
                   ),

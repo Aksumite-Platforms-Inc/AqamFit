@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/features/explore/widgets/explore_search_bar.dart';
@@ -22,7 +23,7 @@ class ExploreScreen extends StatelessWidget {
     final ThemeData theme = Theme.of(context); // Get theme
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // Use theme background
+      backgroundColor: theme.colorScheme.surface, // Use theme background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -31,7 +32,7 @@ class ExploreScreen extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onBackground, // Use theme color
+            color: theme.colorScheme.onSurface, // Use theme color
           ),
         ),
       ),
@@ -82,7 +83,7 @@ class ExploreScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onBackground, // Use theme color
+                          color: theme.colorScheme.onSurface, // Use theme color
                         ),
                       ),
                     ),
@@ -94,11 +95,11 @@ class ExploreScreen extends StatelessWidget {
                       crossAxisSpacing: 16.0,
                       childAspectRatio: 1.2, // Adjust as needed for 5 items or make dynamic
                       children: [
-                        AxumfitCategoryCard(title: "Strength", icon: Icons.fitness_center, onTap: () { print("Category card tapped: Strength"); }),
-                        AxumfitCategoryCard(title: "Cardio", icon: Icons.directions_run, onTap: () { print("Category card tapped: Cardio"); }),
-                        AxumfitCategoryCard(title: "Yoga", icon: Icons.self_improvement, onTap: () { print("Category card tapped: Yoga"); }),
-                        AxumfitCategoryCard(title: "Flexibility", icon: Icons.accessibility_new, onTap: () { print("Category card tapped: Flexibility"); }),
-                        AxumfitCategoryCard(title: "HIIT", icon: Icons.timer_outlined, onTap: () { print("Category card tapped: HIIT"); }),
+                        AxumfitCategoryCard(title: "Strength", icon: CupertinoIcons.flame_fill, onTap: () { print("Category card tapped: Strength"); }),
+                        AxumfitCategoryCard(title: "Cardio", icon: CupertinoIcons.tuningfork, onTap: () { print("Category card tapped: Cardio"); }),
+                        AxumfitCategoryCard(title: "Yoga", icon: CupertinoIcons.loop_thick, onTap: () { print("Category card tapped: Yoga"); }),
+                        AxumfitCategoryCard(title: "Flexibility", icon: CupertinoIcons.person_2, onTap: () { print("Category card tapped: Flexibility"); }),
+                        AxumfitCategoryCard(title: "HIIT", icon: CupertinoIcons.timer_fill, onTap: () { print("Category card tapped: HIIT"); }),
                       ],
                     ),
                   ],
@@ -114,7 +115,7 @@ class ExploreScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onBackground, // Use theme color
+                          color: theme.colorScheme.onSurface, // Use theme color
                         ),
                       ),
                     ),
@@ -145,11 +146,11 @@ class ExploreScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onBackground,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),
-                Container(
+                SizedBox(
                   height: 200, // Adjusted height to fit card and potential padding
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -176,7 +177,7 @@ class ExploreScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onBackground,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 ),

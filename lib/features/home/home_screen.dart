@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // Added for context.go
 import 'package:google_fonts/google_fonts.dart';
@@ -17,7 +18,7 @@ class HomeScreen extends StatelessWidget {
     const String userName = "User"; // Placeholder for username
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // Use theme background
+      backgroundColor: theme.colorScheme.surface, // Use theme background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -26,12 +27,12 @@ class HomeScreen extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 22, // Slightly adjusted for longer text
             fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onBackground, // Use theme color
+            color: theme.colorScheme.onSurface, // Use theme color
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined, color: theme.colorScheme.onBackground), // Use theme color
+            icon: Icon(CupertinoIcons.bell, color: theme.colorScheme.onSurface), // Use theme color
             onPressed: () {
               context.go('/notifications'); // Navigate to notifications
             },
@@ -55,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                   currentProgress: 3,
                   goal: 5,
                   primaryColor: theme.colorScheme.primary,
-                  backgroundColor: theme.colorScheme.surfaceVariant, // Using a variant for background
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest, // Using a variant for background
                 ),
               ),
               const SizedBox(width: 16), // Spacing between rings
@@ -65,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                   currentProgress: 210,
                   goal: 300,
                   primaryColor: theme.colorScheme.tertiary, // Using tertiary for variety
-                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 ),
               ),
             ],
@@ -77,24 +78,24 @@ class HomeScreen extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onBackground,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12), // Consistent spacing after title
           const Column(
             children: [
               ActivityFeedItem(
-                icon: Icons.directions_run_rounded,
+                icon: CupertinoIcons.tuningfork,
                 activity: "Completed 'Morning Cardio'",
                 time: "20 mins ago",
               ),
               ActivityFeedItem(
-                icon: Icons.emoji_events_rounded,
+                icon: CupertinoIcons.rosette,
                 activity: "Unlocked 'Early Bird' Badge",
                 time: "1 hour ago",
               ),
               ActivityFeedItem(
-                icon: Icons.fitness_center_rounded,
+                icon: CupertinoIcons.flame_fill,
                 activity: "Logged 'Strength Session'",
                 time: "Yesterday",
               ),
@@ -109,25 +110,25 @@ class HomeScreen extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 12),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  const QuickActionTile(
-                    icon: Icons.fitness_center,
+                  QuickActionTile(
+                    icon: CupertinoIcons.sportscourt,
                     label: "Start Workout",
                     onTapRoute: '/workout', // Added route
                   ),
-                  const QuickActionTile(
-                    icon: Icons.restaurant_menu,
+                  QuickActionTile(
+                    icon: CupertinoIcons.cart, // Replaced invalid food_fork_drink with cart
                     label: "Log Meal",
                     onTapRoute: '/log-meal', // Added route
                   ),
-                  const QuickActionTile(
-                    icon: Icons.bar_chart_rounded,
+                  QuickActionTile(
+                    icon: CupertinoIcons.chart_bar_square_fill,
                     label: "View Progress",
                     onTapRoute: '/progress', // Added route
                   ),

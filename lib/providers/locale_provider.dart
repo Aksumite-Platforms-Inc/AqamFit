@@ -17,7 +17,7 @@ class LocaleProvider extends ChangeNotifier {
     if (languageCode != null) {
       _locale = Locale(languageCode);
     } else {
-      _locale = Locale('en'); // Default to English
+      _locale = const Locale('en'); // Default to English
     }
     notifyListeners();
   }

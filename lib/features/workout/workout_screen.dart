@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -15,10 +16,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   int _currentExerciseIndex = 0;
   // Updated _exercises data
   final List<Map<String, dynamic>> _exercises = [
-    {'name': 'Jumping Jacks', 'duration': '30s', 'imagePlaceholder': Icons.accessibility_new_rounded},
-    {'name': 'Push Ups', 'reps': '10-12', 'sets': '3', 'imagePlaceholder': Icons.fitness_center},
-    {'name': 'Squats', 'reps': '12-15', 'sets': '3', 'imagePlaceholder': Icons.boy_rounded},
-    {'name': 'Plank', 'duration': '60s', 'imagePlaceholder': Icons.self_improvement},
+    {'name': 'Jumping Jacks', 'duration': '30s', 'imagePlaceholder': CupertinoIcons.person_2_fill},
+    {'name': 'Push Ups', 'reps': '10-12', 'sets': '3', 'imagePlaceholder': CupertinoIcons.flame_fill},
+    {'name': 'Squats', 'reps': '12-15', 'sets': '3', 'imagePlaceholder': CupertinoIcons.person_alt},
+    {'name': 'Plank', 'duration': '60s', 'imagePlaceholder': CupertinoIcons.loop_thick},
   ];
 
   void _previousExercise() {
@@ -64,12 +65,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         backgroundColor: theme.colorScheme.primary,
         iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
         leading: IconButton( // Use leading for back/close button if appropriate
-          icon: const Icon(Icons.close),
+          icon: const Icon(CupertinoIcons.xmark),
           onPressed: () async { // Made onPressed async for showDialog
             final bool? shouldFinish = await showDialog<bool>(
               context: context,
               builder: (BuildContext dialogContext) {
-                return AlertDialog(
+                return CupertinoAlertDialog(
                   title: Text(
                     "Finish Workout?",
                     style: GoogleFonts.inter(color: theme.colorScheme.onSurface),
@@ -78,19 +79,20 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     "Are you sure you want to end your workout?",
                     style: GoogleFonts.inter(color: theme.colorScheme.onSurface.withOpacity(0.8)),
                   ),
-                  backgroundColor: theme.colorScheme.surfaceVariant, // Themed background
                   actions: <Widget>[
-                    TextButton(
-                      child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)),
+                    CupertinoDialogAction(
+                      child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)), // You might want to use default Cupertino styling here
                       onPressed: () {
-                        Navigator.of(dialogContext).pop(false); // Pops dialog, returns false
+                        Navigator.of(dialogContext).pop(false);
                       },
+                      isDefaultAction: true,
                     ),
-                    TextButton(
-                      child: Text("Finish", style: GoogleFonts.inter(color: theme.colorScheme.error)), // Using error color for finish
+                    CupertinoDialogAction(
+                      child: Text("Finish", style: GoogleFonts.inter(color: theme.colorScheme.error)), // You might want to use default Cupertino styling here
                       onPressed: () {
-                        Navigator.of(dialogContext).pop(true); // Pops dialog, returns true
+                        Navigator.of(dialogContext).pop(true);
                       },
+                      isDestructiveAction: true,
                     ),
                   ],
                 );
@@ -129,11 +131,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             Container(
               height: 200,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                currentExercise['imagePlaceholder'] as IconData? ?? Icons.image_not_supported_outlined,
+                currentExercise['imagePlaceholder'] as IconData? ?? CupertinoIcons.photo,
                 size: 100,
                 color: theme.colorScheme.primary,
               ),
@@ -184,14 +186,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.camera_alt_outlined,
-                  color: theme.colorScheme.onBackground.withOpacity(0.6),
+                  CupertinoIcons.camera_fill,
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   "AI Form Analysis: Coming Soon!",
                   style: GoogleFonts.inter(
-                    color: theme.colorScheme.onBackground.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 14,
                   ),
                 ),

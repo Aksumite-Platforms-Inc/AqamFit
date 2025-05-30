@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/features/profile/widgets/user_stats_card.dart';
@@ -24,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       trailing: Icon(
-        Icons.track_changes_outlined,
+        CupertinoIcons.flag_circle_fill,
         color: theme.colorScheme.secondary,
       ),
       onTap: () {
@@ -43,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
         title: Text(
           "Profile",
           style: GoogleFonts.inter(
-            color: theme.colorScheme.onBackground, // Use onBackground for AppBar title
+            color: theme.colorScheme.onSurface, // Use onBackground for AppBar title
             fontWeight: FontWeight.w700, // Ensure consistency
           ),
         ),
@@ -62,9 +63,9 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   child: Icon(
-                    Icons.person_outline_rounded,
+                    CupertinoIcons.person_fill,
                     size: 50,
                     color: theme.colorScheme.primary,
                   ),
@@ -75,7 +76,7 @@ class ProfileScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onBackground,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -83,7 +84,7 @@ class ProfileScreen extends StatelessWidget {
                   "Member since Jan 2024", // Placeholder join date
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: theme.colorScheme.onBackground.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 const SizedBox(height: 24), // Spacing before next section
@@ -102,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onBackground,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),
@@ -133,7 +134,7 @@ class ProfileScreen extends StatelessWidget {
           // Settings Navigation
           Card(
             child: ListTile(
-              leading: Icon(Icons.settings_outlined, color: theme.colorScheme.secondary),
+              leading: Icon(CupertinoIcons.settings, color: theme.colorScheme.secondary),
               title: Text(
                 "Settings",
                 style: GoogleFonts.inter(
@@ -154,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
             // Using a slightly different background to make it stand out
             // color: theme.colorScheme.primary.withOpacity(0.05), // Subtle tint
             // Or use surfaceVariant if not already the default card color
-            color: theme.cardTheme.color ?? theme.colorScheme.surfaceVariant, // Default card color
+            color: theme.cardTheme.color ?? theme.colorScheme.surfaceContainerHighest, // Default card color
             elevation: theme.cardTheme.elevation ?? 2.0,
             shape: theme.cardTheme.shape,
             clipBehavior: Clip.antiAlias, // Good practice if using BoxDecoration inside

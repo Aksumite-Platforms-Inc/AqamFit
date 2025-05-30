@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:axum_app/navigation/app_router.dart';
+import 'package:aksumfit/navigation/app_router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,12 +40,10 @@ class AxumFitApp extends StatelessWidget {
         primary: Color(0xFF6366F1), // Primary purple
         secondary: Color(0xFF8B5CF6), // Secondary purple
         tertiary: Color(0xFF06B6D4), // Accent cyan
-        surface: Color(0xFF1E293B), // Card background
-        background: Color(0xFF0F172A), // Main background
+        surface: Color(0xFF1E293B), // Main background
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.white,
-        onBackground: Colors.white,
       ),
 
       // Typography
@@ -53,33 +51,33 @@ class AxumFitApp extends StatelessWidget {
         ThemeData.dark().textTheme.copyWith(
           displayLarge: GoogleFonts.inter(
             fontSize: 32,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w600, // Updated
             color: Colors.white,
           ),
           displayMedium: GoogleFonts.inter(
             fontSize: 28,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600, // Updated
             color: Colors.white,
           ),
           headlineLarge: GoogleFonts.inter(
             fontSize: 24,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600, // Updated
             color: Colors.white,
           ),
           headlineMedium: GoogleFonts.inter(
             fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500, // Updated
             color: Colors.white,
           ),
           bodyLarge: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w400,
-            color: Colors.white70,
+            color: Colors.white.withOpacity(0.9), // Updated
           ),
           bodyMedium: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w400,
-            color: Colors.white60,
+            color: Colors.white.withOpacity(0.7), // Updated
           ),
         ),
       ),
@@ -91,7 +89,7 @@ class AxumFitApp extends StatelessWidget {
         systemOverlayStyle: SystemUiOverlayStyle.light,
         titleTextStyle: GoogleFonts.inter(
           fontSize: 20,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600, // Updated
           color: Colors.white,
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -100,9 +98,12 @@ class AxumFitApp extends StatelessWidget {
       // Card Theme
       cardTheme: CardTheme(
         color: const Color(0xFF1E293B),
-        elevation: 8,
-        shadowColor: Colors.black26,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        elevation: 0, // Updated
+        shadowColor: Colors.transparent, // Updated
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Updated
+          side: const BorderSide(color: Color(0xFF475569), width: 0.5), // Updated
+        ),
       ),
 
       // Button Themes
@@ -110,13 +111,13 @@ class AxumFitApp extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF6366F1),
           foregroundColor: Colors.white,
-          elevation: 4,
-          shadowColor: const Color(0xFF6366F1).withOpacity(0.3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          elevation: 0, // Updated
+          shadowColor: Colors.transparent, // Updated
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), // Updated
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Updated
           textStyle: GoogleFonts.inter(
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w500, // Updated
           ),
         ),
       ),
@@ -124,21 +125,21 @@ class AxumFitApp extends StatelessWidget {
       // Input Decoration
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: const Color(0xFF334155),
+        fillColor: const Color(0xFF2C2C2E), // Updated
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(8), // Updated
+          borderSide: BorderSide.none, // Updated
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF475569)),
+          borderRadius: BorderRadius.circular(8), // Updated
+          borderSide: const BorderSide(color: Color(0xFF545458), width: 0.5), // Updated
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+          borderRadius: BorderRadius.circular(8), // Updated
+          borderSide: const BorderSide(color: Color(0xFF6366F1), width: 1.5), // Updated
         ),
-        hintStyle: GoogleFonts.inter(color: Colors.white54),
-        labelStyle: GoogleFonts.inter(color: Colors.white70),
+        hintStyle: GoogleFonts.inter(color: Colors.grey[600]), // Updated
+        labelStyle: GoogleFonts.inter(color: Colors.grey[400]), // Updated
       ),
 
       // Bottom Navigation Bar
@@ -166,20 +167,20 @@ class AxumFitApp extends StatelessWidget {
 
       // Divider
       dividerTheme: const DividerThemeData(
-        color: Color(0xFF334155),
+        color: Color(0xFF545458), // Updated
         thickness: 1,
       ),
 
       // Chip Theme
       chipTheme: ChipThemeData(
-        backgroundColor: const Color(0xFF334155), // surfaceVariant or similar
-        selectedColor: const Color(0xFF6366F1), // primary
-        labelStyle: GoogleFonts.inter(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
-        secondaryLabelStyle: GoogleFonts.inter(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600), // For selected chip
+        backgroundColor: const Color(0xFF2C2C2E), // Updated
+        selectedColor: const Color(0xFF6366F1),
+        labelStyle: GoogleFonts.inter(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.w500), // Updated
+        secondaryLabelStyle: GoogleFonts.inter(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500), // Updated
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-        side: BorderSide.none, // No border for a cleaner look
-        showCheckmark: false, // Hide the default checkmark
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)), // Updated
+        side: BorderSide.none,
+        showCheckmark: false,
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 
 class WorkoutSummaryScreen extends StatelessWidget {
   const WorkoutSummaryScreen({super.key});
@@ -27,7 +28,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 16, // Adjusted for better readability
-              color: theme.colorScheme.onBackground,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ),

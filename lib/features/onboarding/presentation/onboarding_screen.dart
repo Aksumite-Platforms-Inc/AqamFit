@@ -1,6 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../models/onboarding_page.dart'; // Adjusted path
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,21 +17,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // Updated content for AxumFit
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      icon: Icons.smart_toy_outlined, // Updated icon
+      icon: CupertinoIcons.gear_alt_fill, // Updated icon
       title: 'Personalized AI Workouts', // Updated title
       description:
           'Intelligent workout plans tailored to your goals and progress.', // Updated description
       // color field will be ignored as per instructions
     ),
     OnboardingPage(
-      icon: Icons.analytics_outlined, // Updated icon
+      icon: CupertinoIcons.graph_circle_fill, // Updated icon
       title: 'Track Your Journey', // Updated title
       description:
           'Log meals, monitor body metrics, and see your strength grow with detailed analytics.', // Updated description
       // color field will be ignored
     ),
     OnboardingPage(
-      icon: Icons.emoji_events_outlined, // Updated icon
+      icon: CupertinoIcons.rosette, // Updated icon
       title: 'Stay Motivated', // Updated title
       description:
           'Join challenges, earn badges, and connect with the AxumFit community.', // Updated description
@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final ColorScheme colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background, // Use theme background
+      backgroundColor: colorScheme.surface, // Use theme background
       body: SafeArea(
         child: Column(
           children: [
@@ -161,14 +161,14 @@ class OnboardingPageWidget extends StatelessWidget {
             page.title,
             textAlign: TextAlign.center,
             // Use GoogleFonts.inter and styles from theme
-            style: textTheme.headlineMedium?.copyWith(color: colorScheme.onBackground),
+            style: textTheme.headlineMedium?.copyWith(color: colorScheme.onSurface),
           ),
           const SizedBox(height: 20),
           Text(
             page.description,
             textAlign: TextAlign.center,
             // Use GoogleFonts.inter and styles from theme
-            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground.withOpacity(0.7)),
+            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
           ),
         ],
       ),
