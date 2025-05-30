@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -96,7 +97,7 @@ class _LogExerciseCardState extends State<LogExerciseCard> {
         const SizedBox(width: 8),
         IconButton(
           icon: Icon(
-            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked_outlined,
+            isCompleted ? CupertinoIcons.check_mark_circled_solid : CupertinoIcons.circle,
             color: isCompleted ? Colors.greenAccent : Colors.white54,
           ),
           onPressed: onToggleComplete,

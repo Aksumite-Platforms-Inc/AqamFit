@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:axum_app/features/home/home_screen.dart';
 import 'package:axum_app/features/explore/explore_screen.dart';
@@ -44,48 +45,49 @@ class _MainScaffoldState extends State<MainScaffold> {
           HomeScreen(),
           ExploreScreen(),
           WorkoutScreen(),
-          ProgressScreen(),  // Added ProgressScreen
+          ProgressScreen(), // Added ProgressScreen
           NutritionScreen(),
           SocialScreen(),
           ProfileScreen(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CupertinoTabBar(
         currentIndex: _currentIndex,
         onTap: (index) {
+          // No need to call setState here as CupertinoTabBar handles its own state.
+          // However, we still need to update the PageView.
+          _pageController.jumpToPage(index);
+          // Optionally, if you want to keep track of the index in _MainScaffoldState:
           setState(() {
             _currentIndex = index;
           });
-          _pageController.animateToPage(
-            index,
-            duration: Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
         },
+        activeColor: Theme.of(context).colorScheme.primary,
+        inactiveColor: CupertinoColors.inactiveGray,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(CupertinoIcons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore_outlined),
+            icon: Icon(CupertinoIcons.compass),
             label: 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center_outlined),
+            icon: Icon(CupertinoIcons.sportscourt),
             label: 'Workout',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart_outlined), // Progress Icon
+            icon: Icon(CupertinoIcons.graph_square), // Progress Icon
             label: 'Progress',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu_outlined),
+            icon: Icon(CupertinoIcons.leaf_arrow_circlepath),
             label: 'Nutrition',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people_alt_outlined),
+            icon: Icon(CupertinoIcons.person_3),
             label: 'Social',
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline), label: 'Profile'),
+              icon: Icon(CupertinoIcons.person_crop_circle), label: 'Profile'),
         ],
       ),
     );

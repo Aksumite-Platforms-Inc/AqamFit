@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -30,7 +31,7 @@ class LineChartWidgetPlaceholder extends StatelessWidget {
               height: 200,
               child: Center(
                 child: Icon(
-                  Icons.show_chart_rounded,
+                  CupertinoIcons.graph_square_fill,
                   size: 100,
                   color: const Color(0xFF06B6D4), // Accent cyan
                 ),

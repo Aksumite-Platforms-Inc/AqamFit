@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,7 +22,7 @@ class PlanExerciseItem extends StatelessWidget {
       ),
       child: ListTile(
         leading: const Icon(
-          Icons.fitness_center,
+          CupertinoIcons.flame_fill,
           color: Color(0xFF6366F1),
         ),
         title: Text(
@@ -39,7 +40,7 @@ class PlanExerciseItem extends StatelessWidget {
           ),
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.white54),
+          icon: const Icon(CupertinoIcons.ellipsis_vertical, color: Colors.white54),
           onPressed: () {
             // TODO: Implement more options (edit/delete)
           },

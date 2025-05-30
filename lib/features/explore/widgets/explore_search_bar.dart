@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,7 +14,7 @@ class ExploreSearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: "Search workouts, articles, challenges...",
           hintStyle: GoogleFonts.inter(color: Colors.white54),
-          prefixIcon: const Icon(Icons.search, color: Colors.white54),
+          prefixIcon: const Icon(CupertinoIcons.search, color: Colors.white54),
           filled: true,
           fillColor: const Color(0xFF1E293B),
           border: OutlineInputBorder(

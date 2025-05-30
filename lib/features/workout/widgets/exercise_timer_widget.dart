@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async'; // For Timer if needed, though AnimationController is primary
@@ -163,14 +164,14 @@ class _ExerciseTimerWidgetState extends State<ExerciseTimerWidget>
           mainAxisAlignment: MainAxisAlignment.center, // Center buttons
           children: [
             IconButton(
-              icon: Icon(_controller.isAnimating ? Icons.pause_circle_filled_outlined : Icons.play_circle_filled_outlined),
+              icon: Icon(_controller.isAnimating ? CupertinoIcons.pause_circle_fill : CupertinoIcons.play_circle_fill),
               onPressed: _togglePlayPause,
               iconSize: 40,
               color: theme.colorScheme.primary, // Theme color for icons
             ),
             const SizedBox(width: 20), // Spacing between buttons
             IconButton(
-              icon: const Icon(Icons.replay_rounded),
+              icon: const Icon(CupertinoIcons.gobackward),
               onPressed: _resetTimer,
               iconSize: 40,
               color: theme.colorScheme.secondary, // Theme color for icons

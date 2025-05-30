@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/meal_entry.dart';
@@ -35,7 +36,7 @@ class MealCard extends StatelessWidget {
               color: Color(0xFFFF7043).withOpacity(0.1),
               borderRadius: BorderRadius.circular(25),
             ),
-            child: Icon(Icons.restaurant, color: Color(0xFFFF7043), size: 24),
+            child: Icon(CupertinoIcons.food_fork_drink, color: Color(0xFFFF7043), size: 24),
           ),
           SizedBox(width: 16),
           Expanded(

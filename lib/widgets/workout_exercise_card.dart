@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models/workout_exercise.dart';
@@ -54,7 +55,7 @@ class WorkoutExerciseCard extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: Colors.grey[400]),
+          Icon(CupertinoIcons.right_chevron, color: Colors.grey[400]),
         ],
       ),
     );

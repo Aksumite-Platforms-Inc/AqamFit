@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -66,7 +67,7 @@ class ChallengeTile extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Icons.people_alt_outlined,
+                        CupertinoIcons.group_solid,
                         color: colorScheme.onSurfaceVariant.withOpacity(0.7),
                         size: 16,
                       ),

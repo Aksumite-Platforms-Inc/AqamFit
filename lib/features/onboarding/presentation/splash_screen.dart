@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -130,7 +131,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                         ),
                         child: const Icon(
-                          Icons.fitness_center,
+                          CupertinoIcons.heart_fill,
                           size: 60,
                           color: Colors.white,
                         ),

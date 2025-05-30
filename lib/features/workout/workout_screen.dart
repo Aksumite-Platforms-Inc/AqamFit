@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -15,10 +16,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   int _currentExerciseIndex = 0;
   // Updated _exercises data
   final List<Map<String, dynamic>> _exercises = [
-    {'name': 'Jumping Jacks', 'duration': '30s', 'imagePlaceholder': Icons.accessibility_new_rounded},
-    {'name': 'Push Ups', 'reps': '10-12', 'sets': '3', 'imagePlaceholder': Icons.fitness_center},
-    {'name': 'Squats', 'reps': '12-15', 'sets': '3', 'imagePlaceholder': Icons.boy_rounded},
-    {'name': 'Plank', 'duration': '60s', 'imagePlaceholder': Icons.self_improvement},
+    {'name': 'Jumping Jacks', 'duration': '30s', 'imagePlaceholder': CupertinoIcons.figure_walk},
+    {'name': 'Push Ups', 'reps': '10-12', 'sets': '3', 'imagePlaceholder': CupertinoIcons.flame_fill},
+    {'name': 'Squats', 'reps': '12-15', 'sets': '3', 'imagePlaceholder': CupertinoIcons.person_alt},
+    {'name': 'Plank', 'duration': '60s', 'imagePlaceholder': CupertinoIcons.loop_thick},
   ];
 
   void _previousExercise() {
@@ -64,7 +65,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         backgroundColor: theme.colorScheme.primary,
         iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
         leading: IconButton( // Use leading for back/close button if appropriate
-          icon: const Icon(Icons.close),
+          icon: const Icon(CupertinoIcons.xmark),
           onPressed: () async { // Made onPressed async for showDialog
             final bool? shouldFinish = await showDialog<bool>(
               context: context,
@@ -133,7 +134,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
-                currentExercise['imagePlaceholder'] as IconData? ?? Icons.image_not_supported_outlined,
+                currentExercise['imagePlaceholder'] as IconData? ?? CupertinoIcons.photo,
                 size: 100,
                 color: theme.colorScheme.primary,
               ),
@@ -184,7 +185,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.camera_alt_outlined,
+                  CupertinoIcons.camera_fill,
                   color: theme.colorScheme.onBackground.withOpacity(0.6),
                 ),
                 const SizedBox(width: 8),

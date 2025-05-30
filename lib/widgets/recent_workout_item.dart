@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RecentWorkoutItem extends StatelessWidget {
@@ -41,7 +42,7 @@ class RecentWorkoutItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(25),
             ),
             child: Icon(
-              Icons.fitness_center,
+              CupertinoIcons.flame_fill,
               color: Color(0xFF1E88E5),
               size: 24,
             ),
@@ -67,7 +68,7 @@ class RecentWorkoutItem extends StatelessWidget {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: Colors.grey[400]),
+          Icon(CupertinoIcons.right_chevron, color: Colors.grey[400]),
         ],
       ),
     );

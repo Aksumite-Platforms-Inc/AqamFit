@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -36,7 +37,7 @@ class FeaturedTrainerCard extends StatelessWidget {
                 color: colorScheme.surface, // A slightly different background for the image area
               ),
               child: Icon(
-                Icons.person_outline,
+                CupertinoIcons.person_fill,
                 size: 40,
                 color: colorScheme.primary,
               ),

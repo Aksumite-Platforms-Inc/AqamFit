@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/features/explore/widgets/explore_search_bar.dart';
@@ -94,11 +95,11 @@ class ExploreScreen extends StatelessWidget {
                       crossAxisSpacing: 16.0,
                       childAspectRatio: 1.2, // Adjust as needed for 5 items or make dynamic
                       children: [
-                        AxumfitCategoryCard(title: "Strength", icon: Icons.fitness_center, onTap: () { print("Category card tapped: Strength"); }),
-                        AxumfitCategoryCard(title: "Cardio", icon: Icons.directions_run, onTap: () { print("Category card tapped: Cardio"); }),
-                        AxumfitCategoryCard(title: "Yoga", icon: Icons.self_improvement, onTap: () { print("Category card tapped: Yoga"); }),
-                        AxumfitCategoryCard(title: "Flexibility", icon: Icons.accessibility_new, onTap: () { print("Category card tapped: Flexibility"); }),
-                        AxumfitCategoryCard(title: "HIIT", icon: Icons.timer_outlined, onTap: () { print("Category card tapped: HIIT"); }),
+                        AxumfitCategoryCard(title: "Strength", icon: CupertinoIcons.flame_fill, onTap: () { print("Category card tapped: Strength"); }),
+                        AxumfitCategoryCard(title: "Cardio", icon: CupertinoIcons.tuningfork, onTap: () { print("Category card tapped: Cardio"); }),
+                        AxumfitCategoryCard(title: "Yoga", icon: CupertinoIcons.loop_thick, onTap: () { print("Category card tapped: Yoga"); }),
+                        AxumfitCategoryCard(title: "Flexibility", icon: CupertinoIcons.stretch_out_figure, onTap: () { print("Category card tapped: Flexibility"); }),
+                        AxumfitCategoryCard(title: "HIIT", icon: CupertinoIcons.timer_fill, onTap: () { print("Category card tapped: HIIT"); }),
                       ],
                     ),
                   ],

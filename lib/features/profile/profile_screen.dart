@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/features/profile/widgets/user_stats_card.dart';
@@ -24,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       trailing: Icon(
-        Icons.track_changes_outlined,
+        CupertinoIcons.flag_circle_fill,
         color: theme.colorScheme.secondary,
       ),
       onTap: () {
@@ -64,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
                   radius: 50,
                   backgroundColor: theme.colorScheme.surfaceVariant,
                   child: Icon(
-                    Icons.person_outline_rounded,
+                    CupertinoIcons.person_fill,
                     size: 50,
                     color: theme.colorScheme.primary,
                   ),
@@ -133,7 +134,7 @@ class ProfileScreen extends StatelessWidget {
           // Settings Navigation
           Card(
             child: ListTile(
-              leading: Icon(Icons.settings_outlined, color: theme.colorScheme.secondary),
+              leading: Icon(CupertinoIcons.settings, color: theme.colorScheme.secondary),
               title: Text(
                 "Settings",
                 style: GoogleFonts.inter(

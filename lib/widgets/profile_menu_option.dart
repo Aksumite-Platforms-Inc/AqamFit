@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProfileMenuOption extends StatelessWidget {
@@ -43,7 +44,7 @@ class ProfileMenuOption extends StatelessWidget {
             color: isHighlighted ? Color(0xFFFFD700) : Color(0xFF2D3748),
           ),
         ),
-        trailing: Icon(Icons.chevron_right, color: Colors.grey[400]),
+        trailing: Icon(CupertinoIcons.right_chevron, color: Colors.grey[400]),
       ),
     );
   }

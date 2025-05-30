@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // Added for context.go
 import 'package:google_fonts/google_fonts.dart';
@@ -31,7 +32,7 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined, color: theme.colorScheme.onBackground), // Use theme color
+            icon: Icon(CupertinoIcons.bell, color: theme.colorScheme.onBackground), // Use theme color
             onPressed: () {
               context.go('/notifications'); // Navigate to notifications
             },
@@ -84,17 +85,17 @@ class HomeScreen extends StatelessWidget {
           const Column(
             children: [
               ActivityFeedItem(
-                icon: Icons.directions_run_rounded,
+                icon: CupertinoIcons.tuningfork,
                 activity: "Completed 'Morning Cardio'",
                 time: "20 mins ago",
               ),
               ActivityFeedItem(
-                icon: Icons.emoji_events_rounded,
+                icon: CupertinoIcons.rosette,
                 activity: "Unlocked 'Early Bird' Badge",
                 time: "1 hour ago",
               ),
               ActivityFeedItem(
-                icon: Icons.fitness_center_rounded,
+                icon: CupertinoIcons.flame_fill,
                 activity: "Logged 'Strength Session'",
                 time: "Yesterday",
               ),
@@ -117,17 +118,17 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   const QuickActionTile(
-                    icon: Icons.fitness_center,
+                    icon: CupertinoIcons.sportscourt,
                     label: "Start Workout",
                     onTapRoute: '/workout', // Added route
                   ),
                   const QuickActionTile(
-                    icon: Icons.restaurant_menu,
+                    icon: CupertinoIcons.food_fork_drink,
                     label: "Log Meal",
                     onTapRoute: '/log-meal', // Added route
                   ),
                   const QuickActionTile(
-                    icon: Icons.bar_chart_rounded,
+                    icon: CupertinoIcons.chart_bar_square_fill,
                     label: "View Progress",
                     onTapRoute: '/progress', // Added route
                   ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -30,7 +31,7 @@ class RadarChartWidgetPlaceholder extends StatelessWidget {
               height: 200,
               child: Center(
                 child: Icon(
-                  Icons.hexagon_outlined,
+                  CupertinoIcons.hexagon_fill,
                   size: 100,
                   color: const Color(0xFF6366F1),
                 ),
