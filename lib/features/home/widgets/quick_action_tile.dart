@@ -28,7 +28,7 @@ class QuickActionTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceVariant, // Use theme color
+              color: theme.colorScheme.surfaceContainerHighest, // Use theme color
               borderRadius: BorderRadius.circular(16.0),
               boxShadow: [ // Optional: add a subtle shadow from theme
                 BoxShadow(

@@ -24,7 +24,7 @@ class ExerciseLibraryScreen extends StatelessWidget {
           textAlign: TextAlign.center, // Ensure text is centered if it wraps
           style: GoogleFonts.inter(
             fontSize: 16, // Adjusted for better readability
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),

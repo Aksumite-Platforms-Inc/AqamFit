@@ -8,16 +8,16 @@ class WorkoutExerciseCard extends StatelessWidget {
   final ValueChanged<bool?> onChanged;
 
   const WorkoutExerciseCard({
-    Key? key,
+    super.key,
     required this.exercise,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -25,7 +25,7 @@ class WorkoutExerciseCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -41,13 +41,13 @@ class WorkoutExerciseCard extends StatelessWidget {
               children: [
                 Text(
                   exercise.name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF2D3748),
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   '${exercise.sets} sets × ${exercise.reps} reps',
                   style: TextStyle(color: Colors.grey[600]),

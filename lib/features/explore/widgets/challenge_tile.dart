@@ -34,7 +34,7 @@ class ChallengeTile extends StatelessWidget {
           // Removed fixed height: 120
           decoration: BoxDecoration(
             // Consider using a gradient or subtle pattern if desired
-            color: colorScheme.surfaceVariant, // Using theme color
+            color: colorScheme.surfaceContainerHighest, // Using theme color
             borderRadius: BorderRadius.circular(12.0),
           ),
           child: Padding(

@@ -28,7 +28,7 @@ class AxumfitCategoryCard extends StatelessWidget { // Renamed class
             borderRadius: BorderRadius.circular(12.0), // Match Card's shape
             gradient: LinearGradient(
               colors: [
-                Theme.of(context).colorScheme.surfaceVariant,
+                Theme.of(context).colorScheme.surfaceContainerHighest,
                 Theme.of(context).colorScheme.surface,
               ],
               begin: Alignment.topLeft,

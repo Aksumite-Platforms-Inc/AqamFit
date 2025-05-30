@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
     const String userName = "User"; // Placeholder for username
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background, // Use theme background
+      backgroundColor: theme.colorScheme.surface, // Use theme background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -27,12 +27,12 @@ class HomeScreen extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 22, // Slightly adjusted for longer text
             fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onBackground, // Use theme color
+            color: theme.colorScheme.onSurface, // Use theme color
           ),
         ),
         actions: [
           IconButton(
-            icon: Icon(CupertinoIcons.bell, color: theme.colorScheme.onBackground), // Use theme color
+            icon: Icon(CupertinoIcons.bell, color: theme.colorScheme.onSurface), // Use theme color
             onPressed: () {
               context.go('/notifications'); // Navigate to notifications
             },
@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                   currentProgress: 3,
                   goal: 5,
                   primaryColor: theme.colorScheme.primary,
-                  backgroundColor: theme.colorScheme.surfaceVariant, // Using a variant for background
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest, // Using a variant for background
                 ),
               ),
               const SizedBox(width: 16), // Spacing between rings
@@ -66,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                   currentProgress: 210,
                   goal: 300,
                   primaryColor: theme.colorScheme.tertiary, // Using tertiary for variety
-                  backgroundColor: theme.colorScheme.surfaceVariant,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 ),
               ),
             ],
@@ -78,7 +78,7 @@ class HomeScreen extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onBackground,
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 12), // Consistent spacing after title
@@ -110,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onBackground,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 12),

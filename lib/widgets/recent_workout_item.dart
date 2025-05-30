@@ -9,18 +9,18 @@ class RecentWorkoutItem extends StatelessWidget {
   // final VoidCallback? onTap;
 
   const RecentWorkoutItem({
-    Key? key,
+    super.key,
     required this.name,
     required this.duration,
     required this.date,
     // this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -28,7 +28,7 @@ class RecentWorkoutItem extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -38,29 +38,29 @@ class RecentWorkoutItem extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: Color(0xFF1E88E5).withOpacity(0.1),
+              color: const Color(0xFF1E88E5).withOpacity(0.1),
               borderRadius: BorderRadius.circular(25),
             ),
-            child: Icon(
+            child: const Icon(
               CupertinoIcons.flame_fill,
               color: Color(0xFF1E88E5),
               size: 24,
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF2D3748),
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   '$duration • $date',
                   style: TextStyle(color: Colors.grey[600], fontSize: 14),

@@ -23,7 +23,7 @@ class NutritionScreen extends StatelessWidget {
           'Nutrition Screen',
           style: GoogleFonts.inter(
             fontSize: 20,
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),

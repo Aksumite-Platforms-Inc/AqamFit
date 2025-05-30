@@ -40,12 +40,10 @@ class AxumFitApp extends StatelessWidget {
         primary: Color(0xFF6366F1), // Primary purple
         secondary: Color(0xFF8B5CF6), // Secondary purple
         tertiary: Color(0xFF06B6D4), // Accent cyan
-        surface: Color(0xFF1E293B), // Card background
-        background: Color(0xFF0F172A), // Main background
+        surface: Color(0xFF1E293B), // Main background
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.white,
-        onBackground: Colors.white,
       ),
 
       // Typography

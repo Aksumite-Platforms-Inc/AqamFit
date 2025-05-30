@@ -79,7 +79,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     "Are you sure you want to end your workout?",
                     style: GoogleFonts.inter(color: theme.colorScheme.onSurface.withOpacity(0.8)),
                   ),
-                  backgroundColor: theme.colorScheme.surfaceVariant, // Themed background
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest, // Themed background
                   actions: <Widget>[
                     TextButton(
                       child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)),
@@ -130,7 +130,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             Container(
               height: 200,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -186,13 +186,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               children: [
                 Icon(
                   CupertinoIcons.camera_fill,
-                  color: theme.colorScheme.onBackground.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   "AI Form Analysis: Coming Soon!",
                   style: GoogleFonts.inter(
-                    color: theme.colorScheme.onBackground.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 14,
                   ),
                 ),

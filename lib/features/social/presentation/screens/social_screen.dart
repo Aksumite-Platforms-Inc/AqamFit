@@ -23,7 +23,7 @@ class SocialScreen extends StatelessWidget {
           'Social Screen',
           style: GoogleFonts.inter(
             fontSize: 20,
-            color: theme.colorScheme.onBackground,
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ),
