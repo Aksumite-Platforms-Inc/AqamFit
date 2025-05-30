@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 // Remove OnboardingScreen import if it's not used after navigation change
-// import 'package:axum_app/screens/onboarding_screen.dart'; // This might be the old path
+// import 'package:aksumfit/screens/onboarding_screen.dart'; // This might be the old path
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

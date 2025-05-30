@@ -6,27 +6,27 @@ class SocialStatItem extends StatelessWidget {
   final IconData icon;
 
   const SocialStatItem({
-    super.key,
+    Key? key,
     required this.label,
     required this.value,
     required this.icon,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Icon(icon, color: Colors.white, size: 28),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(label, style: TextStyle(color: Colors.white70, fontSize: 12)),
       ],
     );
   }

@@ -27,13 +27,13 @@ class RadarChartWidgetPlaceholder extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const SizedBox(
+            Container(
               height: 200,
               child: Center(
                 child: Icon(
                   CupertinoIcons.hexagon_fill,
                   size: 100,
-                  color: Color(0xFF6366F1),
+                  color: const Color(0xFF6366F1),
                 ),
               ),
             ),

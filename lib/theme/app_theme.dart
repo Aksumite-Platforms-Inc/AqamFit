@@ -45,7 +45,7 @@ class AppTheme {
     style: ElevatedButton.styleFrom(
       backgroundColor: accentColor,
       foregroundColor: Colors.white, // Text color for ElevatedButton
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       textStyle: textTheme.labelLarge,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)), // More rounded corners
       elevation: 2,
@@ -55,7 +55,7 @@ class AppTheme {
   static final CardTheme cardTheme = CardTheme(
     color: cardBackgroundColor,
     elevation: 1.0, // Subtle shadow
-    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0), // Consistent margins
+    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 0), // Consistent margins
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12.0), // Rounded corners
       // Cultural patterns could be used as subtle background textures on cards or screens.
@@ -78,24 +78,24 @@ class AppTheme {
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.0),
-      borderSide: const BorderSide(color: accentColor, width: 2.0),
+      borderSide: BorderSide(color: accentColor, width: 2.0),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.0),
-      borderSide: const BorderSide(color: Colors.redAccent, width: 1.0),
+      borderSide: BorderSide(color: Colors.redAccent, width: 1.0),
     ),
     focusedErrorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12.0),
-      borderSide: const BorderSide(color: Colors.redAccent, width: 2.0),
+      borderSide: BorderSide(color: Colors.redAccent, width: 2.0),
     ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+    contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
   );
 
   static final AppBarTheme appBarTheme = AppBarTheme(
     backgroundColor: backgroundColor, // Light background for app bar
     foregroundColor: textColor,       // Dark text/icons on app bar
     elevation: 0,                     // No shadow for a flatter look
-    iconTheme: const IconThemeData(color: primaryColorLight),
+    iconTheme: IconThemeData(color: primaryColorLight),
     titleTextStyle: textTheme.titleLarge?.copyWith(color: textColor),
     // Iconography could incorporate Ethiopian symbols or art styles for specific actions.
   );
@@ -146,7 +146,7 @@ class AppTheme {
       inputDecorationTheme: inputDecorationTheme,
       appBarTheme: appBarTheme,
       bottomNavigationBarTheme: bottomNavigationBarTheme,
-      iconTheme: const IconThemeData(color: primaryColorLight, size: 24.0),
+      iconTheme: IconThemeData(color: primaryColorLight, size: 24.0),
       // --- Comments on Cultural Integration ---
       // 1. Cultural patterns could be used as subtle background textures on cards or screens.
       //    (Example shown in CardTheme's borderSide)

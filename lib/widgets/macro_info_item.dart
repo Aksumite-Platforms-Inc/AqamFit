@@ -6,11 +6,11 @@ class MacroInfoItem extends StatelessWidget {
   final Color color;
 
   const MacroInfoItem({
-    super.key,
+    Key? key,
     required this.label,
     required this.value,
     required this.color,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -27,7 +27,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 16, // Adjusted for better readability
-              color: theme.colorScheme.onSurface,
+              color: theme.colorScheme.onBackground,
             ),
           ),
         ),

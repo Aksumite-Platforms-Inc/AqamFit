@@ -12,7 +12,7 @@ class CreateWorkoutScreen extends StatefulWidget {
 
 class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
   late TextEditingController _planNameController;
-  final List<String> _exercises = ["Push Ups", "Squats", "Plank"]; // Initialize exercises
+  List<String> _exercises = ["Push Ups", "Squats", "Plank"]; // Initialize exercises
 
   @override
   void initState() {

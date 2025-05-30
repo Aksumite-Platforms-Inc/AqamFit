@@ -23,7 +23,7 @@ class NotificationScreen extends StatelessWidget {
           'Notifications Screen',
           style: GoogleFonts.inter( // Ensuring GoogleFonts
             fontSize: 20,
-            color: theme.colorScheme.onSurface, // Using theme color
+            color: theme.colorScheme.onBackground, // Using theme color
           ),
         ),
       ),

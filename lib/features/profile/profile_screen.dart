@@ -44,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
         title: Text(
           "Profile",
           style: GoogleFonts.inter(
-            color: theme.colorScheme.onSurface, // Use onBackground for AppBar title
+            color: theme.colorScheme.onBackground, // Use onBackground for AppBar title
             fontWeight: FontWeight.w700, // Ensure consistency
           ),
         ),
@@ -63,7 +63,7 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  backgroundColor: theme.colorScheme.surfaceVariant,
                   child: Icon(
                     CupertinoIcons.person_fill,
                     size: 50,
@@ -76,7 +76,7 @@ class ProfileScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
+                    color: theme.colorScheme.onBackground,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -84,7 +84,7 @@ class ProfileScreen extends StatelessWidget {
                   "Member since Jan 2024", // Placeholder join date
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onBackground.withOpacity(0.7),
                   ),
                 ),
                 const SizedBox(height: 24), // Spacing before next section
@@ -103,7 +103,7 @@ class ProfileScreen extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: theme.colorScheme.onBackground,
               ),
             ),
           ),
@@ -155,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
             // Using a slightly different background to make it stand out
             // color: theme.colorScheme.primary.withOpacity(0.05), // Subtle tint
             // Or use surfaceVariant if not already the default card color
-            color: theme.cardTheme.color ?? theme.colorScheme.surfaceContainerHighest, // Default card color
+            color: theme.cardTheme.color ?? theme.colorScheme.surfaceVariant, // Default card color
             elevation: theme.cardTheme.elevation ?? 2.0,
             shape: theme.cardTheme.shape,
             clipBehavior: Clip.antiAlias, // Good practice if using BoxDecoration inside

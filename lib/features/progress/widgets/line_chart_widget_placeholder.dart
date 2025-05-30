@@ -27,13 +27,13 @@ class LineChartWidgetPlaceholder extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const SizedBox(
+            Container(
               height: 200,
               child: Center(
                 child: Icon(
                   CupertinoIcons.graph_square_fill,
                   size: 100,
-                  color: Color(0xFF06B6D4), // Accent cyan
+                  color: const Color(0xFF06B6D4), // Accent cyan
                 ),
               ),
             ),

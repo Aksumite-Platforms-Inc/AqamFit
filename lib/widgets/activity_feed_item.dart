@@ -7,11 +7,11 @@ class ActivityFeedItem extends StatelessWidget {
   final IconData icon;
 
   const ActivityFeedItem({
-    super.key,
+    Key? key,
     required this.activity,
     required this.time,
     required this.icon,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class ActivityFeedItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest, // Use theme color
+        color: colorScheme.surfaceVariant, // Use theme color
         borderRadius: BorderRadius.circular(12.0), // Slightly more rounded
         boxShadow: [
           BoxShadow(

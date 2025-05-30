@@ -103,10 +103,10 @@ class _WeightRepLoggerWidgetState extends State<WeightRepLoggerWidget> {
                   child: TextField(
                     controller: _weightController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: "0.0",
                       isDense: true, // Makes the field smaller
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12), // Adjust padding
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12), // Adjust padding
                     ),
                     style: GoogleFonts.inter(fontSize: textTheme.bodyLarge?.fontSize),
                   ),
@@ -128,10 +128,10 @@ class _WeightRepLoggerWidgetState extends State<WeightRepLoggerWidget> {
                   child: TextField(
                     controller: _repsController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: "0",
                       isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
                     style: GoogleFonts.inter(fontSize: textTheme.bodyLarge?.fontSize),
                   ),

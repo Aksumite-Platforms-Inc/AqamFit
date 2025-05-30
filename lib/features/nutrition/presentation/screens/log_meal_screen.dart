@@ -23,7 +23,7 @@ class LogMealScreen extends StatelessWidget {
           'Log Meal Screen',
           style: GoogleFonts.inter(
             fontSize: 20,
-            color: theme.colorScheme.onSurface,
+            color: theme.colorScheme.onBackground,
           ),
         ),
       ),

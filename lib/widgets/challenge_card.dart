@@ -6,17 +6,17 @@ class ChallengeCard extends StatelessWidget {
   final Challenge challenge;
 
   const ChallengeCard({
-    super.key,
+    Key? key,
     required this.challenge,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double progress = challenge.current / challenge.target;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -24,7 +24,7 @@ class ChallengeCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -39,13 +39,13 @@ class ChallengeCard extends StatelessWidget {
                   children: [
                     Text(
                       challenge.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF2D3748),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       challenge.description,
                       style: TextStyle(color: Colors.grey[600], fontSize: 14),
@@ -55,12 +55,12 @@ class ChallengeCard extends StatelessWidget {
               ),
               if (challenge.isActive)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF43A047).withOpacity(0.1),
+                    color: Color(0xFF43A047).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Active',
                     style: TextStyle(
                       color: Color(0xFF43A047),
@@ -71,20 +71,20 @@ class ChallengeCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Row(
             children: [
               Expanded(
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: Colors.grey[200],
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF9C27B0)),
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9C27B0)),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Text(
                 '${challenge.current}/${challenge.target}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF2D3748),

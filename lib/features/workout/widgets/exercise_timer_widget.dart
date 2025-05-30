@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// For Timer if needed, though AnimationController is primary
+import 'dart:async'; // For Timer if needed, though AnimationController is primary
 
 class ExerciseTimerWidget extends StatefulWidget {
   final int durationInSeconds;
@@ -130,7 +130,7 @@ class _ExerciseTimerWidgetState extends State<ExerciseTimerWidget>
               CircularProgressIndicator(
                 value: 1.0,
                 strokeWidth: 10,
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                backgroundColor: theme.colorScheme.surfaceVariant,
               ),
               AnimatedBuilder(
                 animation: _controller,
@@ -151,7 +151,7 @@ class _ExerciseTimerWidgetState extends State<ExerciseTimerWidget>
                     style: GoogleFonts.inter( // Using GoogleFonts for consistency
                       fontSize: textTheme.headlineLarge?.fontSize,
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.onBackground,
                     ),
                   );
                 },

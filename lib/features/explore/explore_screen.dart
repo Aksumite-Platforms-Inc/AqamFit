@@ -23,7 +23,7 @@ class ExploreScreen extends StatelessWidget {
     final ThemeData theme = Theme.of(context); // Get theme
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface, // Use theme background
+      backgroundColor: theme.colorScheme.background, // Use theme background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -32,7 +32,7 @@ class ExploreScreen extends StatelessWidget {
           style: GoogleFonts.inter(
             fontSize: 24,
             fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onSurface, // Use theme color
+            color: theme.colorScheme.onBackground, // Use theme color
           ),
         ),
       ),
@@ -83,7 +83,7 @@ class ExploreScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface, // Use theme color
+                          color: theme.colorScheme.onBackground, // Use theme color
                         ),
                       ),
                     ),
@@ -115,7 +115,7 @@ class ExploreScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface, // Use theme color
+                          color: theme.colorScheme.onBackground, // Use theme color
                         ),
                       ),
                     ),
@@ -146,11 +146,11 @@ class ExploreScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.onBackground,
                     ),
                   ),
                 ),
-                SizedBox(
+                Container(
                   height: 200, // Adjusted height to fit card and potential padding
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -177,7 +177,7 @@ class ExploreScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.onBackground,
                     ),
                   ),
                 ),

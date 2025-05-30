@@ -7,19 +7,19 @@ class HomeQuickAction extends StatelessWidget {
   final VoidCallback onTap;
 
   const HomeQuickAction({
-    super.key,
+    Key? key,
     required this.title,
     required this.icon,
     required this.color,
     required this.onTap,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -27,7 +27,7 @@ class HomeQuickAction extends StatelessWidget {
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
               blurRadius: 10,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ],
         ),
@@ -42,10 +42,10 @@ class HomeQuickAction extends StatelessWidget {
               ),
               child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF2D3748),
               ),

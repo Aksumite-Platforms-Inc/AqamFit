@@ -6,18 +6,18 @@ class HomeAchievementCard extends StatelessWidget {
   final Color color;
 
   const HomeAchievementCard({
-    super.key,
+    Key? key,
     required this.title,
     required this.icon,
     required this.color,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 100,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(12),
+      margin: EdgeInsets.only(right: 12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -25,7 +25,7 @@ class HomeAchievementCard extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -41,10 +41,10 @@ class HomeAchievementCard extends StatelessWidget {
             ),
             child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Color(0xFF2D3748),

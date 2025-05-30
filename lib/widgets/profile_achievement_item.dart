@@ -7,17 +7,17 @@ class ProfileAchievementItem extends StatelessWidget {
   final Color color;
 
   const ProfileAchievementItem({
-    super.key,
+    Key? key,
     required this.title,
     required this.description,
     required this.icon,
     required this.color,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
           Container(
@@ -29,14 +29,14 @@ class ProfileAchievementItem extends StatelessWidget {
             ),
             child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF2D3748),

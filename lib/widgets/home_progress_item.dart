@@ -6,27 +6,27 @@ class HomeProgressItem extends StatelessWidget {
   final IconData icon;
 
   const HomeProgressItem({
-    super.key,
+    Key? key,
     required this.title,
     required this.value,
     required this.icon,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Icon(icon, color: Colors.white70, size: 24),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
-        Text(title, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(title, style: TextStyle(color: Colors.white70, fontSize: 12)),
       ],
     );
   }

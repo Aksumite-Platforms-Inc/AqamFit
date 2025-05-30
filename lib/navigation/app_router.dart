@@ -1,4 +1,4 @@
-// For Widget type, if needed, and for context
+import 'package:flutter/material.dart'; // For Widget type, if needed, and for context
 import 'package:go_router/go_router.dart';
 import '../features/onboarding/presentation/splash_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
@@ -18,11 +18,11 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(
       path: '/splash',
-      builder: (context, state) => const SplashScreen(),
+      builder: (context, state) => SplashScreen(),
     ),
     GoRoute(
       path: '/onboarding',
-      builder: (context, state) => const OnboardingScreen(),
+      builder: (context, state) => OnboardingScreen(),
     ),
     GoRoute(
       path: '/main',

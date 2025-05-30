@@ -260,9 +260,8 @@ class ApiService {
 
       final updateData = <String, dynamic>{};
       if (name != null) updateData['name'] = name;
-      if (profileImageUrl != null) {
+      if (profileImageUrl != null)
         updateData['profileImageUrl'] = profileImageUrl;
-      }
       if (preferences != null) updateData['preferences'] = preferences;
 
       // Mock updated user

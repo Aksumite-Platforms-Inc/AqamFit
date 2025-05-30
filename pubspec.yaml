@@ -55,7 +55,6 @@ dependencies:
   hive_flutter: ^1.1.0
   path_provider: ^2.0.0
 
-  axum_app: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

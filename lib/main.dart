@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:axum_app/navigation/app_router.dart';
+import 'package:aksumfit/navigation/app_router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,10 +40,12 @@ class AxumFitApp extends StatelessWidget {
         primary: Color(0xFF6366F1), // Primary purple
         secondary: Color(0xFF8B5CF6), // Secondary purple
         tertiary: Color(0xFF06B6D4), // Accent cyan
-        surface: Color(0xFF1E293B), // Main background
+        surface: Color(0xFF1E293B), // Card background
+        background: Color(0xFF0F172A), // Main background
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.white,
+        onBackground: Colors.white,
       ),
 
       // Typography
