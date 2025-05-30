@@ -79,7 +79,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     "Are you sure you want to end your workout?",
                     style: GoogleFonts.inter(color: theme.colorScheme.onSurface.withOpacity(0.8)),
                   ),
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest, // Themed background
                   actions: <Widget>[
                     CupertinoDialogAction(
                       child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)), // You might want to use default Cupertino styling here
