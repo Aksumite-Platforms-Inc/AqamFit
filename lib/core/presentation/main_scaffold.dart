@@ -1,11 +1,12 @@
+import 'package:aksumfit/features/explore/explore_screen.dart';
+import 'package:aksumfit/features/home/home_screen.dart';
+import 'package:aksumfit/features/nutrition/presentation/screens/nutrition_screen.dart';
+import 'package:aksumfit/features/profile/profile_screen.dart';
+import 'package:aksumfit/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
+import 'package:aksumfit/features/social/presentation/screens/social_screen.dart';
+import 'package:aksumfit/features/workout/presentation/screens/workout_plans_screen.dart'; // Changed import
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:aksumfit/features/home/home_screen.dart';
-import 'package:aksumfit/features/explore/explore_screen.dart';
-import 'package:aksumfit/features/workout/workout_screen.dart';
-import 'package:aksumfit/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
-import 'package:aksumfit/features/nutrition/presentation/screens/nutrition_screen.dart';
-import 'package:aksumfit/features/social/presentation/screens/social_screen.dart';
 import 'package:aksumfit/features/profile/profile_screen.dart';
 
 class MainScaffold extends StatefulWidget {
@@ -44,7 +45,7 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: const [
           HomeScreen(),
           ExploreScreen(),
-          WorkoutScreen(),
+          WorkoutPlansScreen(), // Changed to WorkoutPlansScreen
           ProgressScreen(), // Added ProgressScreen
           NutritionScreen(),
           SocialScreen(),
