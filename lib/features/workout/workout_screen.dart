@@ -70,7 +70,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             final bool? shouldFinish = await showDialog<bool>(
               context: context,
               builder: (BuildContext dialogContext) {
-                return AlertDialog(
+                return CupertinoAlertDialog(
                   title: Text(
                     "Finish Workout?",
                     style: GoogleFonts.inter(color: theme.colorScheme.onSurface),
@@ -81,17 +81,19 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   ),
                   backgroundColor: theme.colorScheme.surfaceContainerHighest, // Themed background
                   actions: <Widget>[
-                    TextButton(
-                      child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)),
+                    CupertinoDialogAction(
+                      child: Text("Cancel", style: GoogleFonts.inter(color: theme.colorScheme.primary)), // You might want to use default Cupertino styling here
                       onPressed: () {
-                        Navigator.of(dialogContext).pop(false); // Pops dialog, returns false
+                        Navigator.of(dialogContext).pop(false);
                       },
+                      isDefaultAction: true,
                     ),
-                    TextButton(
-                      child: Text("Finish", style: GoogleFonts.inter(color: theme.colorScheme.error)), // Using error color for finish
+                    CupertinoDialogAction(
+                      child: Text("Finish", style: GoogleFonts.inter(color: theme.colorScheme.error)), // You might want to use default Cupertino styling here
                       onPressed: () {
-                        Navigator.of(dialogContext).pop(true); // Pops dialog, returns true
+                        Navigator.of(dialogContext).pop(true);
                       },
+                      isDestructiveAction: true,
                     ),
                   ],
                 );
