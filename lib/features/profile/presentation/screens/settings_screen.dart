@@ -75,7 +75,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     CupertinoListTile(
                       title: const Text("Theme Mode"),
                       leading: Icon(CupertinoIcons.moon_stars_fill, color: cupertinoTheme.primaryColor),
-                      additionalInfo: Text(StringHelperExtension(_currentThemeMode.toString().split('.').last).capitalize()),
+                      additionalInfo: Text(_currentThemeMode.toString().split('.').last.capitalize()),
                       trailing: const Icon(CupertinoIcons.forward),
                       onTap: () => _showThemePicker(context),
                     ),
@@ -100,7 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     CupertinoListTile(
                       title: const Text("Distance Unit"),
                       leading: Icon(CupertinoIcons.map_pin_ellipse, color: cupertinoTheme.primaryColor),
-                      additionalInfo: Text(StringHelperExtension(_currentDistanceUnit.toString().split('.').last).capitalize()),
+                      additionalInfo: Text(_currentDistanceUnit.toString().split('.').last.capitalize()),
                       trailing: const Icon(CupertinoIcons.forward),
                       onTap: () => _showUnitPicker<DistanceUnit>(
                         context: context,
@@ -190,7 +190,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Select Theme Mode'),
         actions: ThemeMode.values
             .map((mode) => CupertinoActionSheetAction(
-                  child: Text(StringHelperExtension(mode.toString().split('.').last).capitalize()),
+                  child: Text(mode.toString().split('.').last.capitalize()),
                   onPressed: () {
                     if (mode != _currentThemeMode) {
                        setState(() => _currentThemeMode = mode);

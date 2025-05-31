@@ -109,7 +109,7 @@ class _PlanExerciseEditTileState extends State<PlanExerciseEditTile> {
             if (isTimed || widget.exerciseDetails.type == ExerciseType.strength)
               _buildCupertinoTextField(_durationController, "Duration (seconds, optional)", TextInputType.number),
             _buildCupertinoTextField(_restController, "Rest between sets (seconds, optional)", TextInputType.number),
-            _buildCupertinoTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text, givenMaxLines: 2),
+            _buildCupertinoTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text, 2),
             const SizedBox(height: 10),
             CupertinoButton(
               child: const Text("Update Exercise Details"),
