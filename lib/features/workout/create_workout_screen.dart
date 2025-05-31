@@ -114,7 +114,7 @@ class _PlanExerciseEditTileState extends State<PlanExerciseEditTile> {
                   _buildTextField(_durationController, "Duration (seconds, optional)", TextInputType.number),
 
                 _buildTextField(_restController, "Rest between sets (seconds, optional)", TextInputType.number),
-                _buildTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text, maxLines: 2),
+                _buildTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text),
                 const SizedBox(height: 10),
                 TextButton(
                   onPressed: _updatePlanExercise,

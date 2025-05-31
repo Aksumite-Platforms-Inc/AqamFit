@@ -183,7 +183,7 @@ class _WeightRepLoggerWidgetState extends State<WeightRepLoggerWidget> {
                 color: Colors.green.shade700,
               ),
             ),
-          ),
+          ]
         ],
       ),
     );

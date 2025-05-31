@@ -3,7 +3,8 @@ import 'package:aksumfit/models/meal.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:aksumfit/features/nutrition/presentation/screens/log_meal_screen.dart';
-import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
+import 'package:aksumfit/core/extensions/string_extensions.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -279,7 +280,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
       ],
     );
   }
-   IconData _getMealTypeIcon(MealType type) {
+  IconData _getMealTypeIcon(MealType type) {
     switch (type) {
       case MealType.breakfast: return CupertinoIcons.sunrise_fill;
       case MealType.lunch: return CupertinoIcons.sun_max_fill;
@@ -289,6 +290,3 @@ class _NutritionScreenState extends State<NutritionScreen> {
     }
   }
 }
-
-extension StringExtension on String {
-// Removed local StringExtension for capitalize (if it existed here)

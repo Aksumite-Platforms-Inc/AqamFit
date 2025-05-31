@@ -159,7 +159,6 @@ class WorkoutSummaryScreen extends StatelessWidget {
           }
         },
         child: Text("Done", style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
       ),
     );
   }

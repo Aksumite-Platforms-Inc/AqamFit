@@ -5,7 +5,8 @@ import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart'; // For AuthManager, potentially for SettingsService if made a ChangeNotifier
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -45,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final authManager = Provider.of<AuthManager>(context, listen: false);
     // In a real app, ApiService might have a logout method to call the backend
     // await ApiService().logout();
-    await authManager.clearUser(); // Clear local user state
+    authManager.clearUser(); // Clear local user state
     await ApiService().clearToken(); // Clear token from secure storage
 
     if (mounted) {
@@ -79,7 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _currentThemeMode,
                     items: ThemeMode.values.map((mode) => DropdownMenuItem(
                       value: mode,
-                      child: Text(mode.toString().split('.').last.capitalize(), style: GoogleFonts.inter()),
+                      child: Text(StringHelperExtension(mode.toString().split('.').last).capitalize(), style: GoogleFonts.inter()),
                     )).toList(),
                     onChanged: (ThemeMode? newValue) {
                       if (newValue != null) {
@@ -119,7 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _currentDistanceUnit,
                     items: DistanceUnit.values.map((unit) => DropdownMenuItem(
                       value: unit,
-                      child: Text(unit.toString().split('.').last.capitalize(), style: GoogleFonts.inter()),
+                      child: Text(StringHelperExtension(unit.toString().split('.').last).capitalize(), style: GoogleFonts.inter()),
                     )).toList(),
                     onChanged: (DistanceUnit? newValue) {
                       if (newValue != null) {

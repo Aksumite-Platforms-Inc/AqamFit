@@ -6,6 +6,7 @@ import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:aksumfit/core/extensions/string_extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
@@ -452,9 +453,4 @@ class _LogMealScreenState extends State<LogMealScreen> {
   }
 }
 
-extension StringExtension on String {
-  String capitalize() {
-    if (this.isEmpty) return this;
-    return this[0].toUpperCase() + this.substring(1);
-  }
-}
+

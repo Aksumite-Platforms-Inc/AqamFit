@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:aksumfit/services/auth_manager.dart'; // Import AuthManager
+import 'package:aksumfit/models/user.dart';
+import 'package:aksumfit/services/auth_manager.dart';
+import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/services/api_service.dart'; // Import ApiService for isAuthenticated (or use AuthManager)
 import 'package:aksumfit/features/auth/presentation/screens/login_screen.dart';
 import 'package:aksumfit/features/auth/presentation/screens/registration_screen.dart';

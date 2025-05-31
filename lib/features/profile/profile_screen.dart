@@ -115,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: const Icon(CupertinoIcons.pencil_ellipsis_rectangle),
             tooltip: "Edit Profile",
             onPressed: () async { // Make async
-               await context.go('/profile/edit'); // Await navigation
+               context.go('/profile/edit'); // Navigation
                _refreshDataOnReturn(); // Call after navigation completes (if widget still mounted)
             },
           )
@@ -219,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: CupertinoIcons.settings_solid,
               title: "Settings",
               onTap: () async { // Make async
-                await context.go('/settings'); // Await navigation
+                context.go('/settings'); // Navigation
                 _refreshDataOnReturn(); // Call after navigation completes
               },
             ),

@@ -76,6 +76,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                   );
                 },
               ),
+            ],
             if (isPickerMode) ...[
               const SizedBox(height: 20),
               ElevatedButton.icon(
@@ -86,7 +87,7 @@ class ExerciseDetailScreen extends StatelessWidget {
                   Navigator.of(context).pop(exercise); // Return the selected exercise
                 },
               ),
-            ]
+            ],
           ],
         ),
       ),

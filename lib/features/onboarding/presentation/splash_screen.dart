@@ -96,9 +96,9 @@ class _SplashScreenState extends State<SplashScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              theme.colorScheme.surface.withBlue(theme.colorScheme.surface.blue + 20), // Darker shade of surface
-              theme.colorScheme.surface,
-              theme.colorScheme.surface.withBlue(theme.colorScheme.surface.blue - 20), // Lighter shade of surface
+              Theme.of(context).colorScheme.surface.withBlue(Theme.of(context).colorScheme.surface.blue + 20), // Darker shade of surface
+              Theme.of(context).colorScheme.surface,
+              Theme.of(context).colorScheme.surface.withBlue(Theme.of(context).colorScheme.surface.blue - 20), // Lighter shade of surface
             ],
           ),
         ),
@@ -119,12 +119,12 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 120,
                         decoration: BoxDecoration(
                           gradient: LinearGradient( // Use theme primary and secondary for logo gradient
-                            colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+                            colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withOpacity(0.7), // Shadow from theme primary
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.7), // Shadow from theme primary
                               blurRadius: 30,
                               spreadRadius: 5,
                             ),
@@ -133,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Icon( // Icon color from theme
                           CupertinoIcons.heart_fill,
                           size: 60,
-                          color: theme.colorScheme.onPrimary,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                     ),
@@ -152,14 +152,14 @@ class _SplashScreenState extends State<SplashScreen>
                     children: [
                       ShaderMask(
                         shaderCallback: (bounds) => LinearGradient( // Use theme colors for text gradient
-                          colors: [theme.colorScheme.primary, theme.colorScheme.secondary, theme.colorScheme.tertiary],
+                          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
                         ).createShader(bounds),
                         child: Text(
                           'AxumFit',
                           style: GoogleFonts.inter(
                             fontSize: 48,
                             fontWeight: FontWeight.w900,
-                            color: theme.colorScheme.onPrimary, // This color is masked by ShaderMask
+                            color: Theme.of(context).colorScheme.onPrimary, // This color is masked by ShaderMask
                           ),
                         ),
                       ),
@@ -171,7 +171,7 @@ class _SplashScreenState extends State<SplashScreen>
                         style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
-                          color: theme.colorScheme.onSurface.withOpacity(0.7), // Use onSurface from theme
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), // Use onSurface from theme
                           letterSpacing: 2,
                         ),
                       ),
@@ -193,7 +193,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: CircularProgressIndicator( // Use theme for progress indicator
                         strokeWidth: 3,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          theme.colorScheme.onSurface.withOpacity(0.7),
+                          Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
                     ),
@@ -202,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen>
                       'Preparing your fitness journey...',
                       style: GoogleFonts.inter(
                         fontSize: 14,
-                        color: theme.colorScheme.onSurface.withOpacity(0.54), // Use onSurface from theme
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), // Use onSurface from theme
                       ),
                     ),
                   ],

@@ -542,8 +542,22 @@ class WeightLineChart extends StatelessWidget {
           getDrawingVerticalLine: (value) => FlLine(color: theme.dividerColor.withOpacity(0.3), strokeWidth: 0.5),
         ),
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, interval: (maxY - minY) / 5 > 0 ? (maxY - minY) / 5 : 1, getTitlesWidget: leftTitleWidgets)),
-          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30, interval: (maxX - minX) / 5 > 0 ? (maxX-minX) / 5 : 1, getTitlesWidget: bottomTitleWidgets)),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              interval: (maxY - minY) / 5 > 0 ? (maxY - minY) / 5 : 1,
+              getTitlesWidget: (value, meta) => leftTitleWidgets(context, value, meta),
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              interval: (maxX - minX) / 5 > 0 ? (maxX-minX) / 5 : 1,
+              getTitlesWidget: (value, meta) => bottomTitleWidgets(context, value, meta),
+            ),
+          ),
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
@@ -584,7 +598,7 @@ class WeightLineChart extends StatelessWidget {
                 },
                 // Check if a direct 'tooltipBackgroundColor' or similar exists for LineTouchTooltipData
                 // Based on fl_chart ^0.66.0 up to recent versions, direct background color is set on LineTouchTooltipData itself
-                tooltipBackgroundColor: theme.colorScheme.primaryContainer.withOpacity(0.8), // Example if property exists
+                // tooltipBackgroundColor: theme.colorScheme.primaryContainer.withOpacity(0.8), // Removed invalid parameter
 
             )
         )
@@ -592,16 +606,15 @@ class WeightLineChart extends StatelessWidget {
     );
   }
 
-  Widget leftTitleWidgets(double value, TitleMeta meta) {
+  Widget leftTitleWidgets(BuildContext context, double value, TitleMeta meta) {
     return Text(value.toStringAsFixed(1), style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant), textAlign: TextAlign.left);
   }
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    // Convert 'daysSinceFirst' back to a date for display - this is a simplification
+  Widget bottomTitleWidgets(BuildContext context, double value, TitleMeta meta) {
     // In a real app, you'd map X values to actual dates more robustly.
     final firstDate = weightEntries.last.date;
     final displayDate = firstDate.add(Duration(days: value.toInt()));
-    return SideTitleWidget( // Removed axisSide parameter
+    return SideTitleWidget(meta: meta, // Added required meta parameter
       space: 8.0,
       child: Text(DateFormat('d MMM').format(displayDate), style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant)),
     );
