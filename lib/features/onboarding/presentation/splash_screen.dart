@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 // Remove OnboardingScreen import if it's not used after navigation change
 // import 'package:aksumfit/screens/onboarding_screen.dart'; // This might be the old path
@@ -90,18 +89,8 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration( // Use theme colors for gradient
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.surface.withBlue(Theme.of(context).colorScheme.surface.blue + 20), // Darker shade of surface
-              Theme.of(context).colorScheme.surface,
-              Theme.of(context).colorScheme.surface.withBlue(Theme.of(context).colorScheme.surface.blue - 20), // Lighter shade of surface
-            ],
-          ),
-        ),
+      body: CupertinoPageScaffold(
+        backgroundColor: CupertinoColors.systemGroupedBackground,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -118,22 +107,25 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient( // Use theme primary and secondary for logo gradient
-                            colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
+                          gradient: LinearGradient(
+                            colors: [
+                              CupertinoColors.activeBlue,
+                              CupertinoColors.activeGreen
+                            ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.7), // Shadow from theme primary
-                              blurRadius: 30,
-                              spreadRadius: 5,
+                              color: CupertinoColors.activeBlue.withOpacity(0.5),
+                              blurRadius: 25,
+                              spreadRadius: 3,
                             ),
                           ],
                         ),
-                        child: Icon( // Icon color from theme
+                        child: const Icon(
                           CupertinoIcons.heart_fill,
                           size: 60,
-                          color: Theme.of(context).colorScheme.onPrimary,
+                          color: CupertinoColors.white,
                         ),
                       ),
                     ),
@@ -150,30 +142,24 @@ class _SplashScreenState extends State<SplashScreen>
                   opacity: _fadeAnimation,
                   child: Column(
                     children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) => LinearGradient( // Use theme colors for text gradient
-                          colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary, Theme.of(context).colorScheme.tertiary],
-                        ).createShader(bounds),
-                        child: Text(
-                          'AxumFit',
-                          style: GoogleFonts.inter(
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900,
-                            color: Theme.of(context).colorScheme.onPrimary, // This color is masked by ShaderMask
-                          ),
-                        ),
+                      Text(
+                        'AxumFit',
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .navLargeTitleTextStyle
+                            .copyWith(
+                                color: CupertinoColors.label,
+                                fontWeight: FontWeight.bold),
                       ),
-
                       const SizedBox(height: 8),
-
                       Text(
                         'AI Powered Fitness',
-                        style: GoogleFonts.inter(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), // Use onSurface from theme
-                          letterSpacing: 2,
-                        ),
+                        style: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .copyWith(
+                                color: CupertinoColors.secondaryLabel,
+                                letterSpacing: 1),
                       ),
                     ],
                   ),
@@ -187,23 +173,14 @@ class _SplashScreenState extends State<SplashScreen>
                 opacity: _fadeAnimation,
                 child: Column(
                   children: [
-                    SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator( // Use theme for progress indicator
-                        strokeWidth: 3,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                    ),
+                    const CupertinoActivityIndicator(radius: 15),
                     const SizedBox(height: 16),
                     Text(
                       'Preparing your fitness journey...',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), // Use onSurface from theme
-                      ),
+                      style: CupertinoTheme.of(context)
+                          .textTheme
+                          .tabLabelTextStyle
+                          .copyWith(color: CupertinoColors.tertiaryLabel),
                     ),
                   ],
                 ),

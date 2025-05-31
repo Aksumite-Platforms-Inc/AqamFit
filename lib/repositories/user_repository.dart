@@ -8,13 +8,10 @@ class UserRepository {
 
   Future<User?> loginUser(String email, String password) async {
     try {
-      final response = await _apiService.login(email, password);
-      if (response.containsKey('token') && response.containsKey('user')) {
-        final token = response['token'] as String;
-        await _apiService.saveToken(token);
-
-        final userData = response['user'] as Map<String, dynamic>;
-        return User.fromJson(userData);
+      final authResponse = await _apiService.login(email: email, password: password);
+      if (authResponse.success) {
+        await _apiService.saveToken(authResponse.token);
+        return authResponse.user;
       }
     } catch (e) {
       print('Login failed: $e');
@@ -26,13 +23,10 @@ class UserRepository {
 
   Future<User?> registerUser(String name, String email, String password) async {
     try {
-      final response = await _apiService.register(name, email, password);
-      if (response.containsKey('token') && response.containsKey('user')) {
-        final token = response['token'] as String;
-        await _apiService.saveToken(token);
-
-        final userData = response['user'] as Map<String, dynamic>;
-        return User.fromJson(userData);
+      final authResponse = await _apiService.register(name: name, email: email, password: password);
+      if (authResponse.success) {
+        await _apiService.saveToken(authResponse.token);
+        return authResponse.user;
       }
     } catch (e) {
       print('Registration failed: $e');

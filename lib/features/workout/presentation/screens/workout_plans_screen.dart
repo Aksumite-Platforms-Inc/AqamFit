@@ -2,11 +2,9 @@ import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/features/workout/create_workout_screen.dart';
 import 'package:aksumfit/features/workout/workout_screen.dart'; // The active workout session screen
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Keep for ScaffoldMessenger, MaterialPageRoute
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 
@@ -89,38 +87,40 @@ class _WorkoutPlansScreenState extends State<WorkoutPlansScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("My Workout Plans", style: GoogleFonts.inter(color: theme.colorScheme.onPrimary)),
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-        // Potentially add actions like filter or sort if list becomes long
+    final cupertinoTheme = CupertinoTheme.of(context);
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text("My Workout Plans"),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.add),
+          onPressed: () => _navigateToCreatePlan(),
+        ),
       ),
-      body: FutureBuilder<List<WorkoutPlan>>(
+      child: FutureBuilder<List<WorkoutPlan>>(
         future: _workoutPlansFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CupertinoActivityIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text("Error loading plans: ${snapshot.error}", style: GoogleFonts.inter()));
+            return Center(child: Text("Error loading plans: ${snapshot.error}"));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(CupertinoIcons.doc_text_search, size: 80, color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                  Icon(CupertinoIcons.doc_text_search, size: 80, color: CupertinoColors.secondaryLabel),
                   const SizedBox(height: 20),
-                  Text(
+                  const Text(
                     "No workout plans yet.",
-                    style: GoogleFonts.inter(fontSize: 18, color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    style: TextStyle(fontSize: 18, color: CupertinoColors.secondaryLabel),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     "Tap the '+' button to create your first plan!",
-                    style: GoogleFonts.inter(fontSize: 14, color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                    style: TextStyle(fontSize: 14, color: CupertinoColors.tertiaryLabel),
                   ),
                 ],
               ),
@@ -129,58 +129,68 @@ class _WorkoutPlansScreenState extends State<WorkoutPlansScreen> {
 
           final plans = snapshot.data!;
           return ListView.builder(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 8.0), // Add padding for the first section
             itemCount: plans.length,
             itemBuilder: (context, index) {
               final plan = plans[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(vertical:10.0, horizontal: 16.0),
-                  leading: CircleAvatar(
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    child: Text(plan.name.isNotEmpty ? plan.name[0].toUpperCase() : "?", style: TextStyle(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold)),
-                  ),
-                  title: Text(plan.name, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                    "${plan.exercises.length} exercises - ${StringExtension(plan.difficulty.toString().split('.').last).capitalize()}",
-                     style: GoogleFonts.inter(),
-                  ),
-                  trailing: PopupMenuButton<String>(
-                    onSelected: (value) {
-                      if (value == 'edit') {
-                        _navigateToCreatePlan(planToEdit: plan);
-                      } else if (value == 'delete') {
-                        _deletePlan(plan);
-                      }
+              return CupertinoListSection.insetGrouped(
+                children: [
+                  CupertinoListTile.notched(
+                    leading: CircleAvatar(
+                      backgroundColor: cupertinoTheme.primaryColor.withOpacity(0.1),
+                      child: Text(plan.name.isNotEmpty ? plan.name[0].toUpperCase() : "?",
+                          style: TextStyle(color: cupertinoTheme.primaryColor, fontWeight: FontWeight.bold)),
+                    ),
+                    title: Text(plan.name, style: cupertinoTheme.textTheme.navTitleTextStyle),
+                    subtitle: Text(
+                      "${plan.exercises.length} exercises - ${StringExtension(plan.difficulty.toString().split('.').last).capitalize()}",
+                    ),
+                    trailing: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: const Icon(CupertinoIcons.ellipsis_vertical),
+                      onPressed: () {
+                        showCupertinoModalPopup(
+                          context: context,
+                          builder: (BuildContext context) => CupertinoActionSheet(
+                            actions: <CupertinoActionSheetAction>[
+                              CupertinoActionSheetAction(
+                                child: const Text('Edit Plan'),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _navigateToCreatePlan(planToEdit: plan);
+                                },
+                              ),
+                              CupertinoActionSheetAction(
+                                child: const Text('Delete Plan'),
+                                isDestructiveAction: true,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _deletePlan(plan);
+                                },
+                              ),
+                            ],
+                            cancelButton: CupertinoActionSheetAction(
+                              child: const Text('Cancel'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(builder: (context) => WorkoutScreen(plan: plan)),
+                      ).then((_) => _loadWorkoutPlans());
                     },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(value: 'edit', child: ListTile(leading: Icon(CupertinoIcons.pencil), title: Text('Edit'))),
-                      const PopupMenuItem<String>(value: 'delete', child: ListTile(leading: Icon(CupertinoIcons.delete), title: Text('Delete'))),
-                    ],
-                    icon: Icon(CupertinoIcons.ellipsis_vertical, color: theme.colorScheme.onSurfaceVariant),
                   ),
-                  onTap: () {
-                    // Navigate to WorkoutScreen (active session) with the selected plan
-                    // Ensure WorkoutScreen is registered in GoRouter if not already
-                    // For now, direct MaterialPageRoute for simplicity if WorkoutScreen is not part of main nav stack
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => WorkoutScreen(plan: plan)),
-                    ).then((_) => _loadWorkoutPlans()); // Refresh plans if user comes back, e.g. after a workout
-                  },
-                ),
+                ],
               );
             },
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToCreatePlan(),
-        icon: const Icon(CupertinoIcons.add),
-        label: const Text("Create Plan"),
-        backgroundColor: theme.colorScheme.tertiaryContainer,
-        foregroundColor: theme.colorScheme.onTertiaryContainer,
       ),
     );
   }

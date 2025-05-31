@@ -90,187 +90,174 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    // Listen to AuthManager to rebuild if user changes (e.g., after logout from settings)
-    // However, for displaying user data, a one-time read in initState or a Consumer is often better.
-    // For simplicity, we use the _currentUser from initState and refresh on return.
-    // final _currentUser = Provider.of<AuthManager>(context).currentUser;
+    final cupertinoTheme = CupertinoTheme.of(context);
 
     if (_currentUser == null) {
-      // This case should ideally not be reached if ProfileScreen is protected by auth routes
-      return Scaffold(
-        appBar: AppBar(title: Text("Profile", style: GoogleFonts.inter())),
-        body: const Center(child: Text("Not logged in.")),
+      return CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(middle: Text("Profile")),
+        child: const Center(child: Text("Not logged in.")),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("My Profile", style: GoogleFonts.inter(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.w600)),
-        backgroundColor: theme.colorScheme.primary,
-        elevation: theme.appBarTheme.elevation,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-        actions: [
-          IconButton(
-            icon: const Icon(CupertinoIcons.pencil_ellipsis_rectangle),
-            tooltip: "Edit Profile",
-            onPressed: () async { // Make async
-               context.go('/profile/edit'); // Navigation
-               _refreshDataOnReturn(); // Call after navigation completes (if widget still mounted)
-            },
-          )
-        ],
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text("My Profile"),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.pencil_ellipsis_rectangle),
+          onPressed: () async {
+            context.go('/profile/edit');
+            _refreshDataOnReturn();
+          },
+        ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async => _loadProfileData(),
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
-          children: [
-            // Profile Header
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 55,
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    child: _currentUser!.profileImageUrl != null && _currentUser!.profileImageUrl!.isNotEmpty
-                        ? ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: _currentUser!.profileImageUrl!,
-                              width: 100, height: 100, fit: BoxFit.cover,
-                              placeholder: (context, url) => const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => Icon(CupertinoIcons.person_fill, size: 50, color: theme.colorScheme.onPrimaryContainer),
-                            ),
-                          )
-                        : Icon(CupertinoIcons.person_fill, size: 50, color: theme.colorScheme.onPrimaryContainer),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    _currentUser!.name,
-                    style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _currentUser!.email, // Display actual email
-                    style: GoogleFonts.inter(fontSize: 15, color: theme.colorScheme.onSurface.withOpacity(0.7)),
-                  ),
-                  // Text("Joined: ${DateFormat.yMMMMd().format(_currentUser!.createdAt)}", style: GoogleFonts.inter(...)), // If createdAt is available
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-            // User Stats Section - pass dynamic data
-            UserStatsCard(
-              totalWorkouts: _currentUser!.totalWorkouts ?? 0,
-              streak: _currentUser!.streakCount,
-              achievements: _currentUser!.achievements ?? 0,
-            ),
-            const SizedBox(height: 24),
-
-            // My Goals Section
-            _buildSectionTitle(context, "Active Goals"),
-            FutureBuilder<List<Goal>>(
-              future: _activeGoalsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CircularProgressIndicator(strokeWidth: 2)));
-                }
-                if (snapshot.hasError) {
-                  return Center(child: Text("Error loading goals.", style: TextStyle(color: theme.colorScheme.error)));
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text("No active goals set yet.", style: GoogleFonts.inter(color: theme.colorScheme.onSurfaceVariant)),
-                  ));
-                }
-                final goals = snapshot.data!;
-                return Card(
+      child: CustomScrollView(
+        slivers: [
+          CupertinoSliverRefreshControl(onRefresh: () async => _loadProfileData()),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      ...goals.take(3).map((goal) => _buildGoalItem(context, goal)), // Show top 3 goals
-                      if (goals.length > 3 || goals.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8.0, bottom: 4.0, top: 4.0),
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                 context.go('/progress'); // Navigate to full progress/goals screen
-                              },
-                              child: Text("View All Goals (${goals.length})", style: GoogleFonts.inter(color: theme.colorScheme.primary, fontSize: 13)),
-                            ),
-                          ),
-                        ),
-                       if (goals.isEmpty) // Should be caught by earlier check, but good fallback
-                         ListTile(title: Text("No active goals.", style: GoogleFonts.inter(color: theme.colorScheme.onSurfaceVariant)))
+                      CircleAvatar(
+                        radius: 55,
+                        backgroundColor: cupertinoTheme.primaryColor.withOpacity(0.1),
+                        child: _currentUser!.profileImageUrl != null && _currentUser!.profileImageUrl!.isNotEmpty
+                            ? ClipOval(
+                                child: CachedNetworkImage(
+                                  imageUrl: _currentUser!.profileImageUrl!,
+                                  width: 100, height: 100, fit: BoxFit.cover,
+                                  placeholder: (context, url) => const CupertinoActivityIndicator(),
+                                  errorWidget: (context, url, error) => Icon(CupertinoIcons.person_fill, size: 50, color: cupertinoTheme.primaryColor),
+                                ),
+                              )
+                            : Icon(CupertinoIcons.person_fill, size: 50, color: cupertinoTheme.primaryColor),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _currentUser!.name,
+                        style: cupertinoTheme.textTheme.navLargeTitleTextStyle.copyWith(color: CupertinoColors.label),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _currentUser!.email,
+                        style: cupertinoTheme.textTheme.tabLabelTextStyle.copyWith(color: CupertinoColors.secondaryLabel),
+                      ),
+                      const SizedBox(height: 24),
                     ],
                   ),
-                );
-              }
+                ),
+                UserStatsCard(
+                  totalWorkouts: _currentUser!.totalWorkouts ?? 0,
+                  streak: _currentUser!.streakCount,
+                  achievements: _currentUser!.achievements ?? 0,
+                ),
+                CupertinoListSection.insetGrouped(
+                  header: const Text("Active Goals"),
+                  children: [
+                    FutureBuilder<List<Goal>>(
+                      future: _activeGoalsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: Padding(padding: EdgeInsets.all(8.0), child: CupertinoActivityIndicator()));
+                        }
+                        if (snapshot.hasError) {
+                          return Center(child: Text("Error loading goals.", style: TextStyle(color: CupertinoColors.destructiveRed)));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return const CupertinoListTile(title: Text("No active goals set yet."));
+                        }
+                        final goals = snapshot.data!;
+                        return Column(
+                          children: [
+                            ...goals.take(3).map((goal) => _buildGoalItemCupertino(context, goal, cupertinoTheme)),
+                            if (goals.length > 3)
+                              CupertinoListTile(
+                                title: Text("View All Goals (${goals.length})", style: TextStyle(color: cupertinoTheme.primaryColor)),
+                                trailing: const Icon(CupertinoIcons.forward),
+                                onTap: () => context.go('/progress'),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                CupertinoListSection.insetGrouped(
+                  children: [
+                    _buildNavigationTileCupertino(
+                      context,
+                      cupertinoTheme: cupertinoTheme,
+                      icon: CupertinoIcons.settings_solid,
+                      title: "Settings",
+                      onTap: () async {
+                        context.go('/settings');
+                        _refreshDataOnReturn();
+                      },
+                    ),
+                    _buildNavigationTileCupertino(
+                      context,
+                      cupertinoTheme: cupertinoTheme,
+                      icon: CupertinoIcons.question_circle_fill,
+                      title: "Help & Support",
+                      onTap: () { /* TODO: Navigate to Help/Support */ }
+                    ),
+                    _buildNavigationTileCupertino(
+                      context,
+                      cupertinoTheme: cupertinoTheme,
+                      icon: CupertinoIcons.shield_lefthalf_fill,
+                      title: "Privacy Policy",
+                      onTap: () { /* TODO: Navigate to Privacy Policy */ }
+                    ),
+                  ],
+                ),
+                // Premium Upsell Card (can be kept or modified)
+                // Card( /* ... existing premium card ... */ ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 24),
-
-            // Settings Navigation
-            _buildNavigationTile(
-              context,
-              icon: CupertinoIcons.settings_solid,
-              title: "Settings",
-              onTap: () async { // Make async
-                context.go('/settings'); // Navigation
-                _refreshDataOnReturn(); // Call after navigation completes
-              },
-            ),
-            const SizedBox(height: 12),
-            _buildNavigationTile(
-              context,
-              icon: CupertinoIcons.question_circle_fill,
-              title: "Help & Support",
-              onTap: () { /* TODO: Navigate to Help/Support */ }
-            ),
-             const SizedBox(height: 12),
-            _buildNavigationTile(
-              context,
-              icon: CupertinoIcons.shield_lefthalf_fill,
-              title: "Privacy Policy",
-              onTap: () { /* TODO: Navigate to Privacy Policy */ }
-            ),
-            const SizedBox(height: 24),
-
-            // Premium Upsell Card (can be kept or modified)
-            Card( /* ... existing premium card ... */ ),
-            const SizedBox(height: 24),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Text(
-        title,
-        style: GoogleFonts.inter(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.onSurface,
+  Widget _buildGoalItemCupertino(BuildContext context, Goal goal, CupertinoThemeData theme) {
+    return CupertinoListTile(
+      title: Text(
+        goal.name,
+        style: theme.textTheme.textStyle.copyWith(fontSize: 15),
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4.0),
+        child: LinearProgressIndicator( // Using LinearProgressIndicator as Cupertino doesn't have a direct equivalent styled this way
+          value: goal.progressPercentage,
+          backgroundColor: CupertinoColors.secondarySystemFill,
+          color: theme.primaryColor,
+          minHeight: 6,
+          // borderRadius: BorderRadius.circular(3), // Not available in LinearProgressIndicator
         ),
       ),
+      trailing: Text(
+        "${(goal.progressPercentage * 100).toStringAsFixed(0)}%",
+         style: theme.textTheme.navActionTextStyle.copyWith(color: theme.primaryColor, fontSize: 14),
+      ),
+      onTap: () {
+        // context.go('/progress/goals/${goal.id}'); // Example
+      },
     );
   }
 
-  Widget _buildNavigationTile(BuildContext context, {required IconData icon, required String title, required VoidCallback onTap}) {
-    final theme = Theme.of(context);
-    return Card(
-      child: ListTile(
-        leading: Icon(icon, color: theme.colorScheme.secondary, size: 24),
-        title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 16)),
-        trailing: Icon(CupertinoIcons.chevron_forward, color: theme.colorScheme.onSurfaceVariant, size: 20),
-        onTap: onTap,
-      ),
+  Widget _buildNavigationTileCupertino(BuildContext context, {required IconData icon, required String title, required VoidCallback onTap, required CupertinoThemeData cupertinoTheme}) {
+    return CupertinoListTile(
+      leading: Icon(icon, color: cupertinoTheme.primaryColor),
+      title: Text(title, style: cupertinoTheme.textTheme.textStyle),
+      trailing: const Icon(CupertinoIcons.forward, color: CupertinoColors.inactiveGray),
+      onTap: onTap,
     );
   }
 }

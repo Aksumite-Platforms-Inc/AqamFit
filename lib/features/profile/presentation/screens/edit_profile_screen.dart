@@ -127,99 +127,172 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Profile", style: GoogleFonts.inter(color: theme.colorScheme.onPrimary)),
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-        actions: [
-          IconButton(
-            icon: _isLoading ? const SizedBox(width:20, height:20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0)) : const Icon(Icons.save),
-            onPressed: _isLoading ? null : _saveProfile,
-            tooltip: "Save Changes",
-          )
-        ],
+    final cupertinoTheme = CupertinoTheme.of(context);
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text("Edit Profile"),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: _isLoading ? const CupertinoActivityIndicator() : const Text("Save"),
+          onPressed: _isLoading ? null : _saveProfile,
+        ),
       ),
-      body: Form(
+      child: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.symmetric(vertical: 8.0), // Add some vertical padding
           children: [
+            const SizedBox(height: 20), // Top spacing
             Center(
               child: Stack(
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    backgroundColor: CupertinoColors.secondarySystemFill,
                     backgroundImage: _profileImageUrlController != null && _profileImageUrlController!.startsWith('http')
                         ? CachedNetworkImageProvider(_profileImageUrlController!)
-                        : null, // TODO: Handle local file path for preview if _picker is used
+                        : null,
                     child: (_profileImageUrlController == null || !_profileImageUrlController!.startsWith('http'))
-                        ? Icon(CupertinoIcons.person_fill, size: 60, color: theme.colorScheme.primary)
+                        ? Icon(CupertinoIcons.person_fill, size: 60, color: cupertinoTheme.primaryColor)
                         : null,
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: IconButton.filled(
-                      style: IconButton.styleFrom(backgroundColor: theme.colorScheme.primary),
-                      icon: Icon(CupertinoIcons.camera_fill, color: theme.colorScheme.onPrimary, size: 20),
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      child: Container( // Create a colored circle for the button
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: cupertinoTheme.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(CupertinoIcons.camera_fill, color: CupertinoColors.white, size: 20),
+                      ),
                       onPressed: _pickProfileImage,
-                      tooltip: "Change Profile Picture",
                     ),
                   )
                 ],
               ),
             ),
             const SizedBox(height: 30),
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: "Full Name", prefixIcon: Icon(CupertinoIcons.person)),
-              validator: (value) => (value == null || value.isEmpty) ? "Name cannot be empty" : null,
+            CupertinoFormSection.insetGrouped(
+              header: const Text("Personal Information"),
+              children: [
+                CupertinoTextFormFieldRow(
+                  controller: _nameController,
+                  prefix: const Text("Name"),
+                  placeholder: "Enter your full name",
+                  validator: (value) => (value == null || value.isEmpty) ? "Name cannot be empty" : null,
+                ),
+                CupertinoTextFormFieldRow(
+                  controller: _emailController,
+                  prefix: const Text("Email"),
+                  placeholder: "your.email@example.com",
+                  readOnly: true,
+                  style: TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context)), // Dim text for read-only
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: "Email Address", prefixIcon: Icon(CupertinoIcons.mail)),
-              readOnly: true, // Typically email is not directly editable
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-            ),
-            const SizedBox(height: 24),
-            Text("Preferences", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<WeightUnit>(
-              value: _selectedWeightUnit,
-              decoration: const InputDecoration(labelText: "Weight Unit", prefixIcon: Icon(CupertinoIcons.gauge)),
-              items: WeightUnit.values.map((unit) => DropdownMenuItem(
-                value: unit,
-                child: Text(unit.toString().split('.').last.toUpperCase()),
-              )).toList(),
-              onChanged: (WeightUnit? newValue) {
-                if (newValue != null) setState(() => _selectedWeightUnit = newValue);
-              },
-            ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<DistanceUnit>(
-              value: _selectedDistanceUnit,
-              decoration: const InputDecoration(labelText: "Distance Unit", prefixIcon: Icon(CupertinoIcons.map_pin_ellipse)),
-              items: DistanceUnit.values.map((unit) => DropdownMenuItem(
-                value: unit,
-                child: Text(unit.toString().split('.').last.capitalize()),
-              )).toList(),
-              onChanged: (DistanceUnit? newValue) {
-                if (newValue != null) setState(() => _selectedDistanceUnit = newValue);
-              },
+            CupertinoFormSection.insetGrouped(
+              header: const Text("Preferences"),
+              children: [
+                CupertinoListTile(
+                  title: const Text("Weight Unit"),
+                  additionalInfo: Text(_selectedWeightUnit.toString().split('.').last.toUpperCase()),
+                  trailing: const Icon(CupertinoIcons.forward),
+                  onTap: () => _showUnitPicker<WeightUnit>(
+                    context: context,
+                    title: "Select Weight Unit",
+                    items: WeightUnit.values,
+                    currentValue: _selectedWeightUnit,
+                    onSelectedItemChanged: (newValue) {
+                      if (newValue != null) setState(() => _selectedWeightUnit = newValue);
+                    },
+                  ),
+                ),
+                CupertinoListTile(
+                  title: const Text("Distance Unit"),
+                  additionalInfo: Text(_selectedDistanceUnit.toString().split('.').last.capitalize()),
+                  trailing: const Icon(CupertinoIcons.forward),
+                  onTap: () => _showUnitPicker<DistanceUnit>(
+                     context: context,
+                    title: "Select Distance Unit",
+                    items: DistanceUnit.values,
+                    currentValue: _selectedDistanceUnit,
+                    onSelectedItemChanged: (newValue) {
+                      if (newValue != null) setState(() => _selectedDistanceUnit = newValue);
+                    },
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 40),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Consistent padding
+              child: CupertinoButton.filled(
+                onPressed: _isLoading ? null : _saveProfile,
+                child: _isLoading ? const CupertinoActivityIndicator(color: CupertinoColors.white) : const Text("Save Changes"),
               ),
-              onPressed: _isLoading ? null : _saveProfile,
-              child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text("Save Changes", style: TextStyle(fontSize: 16)),
+            ),
+             const SizedBox(height: 20), // Bottom spacing
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUnitPicker<T extends Enum>({
+    required BuildContext context,
+    required String title,
+    required List<T> items,
+    required T currentValue,
+    required ValueChanged<T?> onSelectedItemChanged,
+  }) {
+    final FixedExtentScrollController scrollController =
+        FixedExtentScrollController(initialItem: items.indexOf(currentValue));
+
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 250, // Adjust height as needed
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              color: CupertinoColors.secondarySystemBackground.resolveFrom(context),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    child: const Text('Cancel'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                   CupertinoButton(
+                    child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)), // Title in the middle
+                    onPressed: null, // Not interactive
+                  ),
+                  CupertinoButton(
+                    child: const Text('Done'),
+                    onPressed: () {
+                      onSelectedItemChanged(items[scrollController.selectedItem]);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                scrollController: scrollController,
+                itemExtent: 32.0,
+                onSelectedItemChanged: (int index) {
+                  // No immediate state update here, wait for "Done"
+                },
+                children: items.map((T value) {
+                  return Center(child: Text(value.toString().split('.').last.capitalize()));
+                }).toList(),
+              ),
             ),
           ],
         ),

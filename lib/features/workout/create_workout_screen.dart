@@ -5,8 +5,7 @@ import 'package:aksumfit/features/explore/presentation/screens/exercise_library_
 import 'package:aksumfit/services/auth_manager.dart'; // To get current user ID for authorId
 import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart'; // Keep for MaterialPageRoute & showCupertinoDialog
 import 'package:provider/provider.dart'; // Example: using Provider for AuthManager
 import 'package:aksumfit/services/api_service.dart'; // Import ApiService
 import 'package:uuid/uuid.dart';
@@ -76,79 +75,73 @@ class _PlanExerciseEditTileState extends State<PlanExerciseEditTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final cupertinoTheme = CupertinoTheme.of(context);
     bool isStrength = widget.exerciseDetails.type == ExerciseType.strength ||
-                      widget.exerciseDetails.type == ExerciseType.plyometrics; // Plyo might have reps
+                      widget.exerciseDetails.type == ExerciseType.plyometrics;
     bool isTimed = widget.exerciseDetails.type == ExerciseType.cardio ||
                    widget.exerciseDetails.type == ExerciseType.stretch ||
-                   _editingExercise.durationSeconds != null ;
+                   _editingExercise.durationSeconds != null;
 
-
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ExpansionTile(
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
-          child: Icon(CupertinoIcons.flame_fill, color: theme.colorScheme.primary, size: 20),
+    return CupertinoListTile.notched(
+      leading: CircleAvatar(
+        backgroundColor: cupertinoTheme.primaryColor.withOpacity(0.1),
+        child: Icon(CupertinoIcons.flame_fill, color: cupertinoTheme.primaryColor, size: 20),
+      ),
+      title: Text(widget.exerciseDetails.name, style: cupertinoTheme.textTheme.navTitleTextStyle),
+      subtitle: Text(
+        "${widget.exerciseDetails.type.toString().split('.').last.capitalize()} - ${widget.exerciseDetails.muscleGroups.take(2).join(', ')}",
+        style: cupertinoTheme.textTheme.tabLabelTextStyle.copyWith(color: CupertinoColors.secondaryLabel),
+      ),
+      trailing: CupertinoButton(
+        padding: EdgeInsets.zero,
+        child: const Icon(CupertinoIcons.delete_simple, color: CupertinoColors.destructiveRed),
+        onPressed: widget.onRemove,
+      ),
+      additionalInfo: Padding( // Using additionalInfo for expandable content
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0, right: 16.0), // Adjust padding as needed
+        child: Column(
+          children: [
+            if (isStrength) ...[
+              _buildCupertinoTextField(_setsController, "Sets (e.g., 3)", TextInputType.number),
+              _buildCupertinoTextField(_repsController, "Reps (e.g., 8-12 or AMRAP)"),
+              _buildCupertinoTextField(_weightController, "Weight (kg, optional)", const TextInputType.numberWithOptions(decimal: true)),
+            ],
+            if (isTimed || widget.exerciseDetails.type == ExerciseType.strength)
+              _buildCupertinoTextField(_durationController, "Duration (seconds, optional)", TextInputType.number),
+            _buildCupertinoTextField(_restController, "Rest between sets (seconds, optional)", TextInputType.number),
+            _buildCupertinoTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text, 2),
+            const SizedBox(height: 10),
+            CupertinoButton(
+              child: const Text("Update Exercise Details"),
+              onPressed: _updatePlanExercise,
+            )
+          ],
         ),
-        title: Text(widget.exerciseDetails.name, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        subtitle: Text(
-          "${widget.exerciseDetails.type.toString().split('.').last.capitalize()} - ${widget.exerciseDetails.muscleGroups.take(2).join(', ')}",
-          style: GoogleFonts.inter(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7)),
-        ),
-        trailing: IconButton(
-          icon: Icon(CupertinoIcons.delete_simple, color: theme.colorScheme.error),
-          onPressed: widget.onRemove,
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0).copyWith(top: 0),
-            child: Column(
-              children: [
-                if (isStrength) ...[
-                  _buildTextField(_setsController, "Sets (e.g., 3)", TextInputType.number),
-                  _buildTextField(_repsController, "Reps (e.g., 8-12 or AMRAP)"),
-                  _buildTextField(_weightController, "Weight (kg, optional)", TextInputType.numberWithOptions(decimal: true)),
-                ],
-                if (isTimed || widget.exerciseDetails.type == ExerciseType.strength) // Allow duration for strength sets too (e.g. timed plank)
-                  _buildTextField(_durationController, "Duration (seconds, optional)", TextInputType.number),
-
-                _buildTextField(_restController, "Rest between sets (seconds, optional)", TextInputType.number),
-                _buildTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text),
-                const SizedBox(height: 10),
-                TextButton(
-                  onPressed: _updatePlanExercise,
-                  child: const Text("Update Exercise Details"),
-                )
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, [TextInputType? keyboardType, int? maxLines]) {
+  Widget _buildCupertinoTextField(TextEditingController controller, String placeholder, [TextInputType? keyboardType, int? maxLines]) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: TextField(
+      padding: const EdgeInsets.symmetric(vertical: 4.0), // Reduced vertical padding
+      child: CupertinoTextField(
         controller: controller,
+        placeholder: placeholder,
         keyboardType: keyboardType,
-        maxLines: maxLines ?? 1,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        minLines: 1,
+        maxLines: (keyboardType == TextInputType.multiline) ? maxLines : 1, // Use givenMaxLines for multiline, else 1
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Adjusted padding
+        decoration: BoxDecoration(
+          border: Border.all(color: CupertinoColors.inactiveGray),
+          borderRadius: BorderRadius.circular(8.0),
         ),
-        // No onEditingComplete or onChanged here to avoid frequent updates, user will click "Update"
       ),
     );
   }
 }
 
-
 class CreateWorkoutScreen extends StatefulWidget {
-  final WorkoutPlan? existingPlan; // To allow editing existing plans
+  final WorkoutPlan? existingPlan;
 
   const CreateWorkoutScreen({super.key, this.existingPlan});
 
@@ -162,9 +155,6 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
   final Uuid _uuid = const Uuid();
   final TextEditingController _planNameController = TextEditingController();
   final TextEditingController _planDescriptionController = TextEditingController();
-
-  // For fetching actual exercises by ID when loading an existing plan
-  // This is a placeholder; in a real app, you'd fetch from a service/DB.
   final Map<String, Exercise> _exerciseCache = {};
 
   @override
@@ -174,19 +164,14 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
     final String currentUserId = authManager.currentUser?.id ?? "default_user";
 
     if (widget.existingPlan != null) {
-      _workoutPlan = widget.existingPlan!.copyWith(); // Make a mutable copy
+      _workoutPlan = widget.existingPlan!.copyWith();
       _planNameController.text = _workoutPlan.name;
       _planDescriptionController.text = _workoutPlan.description ?? '';
-      // Populate cache for existing exercises (mocked)
       for (var pExercise in _workoutPlan.exercises) {
         if (pExercise.exerciseDetails != null) {
            _exerciseCache[pExercise.exerciseId] = pExercise.exerciseDetails!;
-        } else {
-          // In a real app, you might need to fetch details if not embedded
-          // For now, we'll assume if not embedded, it's an issue or needs a placeholder
         }
       }
-
     } else {
       _workoutPlan = WorkoutPlan(
         id: _uuid.v4(),
@@ -206,17 +191,16 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
 
   void _addExerciseToPlan(Exercise exercise) {
     final newPlanExercise = WorkoutPlanExercise(
-      id: _uuid.v4(), // Unique ID for this entry in the plan
+      id: _uuid.v4(),
       exerciseId: exercise.id,
       order: _workoutPlan.exercises.length,
-      exerciseDetails: exercise, // Embed full details for easier UI building
-      // Default sets/reps/etc. can be set here or in the PlanExerciseEditTile
+      exerciseDetails: exercise,
     );
     setState(() {
       _workoutPlan = _workoutPlan.copyWith(
         exercises: [..._workoutPlan.exercises, newPlanExercise],
       );
-      _exerciseCache[exercise.id] = exercise; // Cache it
+      _exerciseCache[exercise.id] = exercise;
     });
   }
 
@@ -236,12 +220,10 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
     });
   }
 
-  Future<void> _saveWorkoutPlan() async { // Added async
+  Future<void> _saveWorkoutPlan() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
       setState(() {
-        // Update the _workoutPlan object with the latest from controllers before saving
         _workoutPlan = _workoutPlan.copyWith(
           name: _planNameController.text,
           description: _planDescriptionController.text,
@@ -251,158 +233,150 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
 
       try {
         final savedPlan = await ApiService().saveWorkoutPlan(_workoutPlan);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${savedPlan.name} saved successfully!')),
-        );
-        Navigator.of(context).pop(savedPlan); // Return the saved/updated plan
+        // Show Cupertino success dialog
+         if (mounted) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) => CupertinoAlertDialog(
+              title: const Text("Plan Saved"),
+              content: Text('${savedPlan.name} saved successfully!'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Pop dialog
+                    Navigator.of(context).pop(savedPlan); // Pop screen, return plan
+                  },
+                )
+              ],
+            ),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving plan: ${e.toString()}')),
-        );
+         if (mounted) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) => CupertinoAlertDialog(
+              title: const Text("Error"),
+              content: Text('Error saving plan: ${e.toString()}'),
+              actions: [CupertinoDialogAction(child: const Text("OK"), onPressed: () => Navigator.of(context).pop())],
+            ),
+          );
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.existingPlan == null ? "Create Workout Plan" : "Edit Workout Plan",
-          style: GoogleFonts.inter(color: theme.colorScheme.onPrimary),
+    final cupertinoTheme = CupertinoTheme.of(context);
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(widget.existingPlan == null ? "Create Workout Plan" : "Edit Workout Plan"),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.check_mark_circled),
+          onPressed: _saveWorkoutPlan,
         ),
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-        actions: [
-          IconButton(
-            icon: const Icon(CupertinoIcons.check_mark_circled),
-            onPressed: _saveWorkoutPlan,
-            tooltip: "Save Plan",
-          ),
-        ],
       ),
-      body: Form(
+      child: Form(
         key: _formKey,
-        child: ListView( // Changed to ListView for better scrolling with many exercises
-          padding: const EdgeInsets.all(16.0),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Added vertical padding
           children: [
-            TextFormField(
-              controller: _planNameController,
-              decoration: const InputDecoration(labelText: "Plan Name"),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter a plan name";
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _planDescriptionController,
-              decoration: const InputDecoration(
-                labelText: "Description (Optional)",
-                hintText: "e.g., Focus on upper body strength, 3 times a week.",
-              ),
-              maxLines: 3,
-              minLines: 1,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            CupertinoFormSection.insetGrouped(
+              header: const Text("Plan Details"),
               children: [
-                Text(
-                  "Exercises (${_workoutPlan.exercises.length})",
-                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(CupertinoIcons.add),
-                  label: const Text("Add Exercise"),
-                  onPressed: () async {
-                    // Navigate to ExerciseLibraryScreen and wait for result
-                    final selectedExercise = await Navigator.push<Exercise>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ExerciseLibraryScreen(isPickerMode: true),
-                      ),
-                    );
-                    if (selectedExercise != null) {
-                      _addExerciseToPlan(selectedExercise);
+                CupertinoTextFormFieldRow(
+                  controller: _planNameController,
+                  prefix: const Text("Name"),
+                  placeholder: "Enter plan name",
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Please enter a plan name";
                     }
-                    // No else needed here, if user cancels, selectedExercise will be null.
+                    return null;
                   },
+                ),
+                CupertinoTextFormFieldRow(
+                  controller: _planDescriptionController,
+                  prefix: const Text("Description"),
+                  placeholder: "e.g., Focus on upper body",
+                  maxLines: 3,
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            if (_workoutPlan.exercises.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: theme.dividerColor),
-                ),
-                child: Center(
-                  child: Text(
-                    "No exercises added yet. Click 'Add Exercise' to begin.",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(color: theme.colorScheme.onSurfaceVariant, fontSize: 16),
-                  ),
-                ),
-              )
-            else
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(), // Disable scrolling for inner ListView
-                itemCount: _workoutPlan.exercises.length,
-                itemBuilder: (context, index) {
-                  final planExercise = _workoutPlan.exercises[index];
-                  // Fetch full exercise details (assuming they were embedded or cached)
-                  final exerciseDetails = planExercise.exerciseDetails ?? _exerciseCache[planExercise.exerciseId];
-
-                  if (exerciseDetails == null) {
-                    // This case should ideally not happen if data is handled correctly
-                    return Card(
-                      color: theme.colorScheme.errorContainer,
-                      child: ListTile(
-                        title: Text("Error: Exercise details missing for ID ${planExercise.exerciseId}", style: TextStyle(color: theme.colorScheme.onErrorContainer)),
-                        trailing: IconButton(
-                          icon: Icon(CupertinoIcons.delete, color: theme.colorScheme.onErrorContainer),
-                          onPressed: () => _removeExerciseFromPlan(index),
+            CupertinoListSection.insetGrouped(
+              header: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Exercises (${_workoutPlan.exercises.length})", style: cupertinoTheme.textTheme.tabLabelTextStyle.copyWith(color: CupertinoColors.secondaryLabel)),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    child: const Row(children: [Icon(CupertinoIcons.add), SizedBox(width: 4), Text("Add")]),
+                    onPressed: () async {
+                      final selectedExercise = await Navigator.push<Exercise>(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => const ExerciseLibraryScreen(isPickerMode: true),
+                          fullscreenDialog: true,
                         ),
-                      ),
-                    );
-                  }
-
-                  return PlanExerciseEditTile(
-                    key: ValueKey(planExercise.id), // Important for stateful list items
-                    planExercise: planExercise,
-                    exerciseDetails: exerciseDetails,
-                    onUpdate: (updated) => _updatePlannedExercise(index, updated),
-                    onRemove: () => _removeExerciseFromPlan(index),
-                  );
-                },
+                      );
+                      if (selectedExercise != null) {
+                        _addExerciseToPlan(selectedExercise);
+                      }
+                    },
+                  ),
+                ],
               ),
-            const SizedBox(height: 30),
-            // Summary (optional) could go here:
-            // Text("Total Exercises: ${_workoutPlan.exercises.length}", style: theme.textTheme.titleMedium),
-            // Text("Estimated Duration: ${_workoutPlan.estimatedDurationMinutes ?? 'N/A'} min", style: theme.textTheme.titleMedium),
-            // const SizedBox(height: 30),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-              ),
-              onPressed: _saveWorkoutPlan,
-              child: Text(widget.existingPlan == null ? "Save Workout Plan" : "Update Workout Plan", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16)),
+              children: _workoutPlan.exercises.isEmpty
+                  ? [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        child: Center(
+                          child: Text(
+                            "No exercises added yet. Click 'Add' to begin.",
+                            textAlign: TextAlign.center,
+                            style: cupertinoTheme.textTheme.tabLabelTextStyle.copyWith(color: CupertinoColors.secondaryLabel),
+                          ),
+                        ),
+                      )
+                    ]
+                  : List.generate(_workoutPlan.exercises.length, (index) {
+                      final planExercise = _workoutPlan.exercises[index];
+                      final exerciseDetails = planExercise.exerciseDetails ?? _exerciseCache[planExercise.exerciseId];
+                      if (exerciseDetails == null) {
+                        return CupertinoListTile(
+                          title: Text("Error: Exercise details missing for ID ${planExercise.exerciseId}",
+                              style: const TextStyle(color: CupertinoColors.destructiveRed)),
+                          trailing: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            child: const Icon(CupertinoIcons.delete, color: CupertinoColors.destructiveRed),
+                            onPressed: () => _removeExerciseFromPlan(index),
+                          ),
+                        );
+                      }
+                      return PlanExerciseEditTile(
+                        key: ValueKey(planExercise.id),
+                        planExercise: planExercise,
+                        exerciseDetails: exerciseDetails,
+                        onUpdate: (updated) => _updatePlannedExercise(index, updated),
+                        onRemove: () => _removeExerciseFromPlan(index),
+                      );
+                    }),
             ),
+            const SizedBox(height: 30),
+            Padding( // Add padding for the save button
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: CupertinoButton.filled(
+                onPressed: _saveWorkoutPlan,
+                child: Text(widget.existingPlan == null ? "Save Workout Plan" : "Update Workout Plan"),
+              ),
+            ),
+             const SizedBox(height: 30), // Ensure scrollability if keyboard is up
           ],
         ),
       ),
     );
   }
 }
-
-// Removed local StringExtension for capitalize (if it existed here)

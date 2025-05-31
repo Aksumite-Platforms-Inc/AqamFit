@@ -5,12 +5,11 @@ import 'package:aksumfit/models/meal_item.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; // Keep for ScaffoldMessenger, showDialog, AlertDialog
 import 'package:aksumfit/core/extensions/string_extensions.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:intl/intl.dart'; // For date formatting if needed here, or rely on DailyMealLog
+import 'package:intl/intl.dart';
 
 const _uuid = Uuid();
 
@@ -295,146 +294,135 @@ class _LogMealScreenState extends State<LogMealScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Log Meal for ${DateFormat.yMd().format(widget.date)}", style: GoogleFonts.inter(color: theme.colorScheme.onPrimary)),
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-        actions: [
-          IconButton(
-            icon: _isSavingMeal ? const SizedBox(width:20, height:20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0)) : const Icon(Icons.check),
-            onPressed: _isSavingMeal ? null : _saveMeal,
-            tooltip: "Save Meal",
-          )
-        ],
+    final cupertinoTheme = CupertinoTheme.of(context);
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text("Log Meal for ${DateFormat.yMd().format(widget.date)}"),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: _isSavingMeal
+              ? const CupertinoActivityIndicator()
+              : const Text("Save"),
+          onPressed: _isSavingMeal ? null : _saveMeal,
+        ),
       ),
-      body: Column(
+      child: Column(
         children: [
-          // Meal Type Selector
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SegmentedButton<MealType>(
-              segments: MealType.values.map((type) => ButtonSegment(
-                value: type,
-                label: Text(type.toString().split('.').last.capitalize()),
-                icon: Icon(_getMealTypeIcon(type)),
-              )).toList(),
-              selected: {_selectedMealType},
-              onSelectionChanged: (newSelection) {
-                setState(() {
-                  _selectedMealType = newSelection.first;
-                });
+            child: CupertinoSegmentedControl<MealType>(
+              children: {
+                for (var type in MealType.values)
+                  type: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(_getMealTypeIcon(type), size: 18), // Smaller icon
+                        const SizedBox(width: 6),
+                        Text(type.toString().split('.').last.capitalize()),
+                      ],
+                    ),
+                  )
               },
-              style: SegmentedButton.styleFrom(
-                selectedBackgroundColor: theme.colorScheme.primaryContainer,
-                selectedForegroundColor: theme.colorScheme.onPrimaryContainer,
-              ),
+              groupValue: _selectedMealType,
+              onValueChanged: (newSelection) {
+                if (newSelection != null) { // Ensure newSelection is not null
+                  setState(() {
+                    _selectedMealType = newSelection;
+                  });
+                }
+              },
             ),
           ),
-
-          // Search Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: CupertinoSearchTextField(
                     controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Search food items...",
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(icon: const Icon(CupertinoIcons.clear_circled_solid), onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchResults = []);
-                            })
-                          : null,
-                    ),
-                    onChanged: (value) => _searchFood(), // Debounce this in a real app
+                    placeholder: "Search food items...",
+                    onChanged: (value) => _searchFood(),
+                    onSuffixTap: () {
+                       _searchController.clear();
+                       setState(() => _searchResults = []);
+                    },
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(CupertinoIcons.plus_circle_fill),
-                  tooltip: "Add Custom Food",
-                  color: theme.colorScheme.secondary,
-                  iconSize: 30,
+                CupertinoButton(
+                  padding: const EdgeInsets.only(left: 8.0), // Add padding to the left of the button
+                  child: const Icon(CupertinoIcons.plus_circle_fill, size: 28),
                   onPressed: _showAddCustomFoodDialog,
                 ),
               ],
             ),
           ),
           const SizedBox(height: 8),
-
-          // Search Results / Loading
           if (_isLoadingFood)
-            const Padding(padding: EdgeInsets.all(8.0), child: Center(child: CircularProgressIndicator()))
+            const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Center(child: CupertinoActivityIndicator()))
           else if (_searchResults.isNotEmpty)
             Expanded(
-              flex: 2, // Give search results some space, but not too much initially
+              flex: 2,
               child: ListView.builder(
                 itemCount: _searchResults.length,
                 itemBuilder: (context, index) {
                   final foodItem = _searchResults[index];
-                  return ListTile(
+                  return CupertinoListTile(
                     title: Text(foodItem.name),
-                    subtitle: Text("${foodItem.brand.isNotEmpty ? foodItem.brand : ''} - ${foodItem.calories.toStringAsFixed(0)} kcal per ${foodItem.servingSizeDisplay}"),
+                    subtitle: Text(
+                        "${foodItem.brand.isNotEmpty ? foodItem.brand : ''} - ${foodItem.calories.toStringAsFixed(0)} kcal per ${foodItem.servingSizeDisplay}"),
                     onTap: () => _showAddFoodItemDialog(foodItem),
                   );
                 },
               ),
             ),
-
-          // Current Meal Items
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Text("Current Meal Items (${_currentMealItems.length})", style: theme.textTheme.titleLarge),
+            child: Text("Current Meal Items (${_currentMealItems.length})",
+                style: cupertinoTheme.textTheme.navTitleTextStyle),
           ),
           Expanded(
-            flex: 3, // Give more space to the meal items list
+            flex: 3,
             child: _currentMealItems.isEmpty
-                ? Center(child: Text("No items added to this meal yet.", style: GoogleFonts.inter(color: theme.colorScheme.onSurfaceVariant)))
+                ? Center(
+                    child: Text("No items added to this meal yet.",
+                        style: cupertinoTheme.textTheme.tabLabelTextStyle
+                            .copyWith(color: CupertinoColors.secondaryLabel)))
                 : ListView.builder(
                     itemCount: _currentMealItems.length,
                     itemBuilder: (context, index) {
                       final item = _currentMealItems[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        child: ListTile(
-                          title: Text(item.baseFoodItem.name),
-                          subtitle: Text("${item.loggedQuantity.toStringAsFixed(1)} ${item.loggedUnit} - ${item.caloriesConsumed.toStringAsFixed(0)} kcal (P:${item.proteinConsumedGrams.toStringAsFixed(0)}g C:${item.carbConsumedGrams.toStringAsFixed(0)}g F:${item.fatConsumedGrams.toStringAsFixed(0)}g)"),
-                          trailing: IconButton(
-                            icon: const Icon(CupertinoIcons.minus_circle, color: Colors.redAccent),
-                            onPressed: () {
-                              setState(() {
-                                _currentMealItems.removeAt(index);
-                              });
-                            },
-                          ),
+                      return CupertinoListTile.notched(
+                        title: Text(item.baseFoodItem.name),
+                        subtitle: Text(
+                            "${item.loggedQuantity.toStringAsFixed(1)} ${item.loggedUnit} - ${item.caloriesConsumed.toStringAsFixed(0)} kcal (P:${item.proteinConsumedGrams.toStringAsFixed(0)}g C:${item.carbConsumedGrams.toStringAsFixed(0)}g F:${item.fatConsumedGrams.toStringAsFixed(0)}g)"),
+                        trailing: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          child: const Icon(CupertinoIcons.minus_circle,
+                              color: CupertinoColors.destructiveRed),
+                          onPressed: () {
+                            setState(() {
+                              _currentMealItems.removeAt(index);
+                            });
+                          },
                         ),
                       );
                     },
                   ),
           ),
-           // Meal Totals Summary
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Card(
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text("Meal Totals:", style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Text("Calories: ${_currentMealTotalCalories.toStringAsFixed(0)} kcal"),
-                    Text("Protein: ${_currentMealTotalProtein.toStringAsFixed(1)} g"),
-                    Text("Carbs: ${_currentMealTotalCarbs.toStringAsFixed(1)} g"),
-                    Text("Fat: ${_currentMealTotalFat.toStringAsFixed(1)} g"),
-                  ],
-                ),
-              ),
+            child: CupertinoListSection.insetGrouped( // Using ListSection for totals
+              header: const Text("Meal Totals"),
+              children: [
+                CupertinoListTile(title: Text("Calories: ${_currentMealTotalCalories.toStringAsFixed(0)} kcal")),
+                CupertinoListTile(title: Text("Protein: ${_currentMealTotalProtein.toStringAsFixed(1)} g")),
+                CupertinoListTile(title: Text("Carbs: ${_currentMealTotalCarbs.toStringAsFixed(1)} g")),
+                CupertinoListTile(title: Text("Fat: ${_currentMealTotalFat.toStringAsFixed(1)} g")),
+              ],
             ),
           ),
         ],
@@ -442,7 +430,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
     );
   }
 
-  IconData _getMealTypeIcon(MealType type) {
+   IconData _getMealTypeIcon(MealType type) {
     switch (type) {
       case MealType.breakfast: return CupertinoIcons.sunrise_fill; // Example
       case MealType.lunch: return CupertinoIcons.sun_max_fill; // Example
