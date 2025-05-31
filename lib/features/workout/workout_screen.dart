@@ -354,9 +354,4 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 }
 
 // Helper extension (if not already defined globally)
-extension StringExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return "${this[0].toUpperCase()}${substring(1)}";
-  }
-}
+

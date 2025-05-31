@@ -1,5 +1,6 @@
 // import 'package:aksumfit/models/goal.dart'; // No longer used directly in this simplified version
 // import 'package:aksumfit/models/user.dart'; // No longer used directly
+import 'package:aksumfit/models/user.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:flutter/material.dart'; // Changed from Cupertino

@@ -33,8 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (authResponse.user != null && authResponse.token != null && mounted) {
-        // Use Provider to set user and token
-        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user!, authResponse.token!);
+        // Use Provider to set user
+        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user!);
         context.go('/main');
       } else {
         setState(() {

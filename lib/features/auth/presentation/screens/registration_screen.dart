@@ -36,12 +36,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (authResponse.user != null && authResponse.token != null && mounted) {
-        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user!, authResponse.token!);
+        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user!);
         Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
         context.go('/main');
       } else {
         setState(() {
-          _errorMessage = authResponse.message ?? 'Registration failed. Please try again.';
+          _errorMessage = "Registration failed. Please try again.";
         });
       }
     } on ApiException catch (e) {
@@ -165,7 +165,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
                       border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.lock_check),
+                      prefixIcon: const Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(_obscureConfirmPassword
                             ? Icons.visibility_off

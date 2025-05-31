@@ -4,7 +4,7 @@ import 'package:aksumfit/services/settings_service.dart';
 import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -92,11 +92,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           additionalInfo: Text(currentWeightUnit.toString().split('.').last.toUpperCase()),
                           trailing: const Icon(CupertinoIcons.forward),
                           onTap: () => _showUnitPicker<WeightUnit>(
-                            context: context,
-                            title: "Select Weight Unit",
-                            items: WeightUnit.values,
-                            currentValue: currentWeightUnit,
-                            onSelectedItemChanged: (newValue) {
+                            context,
+                            "Select Weight Unit",
+                            WeightUnit.values,
+                            currentWeightUnit,
+                            (newValue) {
                               if (newValue != null) {
                                 // setState(() => _currentWeightUnit = newValue); // No longer needed
                                 settingsService.setWeightUnit(newValue);
@@ -110,11 +110,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           additionalInfo: Text(currentDistanceUnit.toString().split('.').last.capitalize()),
                           trailing: const Icon(CupertinoIcons.forward),
                           onTap: () => _showUnitPicker<DistanceUnit>(
-                            context: context,
-                            title: "Select Distance Unit",
-                            items: DistanceUnit.values,
-                            currentValue: currentDistanceUnit,
-                            onSelectedItemChanged: (newValue) {
+                            context,
+                            "Select Distance Unit",
+                            DistanceUnit.values,
+                            currentDistanceUnit,
+                            (newValue) {
                               if (newValue != null) {
                                 // setState(() => _currentDistanceUnit = newValue); // No longer needed
                                 settingsService.setDistanceUnit(newValue);
@@ -220,14 +220,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showUnitPicker<T extends Enum>({
-                ),
-    required BuildContext context,
-    required String title,
-    required List<T> items,
-    required T currentValue,
-    required ValueChanged<T?> onSelectedItemChanged,
-  }) {
+  void _showUnitPicker<T extends Enum>(
+    BuildContext context,
+    String title,
+    List<T> items,
+    T currentValue,
+    ValueChanged<T?> onSelectedItemChanged,
+  ) {
     final FixedExtentScrollController scrollController =
         FixedExtentScrollController(initialItem: items.indexOf(currentValue));
 

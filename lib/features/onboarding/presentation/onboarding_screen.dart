@@ -24,7 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       description: 'Personalized plans based on your goals and progress.', // Screen 1 Desc
     ),
     OnboardingPage(
-      icon: CupertinoIcons.food_fork_drink_fill, // Screen 2 Icon
+      icon: CupertinoIcons.cart_fill, // Screen 2 Icon (replaced food_fork_drink_fill)
       title: 'Smart Meal Tracking', // Screen 2 Title
       description: 'Snap your meals, track calories, and stay on top of your diet.', // Screen 2 Desc
     ),

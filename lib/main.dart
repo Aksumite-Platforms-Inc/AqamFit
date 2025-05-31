@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/navigation/app_router.dart';
 import 'package:aksumfit/services/api_service.dart'; // Import ApiService
 import 'package:aksumfit/services/settings_service.dart'; // Import SettingsService
+import 'package:aksumfit/services/auth_manager.dart'; // Import AuthManager
 import 'package:provider/provider.dart'; // Import Provider
 
 void main() async { // Make main async
@@ -22,8 +24,11 @@ void main() async { // Make main async
   ));
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => settingsService,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<SettingsService>.value(value: settingsService),
+        ChangeNotifierProvider(create: (_) => AuthManager()),
+      ],
       child: const AxumFitApp(),
     ),
   );

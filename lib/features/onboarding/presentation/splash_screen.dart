@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
       final authManager = Provider.of<AuthManager>(context, listen: false);
       final settingsService = Provider.of<SettingsService>(context, listen: false);
 
-      final bool isLoggedIn = authManager.isUserLoggedIn; // Assuming isUserLoggedIn is the correct getter
+      final bool isLoggedIn = authManager.isLoggedIn; // Use correct getter
       final bool hasCompletedOnboarding = settingsService.hasCompletedOnboarding;
 
       if (isLoggedIn) {
