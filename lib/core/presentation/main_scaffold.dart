@@ -1,8 +1,7 @@
-import 'package:aksumfit/features/explore/explore_screen.dart';
 import 'package:aksumfit/features/home/home_screen.dart';
 import 'package:aksumfit/features/nutrition/presentation/screens/nutrition_screen.dart';
 import 'package:aksumfit/features/profile/profile_screen.dart';
-import 'package:aksumfit/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
+// Re-added ProgressScreen import
 import 'package:aksumfit/features/social/presentation/screens/social_screen.dart';
 import 'package:aksumfit/features/workout/presentation/screens/workout_plans_screen.dart'; // Changed import
 import 'package:flutter/material.dart';

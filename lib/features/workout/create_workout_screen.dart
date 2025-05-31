@@ -94,8 +94,8 @@ class _PlanExerciseEditTileState extends State<PlanExerciseEditTile> {
       ),
       trailing: CupertinoButton(
         padding: EdgeInsets.zero,
-        child: const Icon(CupertinoIcons.delete_simple, color: CupertinoColors.destructiveRed),
         onPressed: widget.onRemove,
+        child: const Icon(CupertinoIcons.delete_simple, color: CupertinoColors.destructiveRed),
       ),
       additionalInfo: Padding( // Using additionalInfo for expandable content
         padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, left: 16.0, right: 16.0), // Adjust padding as needed
@@ -112,8 +112,8 @@ class _PlanExerciseEditTileState extends State<PlanExerciseEditTile> {
             _buildCupertinoTextField(_notesController, "Notes (e.g., tempo, form cues)", TextInputType.text, 2),
             const SizedBox(height: 10),
             CupertinoButton(
-              child: const Text("Update Exercise Details"),
               onPressed: _updatePlanExercise,
+              child: const Text("Update Exercise Details"),
             )
           ],
         ),
@@ -275,8 +275,8 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
         middle: Text(widget.existingPlan == null ? "Create Workout Plan" : "Edit Workout Plan"),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.check_mark_circled),
           onPressed: _saveWorkoutPlan,
+          child: const Icon(CupertinoIcons.check_mark_circled),
         ),
       ),
       child: Form(

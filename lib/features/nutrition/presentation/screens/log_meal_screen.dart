@@ -25,7 +25,7 @@ class LogMealScreen extends StatefulWidget {
 
 class _LogMealScreenState extends State<LogMealScreen> {
   MealType _selectedMealType = MealType.breakfast;
-  List<MealItem> _currentMealItems = [];
+  final List<MealItem> _currentMealItems = [];
   List<FoodItem> _searchResults = [];
   bool _isLoadingFood = false;
   bool _isSavingMeal = false;
@@ -300,10 +300,10 @@ class _LogMealScreenState extends State<LogMealScreen> {
         middle: Text("Log Meal for ${DateFormat.yMd().format(widget.date)}"),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
+          onPressed: _isSavingMeal ? null : _saveMeal,
           child: _isSavingMeal
               ? const CupertinoActivityIndicator()
               : const Text("Save"),
-          onPressed: _isSavingMeal ? null : _saveMeal,
         ),
       ),
       child: Column(
@@ -327,12 +327,11 @@ class _LogMealScreenState extends State<LogMealScreen> {
               },
               groupValue: _selectedMealType,
               onValueChanged: (newSelection) {
-                if (newSelection != null) { // Ensure newSelection is not null
-                  setState(() {
-                    _selectedMealType = newSelection;
-                  });
-                }
-              },
+ // Ensure newSelection is not null
+                setState(() {
+                  _selectedMealType = newSelection;
+                });
+                            },
             ),
           ),
           Padding(
@@ -351,9 +350,9 @@ class _LogMealScreenState extends State<LogMealScreen> {
                   ),
                 ),
                 CupertinoButton(
-                  padding: const EdgeInsets.only(left: 8.0), // Add padding to the left of the button
+                  padding: const EdgeInsets.only(left: 8.0),
+                  onPressed: _showAddCustomFoodDialog, // Add padding to the left of the button
                   child: const Icon(CupertinoIcons.plus_circle_fill, size: 28),
-                  onPressed: _showAddCustomFoodDialog,
                 ),
               ],
             ),

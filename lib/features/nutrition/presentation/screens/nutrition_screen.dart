@@ -270,7 +270,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
               )).toList(),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userName = _currentUser?.name?.split(' ').first ?? "User"; // Get first name
+    final userName = _currentUser?.name.split(' ').first ?? "User"; // Get first name
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -217,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(3),
                 ),
                 const SizedBox(height: 8),
-                Text("3 of ${plan.exercises?.length ?? 10} exercises completed", style: theme.textTheme.bodySmall),
+                Text("3 of ${plan.exercises.length ?? 10} exercises completed", style: theme.textTheme.bodySmall),
                 const SizedBox(height: 16),
               ],
               ElevatedButton(
@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-                "Macros: P:${mealLog?.dailyTotalProteinGrams?.toStringAsFixed(0) ?? 0}g  C:${mealLog?.dailyTotalCarbGrams?.toStringAsFixed(0) ?? 0}g  F:${mealLog?.dailyTotalFatGrams?.toStringAsFixed(0) ?? 0}g",
+                "Macros: P:${mealLog?.dailyTotalProteinGrams.toStringAsFixed(0) ?? 0}g  C:${mealLog?.dailyTotalCarbGrams.toStringAsFixed(0) ?? 0}g  F:${mealLog?.dailyTotalFatGrams.toStringAsFixed(0) ?? 0}g",
                 style: theme.textTheme.bodyMedium),
             const SizedBox(height: 8),
             TextButton(onPressed: () => context.go('/nutrition'), child: const Text("View Full Nutrition Details"))

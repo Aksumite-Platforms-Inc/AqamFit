@@ -42,8 +42,8 @@ class WorkoutPlan {
     required this.authorId,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : this.createdAt = createdAt ?? DateTime.now(),
-        this.updatedAt = updatedAt ?? DateTime.now();
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 
   factory WorkoutPlan.fromJson(Map<String, dynamic> json) {
     return WorkoutPlan(

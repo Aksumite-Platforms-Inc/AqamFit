@@ -24,7 +24,7 @@ class MealItem {
     required this.baseFoodItem,
     required this.loggedQuantity,
     required this.loggedUnit,
-  }) : this.id = id ?? _uuid.v4(),
+  }) : id = id ?? _uuid.v4(),
        // Perform calculations upon instantiation
        caloriesConsumed = (baseFoodItem.calories / baseFoodItem.servingSizeQuantity) * loggedQuantity * _getConversionFactor(loggedUnit, baseFoodItem.servingSizeUnit, baseFoodItem.servingSizeQuantity),
        proteinConsumedGrams = (baseFoodItem.proteinGrams / baseFoodItem.servingSizeQuantity) * loggedQuantity * _getConversionFactor(loggedUnit, baseFoodItem.servingSizeUnit, baseFoodItem.servingSizeQuantity),

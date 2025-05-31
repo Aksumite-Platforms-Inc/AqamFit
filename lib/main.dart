@@ -73,12 +73,10 @@ class AxumFitApp extends StatelessWidget {
         primary: Color(0xFF6366F1), // Primary purple
         secondary: Color(0xFF8B5CF6), // Secondary purple
         tertiary: Color(0xFF06B6D4), // Accent cyan
-        surface: Color(0xFF1E293B), // Main background - dark slate
-        background: Color(0xFF0F172A), // Deep dark slate for overall background
+        surface: Color(0xFF1E293B), // Deep dark slate for overall background
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.white,
-        onBackground: Colors.white,
         error: Color(0xFFEF4444), // Red for errors
         onError: Colors.white,
       ),
@@ -231,17 +229,15 @@ class AxumFitApp extends StatelessWidget {
       brightness: Brightness.light,
 
       // Color Scheme
-      colorScheme: ColorScheme.light(
-        primary: const Color(0xFF6366F1), // Primary purple
-        secondary: const Color(0xFF8B5CF6), // Secondary purple
-        tertiary: const Color(0xFF06B6D4), // Accent cyan
-        surface: const Color(0xFFFFFFFF), // White background for surfaces like cards
-        background: const Color(0xFFF0F2F5), // Light grey for overall background
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFF6366F1), // Primary purple
+        secondary: Color(0xFF8B5CF6), // Secondary purple
+        tertiary: Color(0xFF06B6D4), // Accent cyan
+        surface: Color(0xFFFFFFFF), // Light grey for overall background
         onPrimary: Colors.white, // Text on primary color
         onSecondary: Colors.white, // Text on secondary color
-        onSurface: const Color(0xFF1F2937), // Dark text on surfaces
-        onBackground: const Color(0xFF1F2937), // Dark text on background
-        error: const Color(0xFFD32F2F), // Red for errors
+        onSurface: Color(0xFF1F2937), // Dark text on background
+        error: Color(0xFFD32F2F), // Red for errors
         onError: Colors.white,
       ),
 
@@ -325,14 +321,14 @@ class AxumFitApp extends StatelessWidget {
       ),
 
       // Bottom Navigation Bar
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: const Color(0xFFFFFFFF), // White background
-        selectedItemColor: const Color(0xFF6366F1), // Primary purple
-        unselectedItemColor: const Color(0xFF6B7280), // Medium grey
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Color(0xFFFFFFFF), // White background
+        selectedItemColor: Color(0xFF6366F1), // Primary purple
+        unselectedItemColor: Color(0xFF6B7280), // Medium grey
         type: BottomNavigationBarType.fixed,
         elevation: 2, // Slight elevation for separation
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500),
       ),
 
       // Floating Action Button
@@ -343,10 +339,10 @@ class AxumFitApp extends StatelessWidget {
       ),
 
       // Progress Indicator
-      progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: const Color(0xFF6366F1),
-        linearTrackColor: const Color(0xFFE5E7EB), // Light grey track
-        circularTrackColor: const Color(0xFFE5E7EB), // Light grey track
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: Color(0xFF6366F1),
+        linearTrackColor: Color(0xFFE5E7EB), // Light grey track
+        circularTrackColor: Color(0xFFE5E7EB), // Light grey track
       ),
 
       // Divider

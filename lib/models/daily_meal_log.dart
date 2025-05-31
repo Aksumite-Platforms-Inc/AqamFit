@@ -24,8 +24,8 @@ class DailyMealLog {
     required this.date,
     List<Meal>? meals,
     this.notes,
-  }) : this.id = id ?? _uuid.v4(),
-       this.meals = meals ?? [],
+  }) : id = id ?? _uuid.v4(),
+       meals = meals ?? [],
        // Calculate daily totals upon instantiation
        dailyTotalCalories = (meals ?? []).fold(0, (sum, meal) => sum + meal.totalCalories),
        dailyTotalProteinGrams = (meals ?? []).fold(0, (sum, meal) => sum + meal.totalProteinGrams),

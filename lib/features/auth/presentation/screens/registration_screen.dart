@@ -35,8 +35,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         password: password,
       );
 
-      if (authResponse.user != null && authResponse.token != null && mounted) {
-        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user!);
+      if (mounted) {
+        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user);
         Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
         context.go('/main');
       } else {
@@ -282,7 +282,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                   const SizedBox(height: 24),
                    ElevatedButton.icon(
-                    icon: const Icon(Icons.g_mobiledata, color: Colors.redAccent),
+                    icon: const Icon(Icons.g_mobiledata, color: Colors.blueAccent),
                     label: Text('Continue with Google', style: TextStyle(color: theme.colorScheme.onSurface)),
                     onPressed: () { /* Placeholder */ },
                     style: ElevatedButton.styleFrom(

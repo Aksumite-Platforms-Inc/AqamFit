@@ -1,5 +1,5 @@
 import 'package:aksumfit/models/exercise.dart'; // Assuming Exercise model is in exercise.dart
-import 'package:flutter/foundation.dart'; // For listEquals, if needed for future complex fields
+// For listEquals, if needed for future complex fields
 
 class WorkoutPlanExercise {
   final String id; // Unique ID for this specific instance in the plan

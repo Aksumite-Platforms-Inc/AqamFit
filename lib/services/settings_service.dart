@@ -121,7 +121,7 @@ class SettingsService with ChangeNotifier { // Extend ChangeNotifier
 // but shown here for completeness if it was used more extensively.
 extension EnumToStringHelper<T> on T {
   String enumToString() {
-    return this.toString().split('.').last;
+    return toString().split('.').last;
   }
 }
 

@@ -143,7 +143,7 @@ class _SplashScreenState extends State<SplashScreen>
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             colors: [
                               CupertinoColors.activeBlue,
                               CupertinoColors.activeGreen

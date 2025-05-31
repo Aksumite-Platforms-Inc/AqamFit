@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:aksumfit/models/user.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:aksumfit/models/workout_plan.dart';
-import 'package:aksumfit/services/api_service.dart'; // Import ApiService for isAuthenticated (or use AuthManager)
+// Import ApiService for isAuthenticated (or use AuthManager)
 import 'package:aksumfit/features/auth/presentation/screens/login_screen.dart';
 import 'package:aksumfit/features/auth/presentation/screens/registration_screen.dart';
 // Removed duplicate import for registration_screen.dart
@@ -16,8 +16,6 @@ import '../features/onboarding/presentation/splash_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../core/presentation/main_scaffold.dart';
 import '../features/notifications/notification_screen.dart';
-import '../features/nutrition/presentation/screens/log_meal_screen.dart';
-import '../features/workout/workout_screen.dart';
 import '../features/progress/progress_screen.dart';
 import '../features/explore/presentation/screens/exercise_library_screen.dart';
 import '../features/nutrition/presentation/screens/nutrition_screen.dart';

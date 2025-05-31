@@ -33,7 +33,7 @@ class PerformanceMetricEntry {
     required this.value,
     this.unit,
     this.notes,
-  }) : this.id = id ?? _uuid.v4();
+  }) : id = id ?? _uuid.v4();
 
   factory PerformanceMetricEntry.fromJson(Map<String, dynamic> json) {
     return PerformanceMetricEntry(

@@ -29,9 +29,9 @@ class Meal {
     required this.type,
     List<MealItem>? items,
     DateTime? loggedAt,
-  })  : this.id = id ?? _uuid.v4(),
-        this.items = items ?? [],
-        this.loggedAt = loggedAt ?? DateTime.now(),
+  })  : id = id ?? _uuid.v4(),
+        items = items ?? [],
+        loggedAt = loggedAt ?? DateTime.now(),
         // Calculate totals upon instantiation
         totalCalories = (items ?? []).fold(0, (sum, item) => sum + item.caloriesConsumed),
         totalProteinGrams = (items ?? []).fold(0, (sum, item) => sum + item.proteinConsumedGrams),

@@ -33,7 +33,7 @@ class BodyMeasurementEntry {
     this.thighCircumferenceCm,
     this.calfCircumferenceCm,
     this.notes,
-  }) : this.id = id ?? _uuid.v4();
+  }) : id = id ?? _uuid.v4();
 
   factory BodyMeasurementEntry.fromJson(Map<String, dynamic> json) {
     return BodyMeasurementEntry(

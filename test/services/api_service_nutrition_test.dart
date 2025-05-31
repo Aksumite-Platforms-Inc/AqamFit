@@ -1,5 +1,4 @@
 import 'package:aksumfit/models/daily_meal_log.dart';
-import 'package:aksumfit/models/food_item.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/features/nutrition/data/mock_food_database.dart'; // To access the mock data directly for comparison
 import 'package:flutter_test/flutter_test.dart';
@@ -70,7 +69,7 @@ void main() {
     });
 
     group('DailyMealLog Management', () {
-      final testUserId = 'testUser123';
+      const testUserId = 'testUser123';
       final testDate = DateTime.now();
       final dateKey = DateFormat('yyyy-MM-dd').format(testDate);
       final storageKey = "${testUserId}_$dateKey";

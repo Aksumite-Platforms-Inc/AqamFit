@@ -15,7 +15,7 @@ class WeightEntry {
     required this.weightKg,
     this.notes,
     required this.userId,
-  }) : this.id = id ?? _uuid.v4();
+  }) : id = id ?? _uuid.v4();
 
   factory WeightEntry.fromJson(Map<String, dynamic> json) {
     return WeightEntry(

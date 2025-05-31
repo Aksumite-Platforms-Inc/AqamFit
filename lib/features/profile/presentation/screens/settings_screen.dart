@@ -171,9 +171,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: () => Navigator.of(ctx).pop(false),
                                   ),
                                   CupertinoDialogAction(
-                                    child: const Text('Logout'),
                                     isDestructiveAction: true,
                                     onPressed: () => Navigator.of(ctx).pop(true),
+                                    child: const Text('Logout'),
                                   ),
                                 ],
                               ),
@@ -247,8 +247,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   CupertinoButton(
-                    child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
                     onPressed: null,
+                    child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
                   ),
                   CupertinoButton(
                     child: const Text('Done'),
