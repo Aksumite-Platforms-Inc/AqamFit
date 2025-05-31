@@ -41,6 +41,17 @@ class User {
   final int? totalWorkouts;
   final int? achievements; // e.g., number of badges/achievements unlocked
 
+  // New profile attributes from setup flow
+  final double? weight;
+  final String? heightUnit;
+  final double? height;
+  final String? fitnessGoal;
+  final String? experienceLevel;
+  final List<String>? preferredTrainingDays;
+  final DateTime? dateOfBirth;
+  final String? gender;
+  final bool hasCompletedSetup; // Default to false
+
   User({
     required this.id,
     required this.name,
@@ -48,10 +59,19 @@ class User {
     this.profileImageUrl,
     required this.streakCount,
     this.role = UserRole.user,
-    this.preferredWeightUnit = "kg",
+    this.preferredWeightUnit = "kg", // This can serve as weightUnit
     this.preferredDistanceUnit = "km",
-    this.totalWorkouts, // Can be null
-    this.achievements,  // Can be null
+    this.totalWorkouts,
+    this.achievements,
+    this.weight,
+    this.heightUnit,
+    this.height,
+    this.fitnessGoal,
+    this.experienceLevel,
+    this.preferredTrainingDays,
+    this.dateOfBirth,
+    this.gender,
+    this.hasCompletedSetup = false, // Initialize with default
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -66,6 +86,19 @@ class User {
       preferredDistanceUnit: json['preferredDistanceUnit'] as String? ?? 'km',
       totalWorkouts: json['totalWorkouts'] as int?,
       achievements: json['achievements'] as int?,
+      weight: (json['weight'] as num?)?.toDouble(),
+      heightUnit: json['heightUnit'] as String?,
+      height: (json['height'] as num?)?.toDouble(),
+      fitnessGoal: json['fitnessGoal'] as String?,
+      experienceLevel: json['experienceLevel'] as String?,
+      preferredTrainingDays: json['preferredTrainingDays'] != null
+          ? List<String>.from(json['preferredTrainingDays'] as List<dynamic>)
+          : null,
+      dateOfBirth: json['dateOfBirth'] != null
+          ? DateTime.tryParse(json['dateOfBirth'] as String)
+          : null,
+      gender: json['gender'] as String?,
+      hasCompletedSetup: json['hasCompletedSetup'] as bool? ?? false,
     );
   }
 
@@ -81,6 +114,15 @@ class User {
       'preferredDistanceUnit': preferredDistanceUnit,
       'totalWorkouts': totalWorkouts,
       'achievements': achievements,
+      'weight': weight,
+      'heightUnit': heightUnit,
+      'height': height,
+      'fitnessGoal': fitnessGoal,
+      'experienceLevel': experienceLevel,
+      'preferredTrainingDays': preferredTrainingDays,
+      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'gender': gender,
+      'hasCompletedSetup': hasCompletedSetup,
     };
   }
 
@@ -93,8 +135,17 @@ class User {
     UserRole? role,
     String? preferredWeightUnit,
     String? preferredDistanceUnit,
-    int? totalWorkouts, // Use ValueGetter<T?> to handle nullable types correctly for copyWith
+    int? totalWorkouts,
     int? achievements,
+    double? weight,
+    String? heightUnit,
+    double? height,
+    String? fitnessGoal,
+    String? experienceLevel,
+    List<String>? preferredTrainingDays,
+    DateTime? dateOfBirth,
+    String? gender,
+    bool? hasCompletedSetup,
   }) {
     return User(
       id: id ?? this.id,
@@ -107,6 +158,15 @@ class User {
       preferredDistanceUnit: preferredDistanceUnit ?? this.preferredDistanceUnit,
       totalWorkouts: totalWorkouts ?? this.totalWorkouts,
       achievements: achievements ?? this.achievements,
+      weight: weight ?? this.weight,
+      heightUnit: heightUnit ?? this.heightUnit,
+      height: height ?? this.height,
+      fitnessGoal: fitnessGoal ?? this.fitnessGoal,
+      experienceLevel: experienceLevel ?? this.experienceLevel,
+      preferredTrainingDays: preferredTrainingDays ?? this.preferredTrainingDays,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      gender: gender ?? this.gender,
+      hasCompletedSetup: hasCompletedSetup ?? this.hasCompletedSetup,
     );
   }
 }

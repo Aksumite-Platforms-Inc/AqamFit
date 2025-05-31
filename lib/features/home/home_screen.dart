@@ -15,6 +15,7 @@ import 'package:aksumfit/features/home/widgets/streak_tracker_widget.dart';
 // import 'package:aksumfit/widgets/activity_feed_item.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:aksumfit/features/nutrition/presentation/screens/camera_screen.dart'; // Import CameraScreen
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -242,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     foregroundColor: theme.colorScheme.onSecondary,
                     minimumSize: const Size(double.infinity, 40)
                 ),
-                onPressed: () => context.go('/workout-plans'), // Navigate to workout plans list
+                onPressed: () => context.go('/browse-workouts'), // Navigate to new browse workouts screen
                 child: const Text("Browse Workouts"),
               ),
             ],
@@ -274,8 +275,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 OutlinedButton.icon(
                   icon: const Icon(Icons.camera_alt_outlined),
                   label: const Text("Snap Meal"),
-                  onPressed: () {
-                    context.go('/log-meal'); // Assuming a route for meal logging
+                  onPressed: () async {
+                    final imagePath = await Navigator.of(context).push<String>(
+                      MaterialPageRoute(builder: (context) => const CameraScreen()),
+                    );
+                    if (imagePath != null && imagePath.isNotEmpty && context.mounted) {
+                      // Now navigate to LogMealScreen with the imagePath
+                      print('Captured image path: $imagePath'); // For now, just print
+                      // context.go('/log-meal', extra: <String, dynamic>{'imagePath': imagePath, 'date': DateTime.now()});
+                       // Temporary navigation to /log-meal-quick to verify flow, will pass imagePath later
+                      context.go('/log-meal-quick', extra: <String, dynamic>{'imagePath': imagePath});
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: theme.colorScheme.outline),

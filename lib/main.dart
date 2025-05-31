@@ -6,14 +6,22 @@ import 'package:aksumfit/navigation/app_router.dart';
 import 'package:aksumfit/services/api_service.dart'; // Import ApiService
 import 'package:aksumfit/services/settings_service.dart'; // Import SettingsService
 import 'package:aksumfit/services/auth_manager.dart'; // Import AuthManager
+import 'package:aksumfit/repositories/user_repository.dart'; // Import UserRepository
 import 'package:provider/provider.dart'; // Import Provider
+import 'package:aksumfit/widgets/loading_indicator.dart'; // Import LoadingIndicatorWidget
+import 'features/onboarding/presentation/setup_flow/setup_flow_viewmodel.dart'; // Import SetupFlowViewModel
 
 void main() async { // Make main async
   WidgetsFlutterBinding.ensureInitialized();
-  ApiService().initialize(); // Initialize ApiService
 
-  final settingsService = SettingsService(); // Create instance
-  await settingsService.loadSettings(); // Load settings
+  // Initialize services before running the app
+  final apiService = ApiService(); // Use the instance
+  apiService.initialize();
+
+  final settingsService = SettingsService();
+  await settingsService.loadSettings();
+
+  final userRepository = UserRepository(apiService: apiService); // Create UserRepository
 
   // Set system UI overlay style - consider moving this after theme is determined or make it dynamic
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -26,28 +34,70 @@ void main() async { // Make main async
   runApp(
     MultiProvider(
       providers: [
+        Provider<ApiService>.value(value: apiService), // Provide ApiService
+        Provider<UserRepository>.value(value: userRepository), // Provide UserRepository
         ChangeNotifierProvider<SettingsService>.value(value: settingsService),
-        ChangeNotifierProvider(create: (_) => AuthManager()),
+        ChangeNotifierProvider(create: (_) => AuthManager()), // AuthManager might internally use ApiService singleton or could be refactored to take it
+        ChangeNotifierProvider(create: (_) => SetupFlowViewModel()),
       ],
       child: const AxumFitApp(),
     ),
   );
 }
 
-class AxumFitApp extends StatelessWidget {
+class AxumFitApp extends StatefulWidget {
   const AxumFitApp({super.key});
 
   @override
+  State<AxumFitApp> createState() => _AxumFitAppState();
+}
+
+class _AxumFitAppState extends State<AxumFitApp> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set _isLoading to false after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  // Future<void> _initializeApp() async { // Removed this method
+  //   // Initialize services
+  //   // ApiService().initialize(); // Moved to main()
+  //   // await context.read<SettingsService>().loadSettings(); // Moved to main()
+  //
+  //   // Simulate other initializations if necessary
+  //   // await Future.delayed(const Duration(seconds: 2)); // Example delay
+  //
+  //   // if (mounted) {
+  //   //   setState(() {
+  //   //     _isLoading = false;
+  //   //   });
+  //   // }
+  // }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      // Assuming LoadingIndicatorWidget includes its own Scaffold
+      return const LoadingIndicatorWidget();
+    }
+
     // Listen to SettingsService for theme changes
     return Consumer<SettingsService>(
       builder: (context, settingsService, child) {
         // Update System UI Overlay based on current theme
-        // This is a common place to adjust system chrome based on theme
         SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: settingsService.themeMode == ThemeMode.light ? Brightness.dark : Brightness.light,
-          systemNavigationBarColor: settingsService.themeMode == ThemeMode.light ? const Color(0xFFF0F2F5) : const Color(0xFF0F172A), // Example light/dark nav colors
+          systemNavigationBarColor: settingsService.themeMode == ThemeMode.light ? const Color(0xFFF0F2F5) : const Color(0xFF0F172A),
           systemNavigationBarIconBrightness: settingsService.themeMode == ThemeMode.light ? Brightness.dark : Brightness.light,
         ));
 

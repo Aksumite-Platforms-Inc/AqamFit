@@ -341,7 +341,85 @@ class AuthResponse {
 const Uuid _uuid = Uuid();
 
 // --- Workout Plan Mock Data & Service ---
-final List<WorkoutPlan> _mockWorkoutPlans = [];
+final List<WorkoutPlan> _mockWorkoutPlans = [
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "Beginner Strength Routine",
+    description: "A great starting point for building overall strength. Focuses on compound movements.",
+    category: WorkoutPlanCategory.strength,
+    difficulty: WorkoutDifficulty.beginner,
+    estimatedDurationMinutes: 45,
+    authorId: "system_generated_trainer_1",
+    exercises: [
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Squats", sets: "3", reps: "8-12", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", name: "Push-ups", sets: "3", reps: "As many as possible", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", name: "Rows (Dumbbell or Machine)", sets: "3", reps: "10-15", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", name: "Plank", sets: "3", reps: "Hold for 30-60s", restBetweenSetsSeconds: 45),
+    ],
+    createdAt: DateTime.now().subtract(const Duration(days: 30)),
+    updatedAt: DateTime.now().subtract(const Duration(days: 10)),
+    tags: ["full body", "beginner friendly", "strength building"],
+  ),
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "Leg Day Burner",
+    description: "Intense leg workout to build strength and hypertrophy in your lower body.",
+    category: WorkoutPlanCategory.hypertrophy,
+    difficulty: WorkoutDifficulty.intermediate,
+    estimatedDurationMinutes: 60,
+    authorId: "system_generated_trainer_2",
+    exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Barbell Squats", sets: "4", reps: "8-10", restBetweenSetsSeconds: 90),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", name: "Leg Press", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", name: "Romanian Deadlifts (RDLs)", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", name: "Leg Extensions", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", name: "Hamstring Curls", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", name: "Calf Raises", sets: "4", reps: "15-20", restBetweenSetsSeconds: 45),
+    ],
+    createdAt: DateTime.now().subtract(const Duration(days: 25)),
+    updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+    tags: ["legs", "hypertrophy", "volume"],
+  ),
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "Morning Yoga Flow",
+    description: "A gentle yoga sequence to start your day with energy and mindfulness.",
+    category: WorkoutPlanCategory.flexibility,
+    difficulty: WorkoutDifficulty.allLevels, // Assuming AllLevels is an option
+    estimatedDurationMinutes: 30,
+    authorId: "system_generated_yogi_1",
+    exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", name: "Sun Salutation A", sets: "5", reps: "rounds", notes: "Flow through 5 rounds"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", name: "Downward-Facing Dog", sets: "1", reps: "Hold for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", name: "Warrior II (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", name: "Triangle Pose (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", name: "Child's Pose", sets: "1", reps: "Hold for 5-10 breaths"),
+    ],
+    createdAt: DateTime.now().subtract(const Duration(days: 15)),
+    updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+    tags: ["yoga", "flexibility", "morning routine", "mindfulness"],
+  ),
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "HIIT Cardio Challenge",
+    description: "High-Intensity Interval Training to boost your cardiovascular fitness and burn calories.",
+    category: WorkoutPlanCategory.cardio,
+    difficulty: WorkoutDifficulty.intermediate,
+    estimatedDurationMinutes: 25,
+    authorId: "system_generated_trainer_1",
+    exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", name: "Jumping Jacks", sets: "1", reps: "60s work, 30s rest", notes: "Warm-up"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", name: "High Knees", sets: "4", reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", name: "Burpees", sets: "4", reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", name: "Mountain Climbers", sets: "4", reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", name: "Sprint in Place", sets: "4", reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", name: "Cool Down Jog/Walk", sets: "1", reps: "3-5 minutes"),
+    ],
+    createdAt: DateTime.now().subtract(const Duration(days: 40)),
+    updatedAt: DateTime.now().subtract(const Duration(days: 3)),
+    tags: ["hiit", "cardio", "fat burning", "quick workout"],
+  ),
+];
 extension WorkoutApiService on ApiService {
   Future<WorkoutPlan> saveWorkoutPlan(WorkoutPlan plan) async {
     await _simulateNetworkDelay(delay: 300);
