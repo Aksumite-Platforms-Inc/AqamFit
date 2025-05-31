@@ -73,14 +73,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       _pages.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        width: _currentPage == index ? 28 : 10,
-                        height: 10,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentPage == index ? 24 : 8,
+                        height: 8,
                         decoration: BoxDecoration(
                           color: _currentPage == index
-                              ? colorScheme.primary // Use theme primary color
-                              : colorScheme.surface.withOpacity(0.5), // Use theme surface color
-                          borderRadius: BorderRadius.circular(5),
+                              ? CupertinoColors.activeBlue
+                              : CupertinoColors.inactiveGray,
+                          borderRadius: BorderRadius.circular(4),
                         ),
                       ),
                     ),
@@ -88,8 +88,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 40),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      // Button style will be inherited from ElevatedButtonThemeData in main.dart
+                    child: CupertinoButton.filled(
                       onPressed: () {
                         if (_currentPage == _pages.length - 1) {
                           context.go('/login'); // Navigate to Login Screen
@@ -104,7 +103,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         _currentPage == _pages.length - 1
                             ? 'Get Started'
                             : 'Next',
-                        // Text style will be inherited from ElevatedButtonThemeData
+                        style: const TextStyle(color: CupertinoColors.white),
                       ),
                     ),
                   ),
@@ -126,10 +125,6 @@ class OnboardingPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final ColorScheme colorScheme = theme.colorScheme;
-    final TextTheme textTheme = theme.textTheme;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 20.0),
       child: Column(
@@ -139,11 +134,10 @@ class OnboardingPageWidget extends StatelessWidget {
             width: 180,
             height: 180,
             decoration: BoxDecoration(
-              // Use theme colors instead of page.color
               gradient: LinearGradient(
                 colors: [
-                  colorScheme.primary.withOpacity(0.1),
-                  colorScheme.secondary.withOpacity(0.1),
+                  CupertinoColors.activeBlue.withOpacity(0.1),
+                  CupertinoColors.activeGreen.withOpacity(0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -153,22 +147,26 @@ class OnboardingPageWidget extends StatelessWidget {
             child: Icon(
               page.icon,
               size: 80,
-              color: colorScheme.primary, // Use theme primary color for icon
+              color: CupertinoColors.activeBlue,
             ),
           ),
           const SizedBox(height: 60),
           Text(
             page.title,
             textAlign: TextAlign.center,
-            // Use GoogleFonts.inter and styles from theme
-            style: textTheme.headlineMedium?.copyWith(color: colorScheme.onSurface),
+            style: CupertinoTheme.of(context)
+                .textTheme
+                .navLargeTitleTextStyle
+                .copyWith(color: CupertinoColors.label),
           ),
           const SizedBox(height: 20),
           Text(
             page.description,
             textAlign: TextAlign.center,
-            // Use GoogleFonts.inter and styles from theme
-            style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
+            style: CupertinoTheme.of(context)
+                .textTheme
+                .textStyle
+                .copyWith(color: CupertinoColors.secondaryLabel),
           ),
         ],
       ),

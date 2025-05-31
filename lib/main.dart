@@ -98,7 +98,7 @@ class AxumFitApp extends StatelessWidget {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: const Color(0xFF1E293B),
         elevation: 0, // Updated
         shadowColor: Colors.transparent, // Updated

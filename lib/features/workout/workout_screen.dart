@@ -5,10 +5,16 @@ import 'package:aksumfit/models/logged_exercise.dart';
 import 'package:aksumfit/models/logged_set.dart';
 import 'package:aksumfit/models/workout_log.dart';
 import 'package:aksumfit/services/api_service.dart'; // For saving workout log
+import 'package:aksumfit/models/exercise.dart';
+import 'package:aksumfit/models/workout_plan.dart';
+import 'package:aksumfit/models/workout_plan_exercise.dart';
+import 'package:aksumfit/models/logged_exercise.dart';
+import 'package:aksumfit/models/logged_set.dart';
+import 'package:aksumfit/models/workout_log.dart';
+import 'package:aksumfit/services/api_service.dart'; // For saving workout log
 import 'package:aksumfit/services/auth_manager.dart'; // For getting userId
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart'; // Keep for ScaffoldMessenger & showDialog with AlertDialog
 import 'package:go_router/go_router.dart';
 import 'package:aksumfit/features/workout/widgets/exercise_timer_widget.dart';
 import 'package:aksumfit/features/workout/widgets/weight_rep_logger_widget.dart';
@@ -213,36 +219,31 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final cupertinoTheme = CupertinoTheme.of(context);
 
     if (widget.plan.exercises.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text("Empty Workout Plan")),
-        body: const Center(child: Text("This workout plan has no exercises.")),
+      return CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(middle: Text("Empty Workout Plan")),
+        child: const Center(child: Text("This workout plan has no exercises.")),
       );
     }
 
-    // Fallback if details are somehow null, though _loadExerciseData should prevent this if plan is valid
     final exerciseName = _currentExerciseDetails?.name ?? "Loading...";
     final exerciseImage = _currentExerciseDetails?.imageUrl;
     final exerciseType = _currentExerciseDetails?.type ?? ExerciseType.strength;
 
-    // Determine if the current exercise is strength-based or timed
-    // This logic might need refinement based on WorkoutPlanExercise fields (e.g. if duration is set for a strength exercise like Plank)
     bool isStrengthExercise = exerciseType == ExerciseType.strength && (_currentPlanExercise.sets ?? 0) > 0;
     bool isTimedExercise = (_currentPlanExercise.durationSeconds ?? 0) > 0;
-    if(isStrengthExercise && isTimedExercise) isStrengthExercise = false; // Prioritize timed if both are set (e.g. timed plank)
+    if (isStrengthExercise && isTimedExercise) isStrengthExercise = false;
 
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.plan.name, style: GoogleFonts.inter(color: theme.colorScheme.onPrimary)),
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons.xmark),
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(widget.plan.name),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.xmark),
           onPressed: () async {
-            final bool? shouldQuit = await showDialog<bool>(
+            final bool? shouldQuit = await showCupertinoDialog<bool>(
               context: context,
               builder: (BuildContext dialogContext) => CupertinoAlertDialog(
                 title: const Text("Quit Workout?"),
@@ -254,102 +255,98 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               ),
             );
             if (shouldQuit == true && mounted) {
-              context.pop(); // Go back from whence it came
+              context.pop();
             }
           },
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(CupertinoIcons.check_mark_circled_solid),
-            tooltip: "Finish Workout",
-            onPressed: _finishWorkout,
-          )
-        ],
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.check_mark_circled_solid),
+          onPressed: _finishWorkout,
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Progress Indicator (e.g., Exercise 1 of 5)
-            Text(
-              "Exercise ${_currentPlanExerciseIndex + 1} of ${widget.plan.exercises.length}",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: theme.textTheme.titleMedium?.fontSize, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 10),
-
-            Text(
-              exerciseName,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: theme.textTheme.headlineMedium?.fontSize, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(12.0),
-                image: exerciseImage != null && exerciseImage.isNotEmpty
-                    ? DecorationImage(image: NetworkImage(exerciseImage), fit: BoxFit.cover)
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                "Exercise ${_currentPlanExerciseIndex + 1} of ${widget.plan.exercises.length}",
+                textAlign: TextAlign.center,
+                style: cupertinoTheme.textTheme.navTitleTextStyle.copyWith(color: CupertinoColors.secondaryLabel),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                exerciseName,
+                textAlign: TextAlign.center,
+                style: cupertinoTheme.textTheme.navLargeTitleTextStyle.copyWith(color: CupertinoColors.label),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: CupertinoColors.secondarySystemFill,
+                  borderRadius: BorderRadius.circular(12.0),
+                  image: exerciseImage != null && exerciseImage.isNotEmpty
+                      ? DecorationImage(image: NetworkImage(exerciseImage), fit: BoxFit.cover)
+                      : null,
+                ),
+                child: (exerciseImage == null || exerciseImage.isEmpty)
+                    ? Icon(CupertinoIcons.flame_fill, size: 100, color: cupertinoTheme.primaryColor)
                     : null,
               ),
-              child: (exerciseImage == null || exerciseImage.isEmpty)
-                  ? Icon(CupertinoIcons.flame_fill, size: 100, color: theme.colorScheme.primary)
-                  : null,
-            ),
-            const SizedBox(height: 20),
-
-            // Display target sets/reps or duration from _currentPlanExercise
-            Text(
-              "Target: ${isStrengthExercise ? '${_currentPlanExercise.sets} sets, ${_currentPlanExercise.reps} reps' : ''}${isTimedExercise ? '${_currentPlanExercise.durationSeconds} seconds' : ''}",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: theme.textTheme.titleLarge?.fontSize),
-            ),
-            const SizedBox(height: 20),
-
-            Expanded(
-              child: Center(
-                child: isStrengthExercise
-                    ? WeightRepLoggerWidget(
-                        key: ValueKey("logger_${_currentPlanExercise.id}_${_currentActiveLoggedExercise?.id}"), // More unique key
-                        targetSets: _currentPlanExercise.sets ?? 3,
-                        targetReps: _currentPlanExercise.reps ?? "N/A",
-                        onSetLogged: _handleSetLogged,
-                      )
-                    : isTimedExercise
-                        ? ExerciseTimerWidget(
-                            key: ValueKey("timer_${_currentPlanExercise.id}_${_currentActiveLoggedExercise?.id}"), // More unique key
-                            durationInSeconds: _currentPlanExercise.durationSeconds!,
-                            onTimerComplete: _handleTimedExerciseComplete,
-                          )
-                        : Text(
-                            _currentExerciseDetails == null && widget.plan.exercises.isNotEmpty
-                                ? "Loading exercise details..."
-                                : "Unsupported exercise type or configuration.",
-                            style: GoogleFonts.inter(color: _currentExerciseDetails == null ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.error),
-                          ),
+              const SizedBox(height: 20),
+              Text(
+                "Target: ${isStrengthExercise ? '${_currentPlanExercise.sets} sets, ${_currentPlanExercise.reps} reps' : ''}${isTimedExercise ? '${_currentPlanExercise.durationSeconds} seconds' : ''}",
+                textAlign: TextAlign.center,
+                style: cupertinoTheme.textTheme.navTitleTextStyle,
               ),
-            ),
-            const SizedBox(height: 20),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton.icon(
-                  icon: const Icon(CupertinoIcons.back),
-                  label: const Text("Previous"),
-                  onPressed: _currentPlanExerciseIndex == 0 ? null : () => _moveToExercise(_currentPlanExerciseIndex - 1),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Center(
+                  child: isStrengthExercise
+                      ? WeightRepLoggerWidget(
+                          key: ValueKey("logger_${_currentPlanExercise.id}_${_currentActiveLoggedExercise?.id}"),
+                          targetSets: _currentPlanExercise.sets ?? 3,
+                          targetReps: _currentPlanExercise.reps ?? "N/A",
+                          onSetLogged: _handleSetLogged,
+                        )
+                      : isTimedExercise
+                          ? ExerciseTimerWidget(
+                              key: ValueKey("timer_${_currentPlanExercise.id}_${_currentActiveLoggedExercise?.id}"),
+                              durationInSeconds: _currentPlanExercise.durationSeconds!,
+                              onTimerComplete: _handleTimedExerciseComplete,
+                            )
+                          : Text(
+                              _currentExerciseDetails == null && widget.plan.exercises.isNotEmpty
+                                  ? "Loading exercise details..."
+                                  : "Unsupported exercise type or configuration.",
+                              style: cupertinoTheme.textTheme.textStyle.copyWith(
+                                  color: _currentExerciseDetails == null ? CupertinoColors.secondaryLabel : CupertinoColors.destructiveRed),
+                            ),
                 ),
-                ElevatedButton.icon(
-                  icon: const Icon(CupertinoIcons.forward),
-                  label: Text(_currentPlanExerciseIndex == widget.plan.exercises.length - 1 ? "Finish" : "Next"),
-                  onPressed: () => _moveToExercise(_currentPlanExerciseIndex + 1),
-                ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    child: const Row(children: [Icon(CupertinoIcons.back), SizedBox(width: 4), Text("Previous")]),
+                    onPressed: _currentPlanExerciseIndex == 0 ? null : () => _moveToExercise(_currentPlanExerciseIndex - 1),
+                  ),
+                  CupertinoButton.filled(
+                    child: Row(children: [
+                      Text(_currentPlanExerciseIndex == widget.plan.exercises.length - 1 ? "Finish" : "Next"),
+                      const SizedBox(width: 4),
+                      const Icon(CupertinoIcons.forward)
+                    ]),
+                    onPressed: () => _moveToExercise(_currentPlanExerciseIndex + 1),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

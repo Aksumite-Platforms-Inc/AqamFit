@@ -59,142 +59,123 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final cupertinoTheme = CupertinoTheme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings', style: GoogleFonts.inter(color: colorScheme.onPrimary)),
-        backgroundColor: colorScheme.primary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text('Settings'),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+      child: _isLoading
+          ? const Center(child: CupertinoActivityIndicator())
           : ListView(
               children: [
-                _buildSectionTitle(context, "Preferences"),
-                ListTile(
-                  title: Text("Theme Mode", style: GoogleFonts.inter()),
-                  leading: Icon(CupertinoIcons.moon_stars_fill, color: colorScheme.secondary),
-                  trailing: DropdownButton<ThemeMode>(
-                    value: _currentThemeMode,
-                    items: ThemeMode.values.map((mode) => DropdownMenuItem(
-                      value: mode,
-                      child: Text(StringHelperExtension(mode.toString().split('.').last).capitalize(), style: GoogleFonts.inter()),
-                    )).toList(),
-                    onChanged: (ThemeMode? newValue) {
-                      if (newValue != null) {
-                        setState(() => _currentThemeMode = newValue);
-                        _settingsService.setThemeMode(newValue);
-                        // IMPORTANT: This won't visually change the theme immediately
-                        // without a mechanism to rebuild MaterialApp (e.g., a ThemeProvider).
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Theme change will apply on next app restart (or with ThemeProvider)."))
-                        );
-                      }
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: Text("Weight Unit", style: GoogleFonts.inter()),
-                  leading: Icon(CupertinoIcons.gauge, color: colorScheme.secondary),
-                  trailing: DropdownButton<WeightUnit>(
-                    value: _currentWeightUnit,
-                    items: WeightUnit.values.map((unit) => DropdownMenuItem(
-                      value: unit,
-                      child: Text(unit.toString().split('.').last.toUpperCase(), style: GoogleFonts.inter()),
-                    )).toList(),
-                    onChanged: (WeightUnit? newValue) {
-                      if (newValue != null) {
-                        setState(() => _currentWeightUnit = newValue);
-                        _settingsService.setWeightUnit(newValue);
-                        // TODO: Update user object in AuthManager or ApiService if these are stored there too
-                      }
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: Text("Distance Unit", style: GoogleFonts.inter()),
-                  leading: Icon(CupertinoIcons.map_pin_ellipse, color: colorScheme.secondary),
-                  trailing: DropdownButton<DistanceUnit>(
-                    value: _currentDistanceUnit,
-                    items: DistanceUnit.values.map((unit) => DropdownMenuItem(
-                      value: unit,
-                      child: Text(StringHelperExtension(unit.toString().split('.').last).capitalize(), style: GoogleFonts.inter()),
-                    )).toList(),
-                    onChanged: (DistanceUnit? newValue) {
-                      if (newValue != null) {
-                        setState(() => _currentDistanceUnit = newValue);
-                        _settingsService.setDistanceUnit(newValue);
-                         // TODO: Update user object
-                      }
-                    },
-                  ),
-                ),
-                // Example for a SwitchListTile for boolean settings
-                // SwitchListTile(
-                //   title: Text("Enable Workout Reminders", style: GoogleFonts.inter()),
-                //   secondary: Icon(CupertinoIcons.bell_fill, color: colorScheme.secondary),
-                //   value: _workoutRemindersEnabled,
-                //   onChanged: (bool value) {
-                //     setState(() => _workoutRemindersEnabled = value);
-                //     _settingsService.setWorkoutReminders(value);
-                //   },
-                // ),
-
-                const Divider(height: 30),
-                _buildSectionTitle(context, "Account"),
-                 ListTile(
-                  title: Text("Edit Profile", style: GoogleFonts.inter()),
-                  leading: Icon(CupertinoIcons.person_crop_circle_fill, color: colorScheme.secondary),
-                  trailing: const Icon(CupertinoIcons.forward),
-                  onTap: () {
-                    // TODO: context.go('/profile/edit'); - Create EditProfileScreen
-                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Navigate to Edit Profile (TODO)")));
-                  },
-                ),
-                ListTile(
-                  title: Text("Change Password", style: GoogleFonts.inter()),
-                  leading: Icon(CupertinoIcons.lock_shield_fill, color: colorScheme.secondary),
-                   trailing: const Icon(CupertinoIcons.forward),
-                  onTap: () {
-                    context.go('/profile/change-password');
-                  },
-                ),
-                 const Divider(height: 30),
-                  Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(CupertinoIcons.square_arrow_left),
-                    label: const Text("Logout"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.errorContainer,
-                      foregroundColor: colorScheme.onErrorContainer,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                CupertinoListSection.insetGrouped(
+                  header: const Text("Preferences"),
+                  children: [
+                    CupertinoListTile(
+                      title: const Text("Theme Mode"),
+                      leading: Icon(CupertinoIcons.moon_stars_fill, color: cupertinoTheme.primaryColor),
+                      additionalInfo: Text(StringHelperExtension(_currentThemeMode.toString().split('.').last).capitalize()),
+                      trailing: const Icon(CupertinoIcons.forward),
+                      onTap: () => _showThemePicker(context),
                     ),
-                    onPressed: () async {
-                      final confirmLogout = await showCupertinoDialog<bool>(
+                    CupertinoListTile(
+                      title: const Text("Weight Unit"),
+                      leading: Icon(CupertinoIcons.gauge, color: cupertinoTheme.primaryColor),
+                      additionalInfo: Text(_currentWeightUnit.toString().split('.').last.toUpperCase()),
+                      trailing: const Icon(CupertinoIcons.forward),
+                      onTap: () => _showUnitPicker<WeightUnit>(
                         context: context,
-                        builder: (BuildContext ctx) => CupertinoAlertDialog(
-                          title: const Text('Confirm Logout'),
-                          content: const Text('Are you sure you want to logout?'),
-                          actions: <CupertinoDialogAction>[
-                            CupertinoDialogAction(
-                              child: const Text('Cancel'),
-                              onPressed: () => Navigator.of(ctx).pop(false),
-                            ),
-                            CupertinoDialogAction(
-                              child: const Text('Logout'),
-                              isDestructiveAction: true,
-                              onPressed: () => Navigator.of(ctx).pop(true),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (confirmLogout == true) {
-                        _handleLogout();
-                      }
-                    },
+                        title: "Select Weight Unit",
+                        items: WeightUnit.values,
+                        currentValue: _currentWeightUnit,
+                        onSelectedItemChanged: (newValue) {
+                          if (newValue != null) {
+                            setState(() => _currentWeightUnit = newValue);
+                            _settingsService.setWeightUnit(newValue);
+                          }
+                        },
+                      ),
+                    ),
+                    CupertinoListTile(
+                      title: const Text("Distance Unit"),
+                      leading: Icon(CupertinoIcons.map_pin_ellipse, color: cupertinoTheme.primaryColor),
+                      additionalInfo: Text(StringHelperExtension(_currentDistanceUnit.toString().split('.').last).capitalize()),
+                      trailing: const Icon(CupertinoIcons.forward),
+                      onTap: () => _showUnitPicker<DistanceUnit>(
+                        context: context,
+                        title: "Select Distance Unit",
+                        items: DistanceUnit.values,
+                        currentValue: _currentDistanceUnit,
+                        onSelectedItemChanged: (newValue) {
+                          if (newValue != null) {
+                            setState(() => _currentDistanceUnit = newValue);
+                            _settingsService.setDistanceUnit(newValue);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                CupertinoListSection.insetGrouped(
+                  header: const Text("Account"),
+                  children: [
+                    CupertinoListTile(
+                      title: const Text("Edit Profile"),
+                      leading: Icon(CupertinoIcons.person_crop_circle_fill, color: cupertinoTheme.primaryColor),
+                      trailing: const Icon(CupertinoIcons.forward),
+                      onTap: () {
+                         context.go('/profile/edit');
+                      },
+                    ),
+                    CupertinoListTile(
+                      title: const Text("Change Password"),
+                      leading: Icon(CupertinoIcons.lock_shield_fill, color: cupertinoTheme.primaryColor),
+                      trailing: const Icon(CupertinoIcons.forward),
+                      onTap: () {
+                        context.go('/profile/change-password');
+                      },
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: CupertinoButton(
+                      color: CupertinoColors.destructiveRed,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.square_arrow_left, color: CupertinoColors.white),
+                          SizedBox(width: 8),
+                          Text("Logout", style: TextStyle(color: CupertinoColors.white)),
+                        ],
+                      ),
+                      onPressed: () async {
+                        final confirmLogout = await showCupertinoDialog<bool>(
+                          context: context,
+                          builder: (BuildContext ctx) => CupertinoAlertDialog(
+                            title: const Text('Confirm Logout'),
+                            content: const Text('Are you sure you want to logout?'),
+                            actions: <CupertinoDialogAction>[
+                              CupertinoDialogAction(
+                                child: const Text('Cancel'),
+                                onPressed: () => Navigator.of(ctx).pop(false),
+                              ),
+                              CupertinoDialogAction(
+                                child: const Text('Logout'),
+                                isDestructiveAction: true,
+                                onPressed: () => Navigator.of(ctx).pop(true),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmLogout == true) {
+                          _handleLogout();
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -202,25 +183,98 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
-      child: Text(
-        title,
-        style: GoogleFonts.inter(
-          fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.primary,
+  void _showThemePicker(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('Select Theme Mode'),
+        actions: ThemeMode.values
+            .map((mode) => CupertinoActionSheetAction(
+                  child: Text(StringHelperExtension(mode.toString().split('.').last).capitalize()),
+                  onPressed: () {
+                    if (mode != _currentThemeMode) {
+                       setState(() => _currentThemeMode = mode);
+                      _settingsService.setThemeMode(mode);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Theme change will apply on next app restart (or with ThemeProvider)."))
+                      );
+                    }
+                    Navigator.pop(context);
+                  },
+                ))
+            .toList(),
+        cancelButton: CupertinoActionSheetAction(
+          child: const Text('Cancel'),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
+
+  void _showUnitPicker<T extends Enum>({
+    required BuildContext context,
+    required String title,
+    required List<T> items,
+    required T currentValue,
+    required ValueChanged<T?> onSelectedItemChanged,
+  }) {
+    final FixedExtentScrollController scrollController =
+        FixedExtentScrollController(initialItem: items.indexOf(currentValue));
+
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 250,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              color: CupertinoColors.secondarySystemBackground.resolveFrom(context),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CupertinoButton(
+                    child: const Text('Cancel'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                  CupertinoButton(
+                    child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    onPressed: null,
+                  ),
+                  CupertinoButton(
+                    child: const Text('Done'),
+                    onPressed: () {
+                      onSelectedItemChanged(items[scrollController.selectedItem]);
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CupertinoPicker(
+                scrollController: scrollController,
+                itemExtent: 32.0,
+                onSelectedItemChanged: (int index) {
+                  // No immediate state update here, wait for "Done"
+                },
+                children: items.map((T value) {
+                  return Center(child: Text(value.toString().split('.').last.capitalize()));
+                }).toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-extension StringHelperExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return this[0].toUpperCase() + substring(1);
-  }
-}
+// Removed local StringHelperExtension as it's defined globally
+// extension StringHelperExtension on String {
+//   String capitalize() {
+//     if (isEmpty) return this;
+//     return this[0].toUpperCase() + substring(1);
+//   }
+// }
 // Removed import from here as it's moved to the top

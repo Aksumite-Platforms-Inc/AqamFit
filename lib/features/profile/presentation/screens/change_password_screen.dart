@@ -57,62 +57,67 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Change Password", style: GoogleFonts.inter(color: theme.colorScheme.onPrimary)),
-        backgroundColor: theme.colorScheme.primary,
-        iconTheme: IconThemeData(color: theme.colorScheme.onPrimary),
+    final cupertinoTheme = CupertinoTheme.of(context);
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text("Change Password"),
       ),
-      body: Form(
+      child: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(20.0),
           children: [
-            TextFormField(
-              controller: _currentPasswordController,
-              decoration: const InputDecoration(labelText: "Current Password", prefixIcon: Icon(CupertinoIcons.lock_fill)),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) return "Current password is required.";
-                // Add more validation if needed (e.g., length)
-                return null;
-              },
+            CupertinoFormSection.insetGrouped(
+              header: const Text('Current Password'),
+              children: [
+                CupertinoTextFormFieldRow(
+                  controller: _currentPasswordController,
+                  placeholder: "Enter current password",
+                  prefix: const Icon(CupertinoIcons.lock_fill, color: CupertinoColors.systemGrey),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "Current password is required.";
+                    return null;
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _newPasswordController,
-              decoration: const InputDecoration(labelText: "New Password", prefixIcon: Icon(CupertinoIcons.lock)),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) return "New password is required.";
-                if (value.length < 6) return "Password must be at least 6 characters.";
-                // Add more strength validation if desired
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _confirmPasswordController,
-              decoration: const InputDecoration(labelText: "Confirm New Password", prefixIcon: Icon(CupertinoIcons.lock)),
-              obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) return "Please confirm your new password.";
-                if (value != _newPasswordController.text) return "Passwords do not match.";
-                return null;
-              },
+            CupertinoFormSection.insetGrouped(
+              header: const Text('New Password'),
+              children: [
+                CupertinoTextFormFieldRow(
+                  controller: _newPasswordController,
+                  placeholder: "Enter new password",
+                  prefix: const Icon(CupertinoIcons.lock, color: CupertinoColors.systemGrey),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "New password is required.";
+                    if (value.length < 6) return "Password must be at least 6 characters.";
+                    return null;
+                  },
+                ),
+                CupertinoTextFormFieldRow(
+                  controller: _confirmPasswordController,
+                  placeholder: "Confirm new password",
+                  prefix: const Icon(CupertinoIcons.lock, color: CupertinoColors.systemGrey),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "Please confirm your new password.";
+                    if (value != _newPasswordController.text) return "Passwords do not match.";
+                    return null;
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 40),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0), // Match typical Cupertino button padding
+              child: CupertinoButton.filled(
+                onPressed: _isLoading ? null : _handleChangePassword,
+                child: _isLoading
+                    ? const CupertinoActivityIndicator(color: CupertinoColors.white)
+                    : const Text("Change Password"),
               ),
-              onPressed: _isLoading ? null : _handleChangePassword,
-              child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Change Password", style: TextStyle(fontSize: 16)),
             ),
           ],
         ),

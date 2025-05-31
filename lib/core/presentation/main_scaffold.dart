@@ -5,18 +5,16 @@ import 'package:aksumfit/features/profile/profile_screen.dart';
 import 'package:aksumfit/features/progress/progress_screen.dart'; // Re-added ProgressScreen import
 import 'package:aksumfit/features/social/presentation/screens/social_screen.dart';
 import 'package:aksumfit/features/workout/presentation/screens/workout_plans_screen.dart'; // Changed import
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:aksumfit/features/profile/profile_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
 
   @override
-  _MainScaffoldState createState() => _MainScaffoldState();
+  MainScaffoldState createState() => MainScaffoldState();
 }
 
-class _MainScaffoldState extends State<MainScaffold> {
+class MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
   late PageController _pageController;
 
@@ -52,43 +50,40 @@ class _MainScaffoldState extends State<MainScaffold> {
           ProfileScreen(),
         ],
       ),
-      bottomNavigationBar: CupertinoTabBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
-          // No need to call setState here as CupertinoTabBar handles its own state.
-          // However, we still need to update the PageView.
           _pageController.jumpToPage(index);
-          // Optionally, if you want to keep track of the index in _MainScaffoldState:
           setState(() {
             _currentIndex = index;
           });
         },
-        activeColor: Theme.of(context).colorScheme.primary,
-        inactiveColor: CupertinoColors.inactiveGray,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.compass),
+            icon: Icon(Icons.explore),
             label: 'Explore',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.sportscourt),
+            icon: Icon(Icons.fitness_center),
             label: 'Workout',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.graph_square), // Progress Icon
+            icon: Icon(Icons.show_chart), // Progress Icon
             label: 'Progress',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.leaf_arrow_circlepath),
+            icon: Icon(Icons.restaurant),
             label: 'Nutrition',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_3),
+            icon: Icon(Icons.group),
             label: 'Social',
           ),
           BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.person_crop_circle), label: 'Profile'),
+              icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
