@@ -92,7 +92,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       // Button style will be inherited from ElevatedButtonThemeData in main.dart
                       onPressed: () {
                         if (_currentPage == _pages.length - 1) {
-                          context.go('/main'); // Navigate using GoRouter
+                          context.go('/login'); // Navigate to Login Screen
                         } else {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 400),

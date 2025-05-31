@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StreakTrackerWidget extends StatefulWidget {
-  const StreakTrackerWidget({super.key});
+  final int streakCount;
+
+  const StreakTrackerWidget({super.key, required this.streakCount});
 
   @override
   State<StreakTrackerWidget> createState() => _StreakTrackerWidgetState();
@@ -20,12 +22,31 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
-    )..repeat(reverse: true);
+    );
 
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.25).animate(
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate( // Reduced scale slightly
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+
+    // Play animation only if streak is active
+    if (widget.streakCount > 0) {
+      _animationController.repeat(reverse: true);
+    }
   }
+
+  @override
+  void didUpdateWidget(covariant StreakTrackerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.streakCount != oldWidget.streakCount) {
+      if (widget.streakCount > 0 && !_animationController.isAnimating) {
+        _animationController.repeat(reverse: true);
+      } else if (widget.streakCount == 0 && _animationController.isAnimating) {
+        _animationController.stop();
+        _animationController.reset(); // Reset to initial scale
+      }
+    }
+  }
+
 
   @override
   void dispose() {
@@ -40,7 +61,6 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
     final TextTheme textTheme = theme.textTheme;
 
     return Card(
-      // Using theme's cardTheme for color and shape
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -52,36 +72,36 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
                   scale: _scaleAnimation,
                   child: Icon(
                     CupertinoIcons.flame_fill,
-                    color: colorScheme.tertiary, // Using theme color
-                    size: 24, // Adjusted size
+                    color: widget.streakCount > 0 ? colorScheme.tertiary : colorScheme.onSurfaceVariant.withOpacity(0.5),
+                    size: 24,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "Streak",
+                  "Current Streak",
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: textTheme.titleLarge?.color, // Use theme text color
+                    color: textTheme.titleLarge?.color,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12), // Increased spacing
+            const SizedBox(height: 12),
             Text(
-              "5 Days", // Placeholder
+              "${widget.streakCount} Day${widget.streakCount == 1 ? '' : 's'}",
               style: GoogleFonts.inter(
-                fontSize: 30, // Increased font size for prominence
+                fontSize: 30,
                 fontWeight: FontWeight.bold,
-                color: colorScheme.primary, // Use theme primary color
+                color: widget.streakCount > 0 ? colorScheme.primary : colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 6), // Increased spacing
+            const SizedBox(height: 6),
             Text(
-              "Keep it up!", // Placeholder
+              widget.streakCount > 0 ? "Keep the fire alive!" : "Log a workout to start a streak!",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: textTheme.bodyMedium?.color?.withOpacity(0.7), // Use theme text color
+                color: textTheme.bodyMedium?.color?.withOpacity(0.7),
               ),
             ),
           ],

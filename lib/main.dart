@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aksumfit/navigation/app_router.dart';
+import 'package:aksumfit/services/api_service.dart'; // Import ApiService
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  ApiService().initialize(); // Initialize ApiService
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

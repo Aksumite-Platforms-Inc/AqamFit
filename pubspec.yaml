@@ -48,6 +48,7 @@ dependencies:
   dio: ^5.4.3
   flutter_secure_storage: ^9.2.2
   google_fonts: ^6.2.1
+  cached_network_image: ^3.3.1 # Added missing dependency
 
   # Added for state management and local storage
   flutter_riverpod: ^2.5.1
@@ -58,6 +59,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mockito: ^5.4.4 # Added mockito
+  build_runner: ^2.4.10 # Added build_runner
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

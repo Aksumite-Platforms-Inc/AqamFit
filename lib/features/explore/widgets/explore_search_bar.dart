@@ -7,28 +7,21 @@ class ExploreSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: TextField(
-        style: GoogleFonts.inter(color: Colors.white), // For the input text itself
+        style: GoogleFonts.inter(color: theme.colorScheme.onSurface), // Use theme color
         decoration: InputDecoration(
           hintText: "Search workouts, articles, challenges...",
-          hintStyle: GoogleFonts.inter(color: Colors.white54),
-          prefixIcon: const Icon(CupertinoIcons.search, color: Colors.white54),
-          filled: true,
-          fillColor: const Color(0xFF1E293B),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF334155)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
-          ),
+          // hintStyle will be inherited from theme.inputDecorationTheme.hintStyle
+          prefixIcon: Icon(CupertinoIcons.search, color: theme.inputDecorationTheme.hintStyle?.color), // Use theme hint color for icon
+          // filled, fillColor, border, enabledBorder, focusedBorder will be inherited from theme.
+          // If specific borderRadius like 12 is needed and theme is 8, either theme should be updated,
+          // or this specific instance can override parts of the theme's InputDecoration.
+          // For now, let's assume the theme's default (borderRadius: 8) is acceptable for consistency.
+          // If a larger radius (e.g. 30 as seen in a previous grep for another search bar) is desired,
+          // then this decoration would need to be more custom.
         ),
       ),
     );
