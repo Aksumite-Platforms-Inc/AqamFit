@@ -4,7 +4,6 @@ import 'package:aksumfit/services/auth_manager.dart';
 import 'package:aksumfit/services/settings_service.dart'; // For WeightUnit/DistanceUnit enums
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:image_picker/image_picker.dart'; // For actual image picking
@@ -133,8 +132,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         middle: const Text("Edit Profile"),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: _isLoading ? const CupertinoActivityIndicator() : const Text("Save"),
           onPressed: _isLoading ? null : _saveProfile,
+          child: _isLoading ? const CupertinoActivityIndicator() : const Text("Save"),
         ),
       ),
       child: Form(
@@ -161,6 +160,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     right: 0,
                     child: CupertinoButton(
                       padding: EdgeInsets.zero,
+                      onPressed: _pickProfileImage,
                       child: Container( // Create a colored circle for the button
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -169,7 +169,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         child: const Icon(CupertinoIcons.camera_fill, color: CupertinoColors.white, size: 20),
                       ),
-                      onPressed: _pickProfileImage,
                     ),
                   )
                 ],
@@ -269,8 +268,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                    CupertinoButton(
-                    child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)), // Title in the middle
-                    onPressed: null, // Not interactive
+                    onPressed: null,
+                    child: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)), // Not interactive
                   ),
                   CupertinoButton(
                     child: const Text('Done'),

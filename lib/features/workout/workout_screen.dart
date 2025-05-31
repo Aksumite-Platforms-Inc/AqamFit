@@ -5,13 +5,7 @@ import 'package:aksumfit/models/logged_exercise.dart';
 import 'package:aksumfit/models/logged_set.dart';
 import 'package:aksumfit/models/workout_log.dart';
 import 'package:aksumfit/services/api_service.dart'; // For saving workout log
-import 'package:aksumfit/models/exercise.dart';
-import 'package:aksumfit/models/workout_plan.dart';
-import 'package:aksumfit/models/workout_plan_exercise.dart';
-import 'package:aksumfit/models/logged_exercise.dart';
-import 'package:aksumfit/models/logged_set.dart';
-import 'package:aksumfit/models/workout_log.dart';
-import 'package:aksumfit/services/api_service.dart'; // For saving workout log
+// For saving workout log
 import 'package:aksumfit/services/auth_manager.dart'; // For getting userId
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'; // Keep for ScaffoldMessenger & showDialog with AlertDialog
@@ -35,7 +29,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   late WorkoutPlanExercise _currentPlanExercise;
   Exercise? _currentExerciseDetails; // Full details of the current exercise
 
-  List<LoggedExercise> _completedWorkoutExercises = []; // Renamed from _loggedExercises for clarity
+  final List<LoggedExercise> _completedWorkoutExercises = []; // Renamed from _loggedExercises for clarity
   LoggedExercise? _currentActiveLoggedExercise; // Holds data for the exercise currently being performed
   DateTime _workoutStartTime = DateTime.now();
   final Uuid _uuid = const Uuid();
@@ -222,9 +216,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     final cupertinoTheme = CupertinoTheme.of(context);
 
     if (widget.plan.exercises.isEmpty) {
-      return CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(middle: Text("Empty Workout Plan")),
-        child: const Center(child: Text("This workout plan has no exercises.")),
+      return const CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(middle: Text("Empty Workout Plan")),
+        child: Center(child: Text("This workout plan has no exercises.")),
       );
     }
 
@@ -250,7 +244,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 content: const Text("Are you sure you want to end this workout session? Progress may not be saved."),
                 actions: <Widget>[
                   CupertinoDialogAction(child: const Text("Cancel"), onPressed: () => Navigator.of(dialogContext).pop(false)),
-                  CupertinoDialogAction(child: const Text("Quit"), isDestructiveAction: true, onPressed: () => Navigator.of(dialogContext).pop(true)),
+                  CupertinoDialogAction(isDestructiveAction: true, onPressed: () => Navigator.of(dialogContext).pop(true), child: const Text("Quit")),
                 ],
               ),
             );
@@ -261,8 +255,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.check_mark_circled_solid),
           onPressed: _finishWorkout,
+          child: const Icon(CupertinoIcons.check_mark_circled_solid),
         ),
       ),
       child: SafeArea(
@@ -332,8 +326,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CupertinoButton(
-                    child: const Row(children: [Icon(CupertinoIcons.back), SizedBox(width: 4), Text("Previous")]),
                     onPressed: _currentPlanExerciseIndex == 0 ? null : () => _moveToExercise(_currentPlanExerciseIndex - 1),
+                    child: const Row(children: [Icon(CupertinoIcons.back), SizedBox(width: 4), Text("Previous")]),
                   ),
                   CupertinoButton.filled(
                     child: Row(children: [
@@ -354,9 +348,4 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 }
 
 // Helper extension (if not already defined globally)
-extension StringExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return "${this[0].toUpperCase()}${substring(1)}";
-  }
-}
+

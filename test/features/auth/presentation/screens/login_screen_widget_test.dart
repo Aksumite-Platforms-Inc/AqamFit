@@ -1,10 +1,8 @@
 import 'package:aksumfit/features/auth/presentation/screens/login_screen.dart';
-import 'package:aksumfit/models/user.dart';
-import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart'; // Use if MockApiService was generated
+// Use if MockApiService was generated
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 

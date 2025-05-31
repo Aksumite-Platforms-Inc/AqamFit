@@ -1,4 +1,3 @@
-import 'package:aksumfit/models/user.dart';
 import 'package:aksumfit/models/workout_log.dart';
 import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/models/weight_entry.dart';
@@ -22,8 +21,8 @@ void resetApiServiceMockData() {
 void main() {
   group('ApiService - HomeScreenApiService Tests', () {
     late ApiService apiService;
-    final testUserId = 'homeScreenTestUser';
-    final otherUserId = 'otherUser';
+    const testUserId = 'homeScreenTestUser';
+    const otherUserId = 'otherUser';
 
     setUpAll(() {
       // This is where global setup for all tests in this group would go.

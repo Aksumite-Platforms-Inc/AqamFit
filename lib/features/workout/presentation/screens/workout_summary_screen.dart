@@ -24,9 +24,9 @@ class WorkoutSummaryScreen extends StatelessWidget {
     final cupertinoTheme = CupertinoTheme.of(context);
 
     if (workoutLog == null) {
-      return CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(middle: Text("Workout Summary")),
-        child: const Center(
+      return const CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(middle: Text("Workout Summary")),
+        child: Center(
           child: Text(
             "No workout summary available.",
             style: TextStyle(fontSize: 16, color: CupertinoColors.secondaryLabel),
@@ -77,7 +77,7 @@ class WorkoutSummaryScreen extends StatelessWidget {
                                       "Set ${set.setNumber}: ${set.repsAchieved ?? 'N/A'} reps @ ${set.weightUsedKg ?? 'N/A'} kg ${set.isCompleted ? '(Completed)' : ''}",
                                       style: cupertinoTheme.textTheme.tabLabelTextStyle,
                                     );
-                                  }).toList(),
+                                  }),
                                 if (loggedEx.durationAchievedSeconds != null && loggedEx.durationAchievedSeconds! > 0)
                                   Text(
                                     "Duration: ${_formatDuration(Duration(seconds: loggedEx.durationAchievedSeconds!))}",

@@ -1,6 +1,12 @@
-import 'package:aksumfit/services/api_service.dart'; // Import ApiService
-import 'package:flutter/cupertino.dart';
+import 'package:aksumfit/services/api_service.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:aksumfit/services/auth_manager.dart';
+import 'package:aksumfit/services/settings_service.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -10,93 +16,71 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormBuilderState>();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
   String? _errorMessage;
 
-  Future<void> _register() async {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _register(String fullName, String email, String password) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authResponse = await ApiService().register(
+        name: fullName,
+        email: email,
+        password: password,
+      );
+
+      if (mounted) {
+        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user);
+        Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
+        context.go('/main');
+      } else {
+        setState(() {
+          _errorMessage = "Registration failed. Please try again.";
+        });
+      }
+    } on ApiException catch (e) {
       setState(() {
-        _isLoading = true;
-        _errorMessage = null;
+        _errorMessage = e.message;
       });
-
-      try {
-        final authResponse = await ApiService().register(
-          name: _nameController.text,
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-
-        if (authResponse.success && mounted) {
-          // Show a success message and navigate to login
-          showCupertinoDialog(
-            context: context,
-            builder: (context) => CupertinoAlertDialog(
-              title: const Text('Registration Successful'),
-              content: const Text('You can now login with your new account.'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    context.go('/login');
-                  },
-                ),
-              ],
-            ),
-          );
-        } else {
-          setState(() {
-            _errorMessage = authResponse.message ?? 'Registration failed. Please try again.';
-          });
-        }
-      } on ApiException catch (e) {
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred: ${e.toString()}';
+      });
+    } finally {
+      if (mounted) {
         setState(() {
-          _errorMessage = e.message;
+          _isLoading = false;
         });
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'An unexpected error occurred: ${e.toString()}';
-        });
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
       }
     }
   }
 
   @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final cupertinoTheme = CupertinoTheme.of(context);
+    final theme = Theme.of(context);
 
-    return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Sign Up'),
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        title: const Text('Sign Up'),
+         backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
+        titleTextStyle: TextStyle(color: theme.colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      child: SafeArea(
+      body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Form(
+            child: FormBuilder(
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -104,112 +88,246 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   Text(
                     'Create Account',
                     textAlign: TextAlign.center,
-                    style: cupertinoTheme.textTheme.navLargeTitleTextStyle
-                        .copyWith(color: CupertinoColors.label),
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                        color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Start your fitness journey with AxumFit.',
                     textAlign: TextAlign.center,
-                    style: cupertinoTheme.textTheme.textStyle
-                        .copyWith(color: CupertinoColors.secondaryLabel),
-                  ),
-                  const SizedBox(height: 48),
-                  CupertinoFormSection(
-                    header: const Text('Account Information'),
-                    children: [
-                      CupertinoTextFormFieldRow(
-                        controller: _nameController,
-                        prefix: const Text('Full Name'),
-                        placeholder: 'Enter your full name',
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your name';
-                          }
-                          return null;
-                        },
-                      ),
-                      CupertinoTextFormFieldRow(
-                        controller: _emailController,
-                        prefix: const Text('Email'),
-                        placeholder: 'Enter your email',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
-                        },
-                      ),
-                      CupertinoTextFormFieldRow(
-                        controller: _passwordController,
-                        prefix: const Text('Password'),
-                        placeholder: 'Enter your password',
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
-                      ),
-                      CupertinoTextFormFieldRow(
-                        controller: _confirmPasswordController,
-                        prefix: const Text('Confirm'),
-                        placeholder: 'Confirm your password',
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please confirm your password';
-                          }
-                          if (value != _passwordController.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                     style: theme.textTheme.titleMedium
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 32),
+                  FormBuilderTextField(
+                    name: 'full_name',
+                    decoration: InputDecoration(
+                      labelText: 'Full Name',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.person),
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    validator: FormBuilderValidators.required(),
+                  ),
+                  const SizedBox(height: 20),
+                  FormBuilderTextField(
+                    name: 'email',
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.email),
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                      FormBuilderValidators.email(),
+                    ]),
+                  ),
+                  const SizedBox(height: 20),
+                  FormBuilderTextField(
+                    name: 'password',
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    obscureText: _obscurePassword,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                      FormBuilderValidators.minLength(8, errorText: 'Password must be at least 8 characters long'),
+                    ]),
+                  ),
+                   Padding(
+                    padding: const EdgeInsets.only(top: 4.0, left: 12.0),
+                    child: Text(
+                      'Use 8 or more characters with a mix of letters, numbers & symbols.',
+                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  FormBuilderTextField(
+                    name: 'confirm_password',
+                    decoration: InputDecoration(
+                      labelText: 'Confirm Password',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    obscureText: _obscureConfirmPassword,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                      (val) {
+                        if (val !=
+                            _formKey.currentState?.fields['password']?.value) {
+                          return 'Passwords do not match';
+                        }
+                        return null;
+                      }
+                    ]),
+                  ),
+                  const SizedBox(height: 24),
+                  FormBuilderCheckbox(
+                    name: 'accept_terms',
+                    initialValue: false,
+                    title: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                              text: 'I accept the ',
+                              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          TextSpan(
+                            text: 'Terms of Service',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                                decoration: TextDecoration.underline),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // TODO: Implement navigation to Terms of Service
+                                print('Navigate to Terms of Service');
+                              },
+                          ),
+                          TextSpan(
+                              text: ' & ',
+                              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                          TextSpan(
+                            text: 'Privacy Policy',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                                decoration: TextDecoration.underline),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // TODO: Implement navigation to Privacy Policy
+                                print('Navigate to Privacy Policy');
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                    validator: FormBuilderValidators.required(
+                        errorText:
+                            'You must accept the terms and conditions to continue'),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      errorStyle: TextStyle(color: theme.colorScheme.error),
+                      border: InputBorder.none, // Remove border from checkbox itself
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   if (_errorMessage != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Text(
                         _errorMessage!,
-                        style: cupertinoTheme.textTheme.textStyle
-                            .copyWith(color: CupertinoColors.destructiveRed),
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: theme.colorScheme.error),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   _isLoading
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : CupertinoButton.filled(
-                          onPressed: _register,
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            shape: RoundedRectangleBorder(
+                               borderRadius: BorderRadius.circular(12.0),
+                             ),
+                          ),
+                          onPressed: () {
+                            if (_formKey.currentState?.saveAndValidate() ?? false) {
+                              final formData = _formKey.currentState!.value;
+                              _register(formData['full_name'], formData['email'], formData['password']);
+                            }
+                          },
                           child: const Text('Create Account'),
                         ),
+                  const SizedBox(height: 32),
+                  Row(
+                    children: <Widget>[
+                      const Expanded(child: Divider()),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('OR', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                      ),
+                      const Expanded(child: Divider()),
+                    ],
+                  ),
                   const SizedBox(height: 24),
+                   ElevatedButton.icon(
+                    icon: const Icon(Icons.g_mobiledata, color: Colors.blueAccent),
+                    label: Text('Continue with Google', style: TextStyle(color: theme.colorScheme.onSurface)),
+                    onPressed: () { /* Placeholder */ },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surfaceContainerLowest,
+                      foregroundColor: theme.colorScheme.onSurface,
+                      side: BorderSide(color: theme.dividerColor),
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(12.0),
+                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.apple, color: Colors.black),
+                    label: Text('Continue with Apple', style: TextStyle(color: theme.colorScheme.onSurface)),
+                    onPressed: () { /* Placeholder */ },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surfaceContainerLowest,
+                      foregroundColor: theme.colorScheme.onSurface,
+                      side: BorderSide(color: theme.dividerColor),
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(12.0),
+                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'Already have an account?',
-                        style: cupertinoTheme.textTheme.textStyle
-                            .copyWith(color: CupertinoColors.secondaryLabel),
+                         style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                       ),
-                      CupertinoButton(
+                      TextButton(
                         onPressed: () {
                           context.go('/login');
                         },
                         child: Text(
                           'Login',
-                          style: cupertinoTheme.textTheme.actionTextStyle
-                              .copyWith(fontWeight: FontWeight.bold),
+                           style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],

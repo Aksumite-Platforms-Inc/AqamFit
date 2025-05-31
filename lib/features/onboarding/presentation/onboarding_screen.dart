@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:aksumfit/services/settings_service.dart';
 import '../../../models/onboarding_page.dart'; // Adjusted path
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,25 +19,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // Updated content for AxumFit
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      icon: CupertinoIcons.gear_alt_fill, // Updated icon
-      title: 'Personalized AI Workouts', // Updated title
-      description:
-          'Intelligent workout plans tailored to your goals and progress.', // Updated description
-      // color field will be ignored as per instructions
+      icon: CupertinoIcons.flame_fill, // Screen 1 Icon
+      title: 'AI-Powered Fitness', // Screen 1 Title
+      description: 'Personalized plans based on your goals and progress.', // Screen 1 Desc
     ),
     OnboardingPage(
-      icon: CupertinoIcons.graph_circle_fill, // Updated icon
-      title: 'Track Your Journey', // Updated title
-      description:
-          'Log meals, monitor body metrics, and see your strength grow with detailed analytics.', // Updated description
-      // color field will be ignored
+      icon: CupertinoIcons.cart_fill, // Screen 2 Icon (replaced food_fork_drink_fill)
+      title: 'Smart Meal Tracking', // Screen 2 Title
+      description: 'Snap your meals, track calories, and stay on top of your diet.', // Screen 2 Desc
     ),
     OnboardingPage(
-      icon: CupertinoIcons.rosette, // Updated icon
-      title: 'Stay Motivated', // Updated title
-      description:
-          'Join challenges, earn badges, and connect with the AxumFit community.', // Updated description
-      // color field will be ignored
+      icon: CupertinoIcons.star_fill, // Screen 3 Icon
+      title: 'Stay Motivated', // Screen 3 Title
+      description: 'Social challenges, rewards, and expert support.', // Screen 3 Desc
     ),
   ];
 
@@ -46,11 +42,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Scaffold(
       backgroundColor: colorScheme.surface, // Use theme background
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
+      body: Stack( // Wrap SafeArea with Stack for Skip button
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
                 controller: _pageController,
                 onPageChanged: (index) {
                   setState(() {
@@ -78,8 +76,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 8,
                         decoration: BoxDecoration(
                           color: _currentPage == index
-                              ? CupertinoColors.activeBlue
-                              : CupertinoColors.inactiveGray,
+                              ? theme.colorScheme.primary // Use theme primary color
+                              : theme.colorScheme.onSurface.withOpacity(0.3), // Use theme surface/variant
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
@@ -88,10 +86,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   const SizedBox(height: 40),
                   SizedBox(
                     width: double.infinity,
-                    child: CupertinoButton.filled(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0), // More rounded
+                        ),
+                        elevation: 5.0, // Add elevation
+                      ),
                       onPressed: () {
                         if (_currentPage == _pages.length - 1) {
-                          context.go('/login'); // Navigate to Login Screen
+                          Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
+                          context.go('/register'); // Navigate to Register Screen
                         } else {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 400),
@@ -100,10 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         }
                       },
                       child: Text(
-                        _currentPage == _pages.length - 1
-                            ? 'Get Started'
-                            : 'Next',
-                        style: const TextStyle(color: CupertinoColors.white),
+                        _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
                       ),
                     ),
                   ),
@@ -112,7 +118,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
           ],
-        ),
+          ),
+          ),
+          Positioned(
+            top: 16.0,
+            right: 16.0,
+            child: TextButton(
+              onPressed: () {
+                Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
+                context.go('/register');
+              },
+              child: Text('Skip', style: TextStyle(color: theme.colorScheme.primary)),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -125,6 +144,8 @@ class OnboardingPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Get theme for styling
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 20.0),
       child: Column(
@@ -134,39 +155,31 @@ class OnboardingPageWidget extends StatelessWidget {
             width: 180,
             height: 180,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  CupertinoColors.activeBlue.withOpacity(0.1),
-                  CupertinoColors.activeGreen.withOpacity(0.1),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: theme.colorScheme.secondaryContainer.withOpacity(0.5), // Theme-aware background
               shape: BoxShape.circle,
             ),
             child: Icon(
-              page.icon,
+              page.icon, // This comes from the _pages list
               size: 80,
-              color: CupertinoColors.activeBlue,
+              color: theme.colorScheme.primary, // Theme-aware icon color
             ),
           ),
           const SizedBox(height: 60),
           Text(
             page.title,
             textAlign: TextAlign.center,
-            style: CupertinoTheme.of(context)
-                .textTheme
-                .navLargeTitleTextStyle
-                .copyWith(color: CupertinoColors.label),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 20),
           Text(
             page.description,
             textAlign: TextAlign.center,
-            style: CupertinoTheme.of(context)
-                .textTheme
-                .textStyle
-                .copyWith(color: CupertinoColors.secondaryLabel),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

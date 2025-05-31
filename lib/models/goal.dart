@@ -54,9 +54,9 @@ class Goal {
     this.isActive = true,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) : this.id = id ?? _uuid.v4(),
-       this.createdAt = createdAt ?? DateTime.now(),
-       this.updatedAt = updatedAt ?? DateTime.now();
+  }) : id = id ?? _uuid.v4(),
+       createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now();
 
   factory Goal.fromJson(Map<String, dynamic> json) {
     return Goal(

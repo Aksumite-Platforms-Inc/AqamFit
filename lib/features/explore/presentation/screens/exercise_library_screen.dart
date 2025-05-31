@@ -155,8 +155,8 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   String _searchTerm = '';
   final TextEditingController _searchController = TextEditingController();
 
-  List<String> _muscleGroupFilters = [];
-  List<String> _equipmentFilters = [];
+  final List<String> _muscleGroupFilters = [];
+  final List<String> _equipmentFilters = [];
 
   final List<String> _availableMuscleGroups = [
     "Chest", "Back", "Legs", "Shoulders", "Biceps", "Triceps", "Abs", "Full Body"
@@ -348,8 +348,8 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
         previousPageTitle: "Explore",
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.slider_horizontal_3),
           onPressed: _showFilterDialog,
+          child: const Icon(CupertinoIcons.slider_horizontal_3),
         ),
       ),
       child: Column(

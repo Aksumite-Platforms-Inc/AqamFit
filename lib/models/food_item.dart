@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // For listEquals, if used for complex fields later
+// For listEquals, if used for complex fields later
 
 enum FoodItemCategory {
   fruit, vegetable, grain, protein, dairy, fat, beverage, snack, other

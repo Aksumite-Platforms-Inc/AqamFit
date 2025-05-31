@@ -1,6 +1,10 @@
-import 'package:aksumfit/services/api_service.dart'; // Import ApiService
-import 'package:flutter/cupertino.dart';
+import 'package:aksumfit/services/api_service.dart';
+import 'package:flutter/material.dart'; // Added Material import
+import 'package:flutter_form_builder/flutter_form_builder.dart'; // Added FormBuilder
+import 'package:form_builder_validators/form_builder_validators.dart'; // Added Validators
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart'; // Added Provider for AuthManager
+import 'package:aksumfit/services/auth_manager.dart'; // Added AuthManager
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,73 +14,71 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'demo@axumfit.com'); // For easier testing
-  final _passwordController = TextEditingController(text: 'demo123'); // For easier testing
+  final _formKey = GlobalKey<FormBuilderState>(); // Changed to FormBuilderState
+  bool _obscurePassword = true; // State for password visibility
   bool _isLoading = false;
   String? _errorMessage;
 
-  Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
+  // Adapted _login method
+  Future<void> _login(String email, String password) async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final authResponse = await ApiService().login(
+        email: email,
+        password: password,
+      );
+
+      if (mounted) {
+        // Use Provider to set user
+        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user);
+        context.go('/main');
+      } else {
+        setState(() {
+          _errorMessage = authResponse.message ?? 'Login failed. Please try again.';
+        });
+      }
+    } on ApiException catch (e) {
       setState(() {
-        _isLoading = true;
-        _errorMessage = null;
+        _errorMessage = e.message;
       });
-
-      try {
-        // Use ApiService for login
-        final authResponse = await ApiService().login(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-
-        if (authResponse.success && mounted) {
-          context.go('/main'); // Navigate to main app screen
-        } else {
-          setState(() {
-            _errorMessage = authResponse.message ?? 'Login failed. Please try again.';
-          });
-        }
-      } on ApiException catch (e) {
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An unexpected error occurred: ${e.toString()}';
+      });
+    } finally {
+      if (mounted) {
         setState(() {
-          _errorMessage = e.message;
+          _isLoading = false;
         });
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'An unexpected error occurred: ${e.toString()}';
-        });
-      } finally {
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
       }
     }
   }
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final cupertinoTheme = CupertinoTheme.of(context);
+    final theme = Theme.of(context); // Get Material theme
 
-    return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Login'),
+    return Scaffold( // Changed to Scaffold
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar( // Changed to AppBar
+        title: const Text('Login'),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 0,
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
+        titleTextStyle: TextStyle(color: theme.colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
+
       ),
-      child: SafeArea(
+      body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
-            child: Form(
+            child: FormBuilder( // Changed to FormBuilder
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -84,64 +86,72 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'Welcome Back!',
                     textAlign: TextAlign.center,
-                    style: cupertinoTheme.textTheme.navLargeTitleTextStyle
-                        .copyWith(color: CupertinoColors.label),
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                        color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Login to continue your fitness journey.',
                     textAlign: TextAlign.center,
-                    style: cupertinoTheme.textTheme.textStyle
-                        .copyWith(color: CupertinoColors.secondaryLabel),
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 48),
-                  CupertinoFormSection(
-                    header: const Text('Credentials'),
-                    children: [
-                      CupertinoTextFormFieldRow(
-                        controller: _emailController,
-                        prefix: const Text('Email'),
-                        placeholder: 'Enter your email',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
-                          }
-                          if (!value.contains('@')) {
-                            return 'Please enter a valid email';
-                          }
-                          return null;
+                  FormBuilderTextField(
+                    name: 'email',
+                    initialValue: 'demo@axumfit.com', // For easier testing
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.email),
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                      FormBuilderValidators.email(),
+                    ]),
+                  ),
+                  const SizedBox(height: 20),
+                  FormBuilderTextField(
+                    name: 'password',
+                    initialValue: 'demo123', // For easier testing
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.lock),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
                         },
                       ),
-                      CupertinoTextFormFieldRow(
-                        controller: _passwordController,
-                        prefix: const Text('Password'),
-                        placeholder: 'Enter your password',
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                      filled: true,
+                      fillColor: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    obscureText: _obscurePassword,
+                    validator: FormBuilderValidators.required(),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Align(
                       alignment: Alignment.centerRight,
-                      child: CupertinoButton(
+                      child: TextButton( // Changed to TextButton
                         onPressed: () {
                           // TODO: Implement forgot password navigation/logic
-                          showCupertinoDialog(
+                          showDialog( // Changed to showDialog for Material
                             context: context,
-                            builder: (context) => CupertinoAlertDialog(
+                            builder: (context) => AlertDialog(
                               title: const Text('Forgot Password'),
                               content: const Text(
                                   'Password recovery is not yet implemented.'),
                               actions: [
-                                CupertinoDialogAction(
+                                TextButton(
                                   child: const Text('OK'),
                                   onPressed: () => Navigator.pop(context),
                                 ),
@@ -151,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text(
                           'Forgot Password?',
-                          style: cupertinoTheme.textTheme.actionTextStyle,
+                          style: TextStyle(color: theme.colorScheme.primary),
                         ),
                       ),
                     ),
@@ -162,34 +172,90 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Text(
                         _errorMessage!,
-                        style: cupertinoTheme.textTheme.textStyle
-                            .copyWith(color: CupertinoColors.destructiveRed),
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: theme.colorScheme.error),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   _isLoading
-                      ? const Center(child: CupertinoActivityIndicator())
-                      : CupertinoButton.filled(
-                          onPressed: _login,
+                      ? const Center(child: CircularProgressIndicator()) // Changed to CircularProgressIndicator
+                      : ElevatedButton( // Changed to ElevatedButton
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                             shape: RoundedRectangleBorder(
+                               borderRadius: BorderRadius.circular(12.0),
+                             ),
+                          ),
+                          onPressed: () {
+                            if (_formKey.currentState?.saveAndValidate() ?? false) {
+                              final formData = _formKey.currentState!.value;
+                              _login(formData['email'], formData['password']);
+                            }
+                          },
                           child: const Text('Login'),
                         ),
+                  const SizedBox(height: 32),
+                  Row(
+                    children: <Widget>[
+                      const Expanded(child: Divider()),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text('OR', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                      ),
+                      const Expanded(child: Divider()),
+                    ],
+                  ),
                   const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.g_mobiledata, color: Colors.redAccent), // Placeholder, replace with actual Google icon
+                    label: Text('Continue with Google', style: TextStyle(color: theme.colorScheme.onSurface)),
+                    onPressed: () { /* Placeholder for Google Sign In */ },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surfaceContainerLowest, // Light background
+                      foregroundColor: theme.colorScheme.onSurface, // Text color
+                      side: BorderSide(color: theme.dividerColor), // Border color
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(12.0),
+                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.apple, color: Colors.black), // Placeholder, replace with actual Apple icon
+                    label: Text('Continue with Apple', style: TextStyle(color: theme.colorScheme.onSurface)),
+                    onPressed: () { /* Placeholder for Apple Sign In */ },
+                     style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surfaceContainerLowest,
+                      foregroundColor: theme.colorScheme.onSurface,
+                      side: BorderSide(color: theme.dividerColor),
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(12.0),
+                       ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         "Don't have an account?",
-                        style: cupertinoTheme.textTheme.textStyle
-                            .copyWith(color: CupertinoColors.secondaryLabel),
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                       ),
-                      CupertinoButton(
+                      TextButton( // Changed to TextButton
                         onPressed: () {
                           context.go('/register');
                         },
                         child: Text(
                           'Sign Up',
-                          style: cupertinoTheme.textTheme.actionTextStyle
-                              .copyWith(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
