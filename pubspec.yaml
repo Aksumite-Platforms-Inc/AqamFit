@@ -48,6 +48,7 @@ dependencies:
   dio: ^5.4.3
   flutter_secure_storage: ^9.2.2
   google_fonts: ^6.2.1
+  cached_network_image: ^3.3.1 # Added missing dependency
 
   # Added for state management and local storage
   flutter_riverpod: ^2.5.1

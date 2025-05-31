@@ -2,6 +2,7 @@ import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/features/workout/create_workout_screen.dart';
 import 'package:aksumfit/features/workout/workout_screen.dart'; // The active workout session screen
+import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -187,8 +188,4 @@ class _WorkoutPlansScreenState extends State<WorkoutPlansScreen> {
 
 // Helper extension (if not already defined globally)
 extension StringExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return "${this[0].toUpperCase()}${substring(1)}";
-  }
-}
+// Removed local StringExtension for capitalize (if it existed here)

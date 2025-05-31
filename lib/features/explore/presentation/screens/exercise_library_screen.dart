@@ -1,4 +1,5 @@
 import 'package:aksumfit/models/exercise.dart'; // Updated import
+import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -422,10 +423,4 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   }
 }
 
-// Helper extension for capitalizing strings
-extension StringExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return "${this[0].toUpperCase()}${substring(1)}";
-  }
-}
+// Removed local StringExtension for capitalize

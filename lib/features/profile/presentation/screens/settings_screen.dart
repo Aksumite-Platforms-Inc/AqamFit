@@ -1,5 +1,7 @@
+import 'package:aksumfit/services/api_service.dart'; // Moved import to top
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:aksumfit/services/settings_service.dart';
+import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -220,5 +222,4 @@ extension StringHelperExtension on String {
     return this[0].toUpperCase() + substring(1);
   }
 }
-
-import 'package:aksumfit/services/api_service.dart'; // Import actual ApiService
+// Removed import from here as it's moved to the top

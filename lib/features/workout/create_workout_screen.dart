@@ -3,6 +3,7 @@ import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/models/workout_plan_exercise.dart';
 import 'package:aksumfit/features/explore/presentation/screens/exercise_library_screen.dart'; // To pick exercises
 import 'package:aksumfit/services/auth_manager.dart'; // To get current user ID for authorId
+import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -235,7 +236,7 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
     });
   }
 
-  void _saveWorkoutPlan() {
+  Future<void> _saveWorkoutPlan() async { // Added async
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
@@ -404,10 +405,4 @@ class _CreateWorkoutScreenState extends State<CreateWorkoutScreen> {
   }
 }
 
-// Helper extension (if not already defined globally)
-extension StringExtension on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return "${this[0].toUpperCase()}${substring(1)}";
-  }
-}
+// Removed local StringExtension for capitalize (if it existed here)

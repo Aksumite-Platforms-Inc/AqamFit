@@ -41,7 +41,7 @@ class ApiService {
         encryptedSharedPreferences: true,
       ),
       iOptions: IOSOptions(
-        accessibility: IOSAccessibility.first_unlock_this_device,
+        accessibility: IOSAccessibility.unlocked_this_device, // Changed to a valid and common option
       ),
     );
 

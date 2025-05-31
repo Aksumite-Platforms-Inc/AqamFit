@@ -15,8 +15,9 @@ class Exercise {
   final List<String> muscleGroups; // e.g., ["Chest", "Triceps", "Shoulders"]
   final List<String> equipment;    // e.g., ["Dumbbell", "Barbell", "Bench"]
   final ExerciseType type;
-  final String? imageUrl; // Optional: path to local asset or network URL
-  final String? videoUrl; // Optional: network URL (e.g., YouTube)
+  final String? imageUrl;
+  final String? videoUrl;
+  final int? durationSeconds; // Typical duration for timed exercises
 
   Exercise({
     required this.id,
@@ -27,9 +28,9 @@ class Exercise {
     required this.type,
     this.imageUrl,
     this.videoUrl,
+    this.durationSeconds, // Added optional field
   });
 
-  // Factory constructor for creating a new Exercise instance from a map (e.g., from JSON)
   factory Exercise.fromJson(Map<String, dynamic> json) {
     return Exercise(
       id: json['id'] as String,
@@ -39,14 +40,14 @@ class Exercise {
       equipment: List<String>.from(json['equipment'] as List<dynamic>? ?? []),
       type: ExerciseType.values.firstWhere(
         (e) => e.toString() == json['type'],
-        orElse: () => ExerciseType.strength, // Default type
+        orElse: () => ExerciseType.strength,
       ),
       imageUrl: json['imageUrl'] as String?,
       videoUrl: json['videoUrl'] as String?,
+      durationSeconds: json['durationSeconds'] as int?, // Added
     );
   }
 
-  // Method for converting an Exercise instance to a map (e.g., for JSON serialization)
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -57,6 +58,7 @@ class Exercise {
       'type': type.toString(),
       'imageUrl': imageUrl,
       'videoUrl': videoUrl,
+      'durationSeconds': durationSeconds, // Added
     };
   }
 
@@ -72,7 +74,8 @@ class Exercise {
         listEquals(other.equipment, equipment) &&
         other.type == type &&
         other.imageUrl == imageUrl &&
-        other.videoUrl == videoUrl;
+        other.videoUrl == videoUrl &&
+        other.durationSeconds == durationSeconds; // Added
   }
 
   @override
@@ -84,5 +87,6 @@ class Exercise {
       equipment.hashCode ^
       type.hashCode ^
       imageUrl.hashCode ^
-      videoUrl.hashCode;
+      videoUrl.hashCode ^
+      durationSeconds.hashCode; // Added
 }

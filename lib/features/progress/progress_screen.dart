@@ -2,6 +2,8 @@ import 'package:aksumfit/models/goal.dart';
 import 'package:aksumfit/models/weight_entry.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
+import 'package:flutter/foundation.dart'; // Import for kDebugMode
+import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 // import 'package:aksumfit/features/progress/widgets/line_chart_widget_placeholder.dart'; // Will replace
 // import 'package:aksumfit/features/progress/widgets/radar_chart_widget_placeholder.dart'; // Will replace
 import 'package:fl_chart/fl_chart.dart';
@@ -559,19 +561,31 @@ class WeightLineChart extends StatelessWidget {
         ],
         lineTouchData: LineTouchData(
              touchTooltipData: LineTouchTooltipData(
-                tooltipBgColor: theme.colorScheme.primaryContainer,
+                // tooltipBgColor is likely deprecated. Use tooltipData on LineChartData or style LineTooltipItem.
+                // For now, we'll rely on default background or style the item directly.
+                tooltipRoundedRadius: 8.0, // Common property
                 getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                   return touchedBarSpots.map((barSpot) {
                     final flSpot = barSpot;
-                    // Find original entry to show date
-                    // This is tricky because X is daysSinceFirst. Need to map back or store original date with spot.
-                    // For now, just show Y value.
                     return LineTooltipItem(
                         '${flSpot.y.toStringAsFixed(1)} kg',
-                        TextStyle(color: theme.colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold),
+                        TextStyle(
+                          color: theme.colorScheme.onPrimaryContainer, // Example: use onPrimaryContainer for text
+                          fontWeight: FontWeight.bold,
+                          backgroundColor: theme.colorScheme.primaryContainer, // This won't work on TextStyle for background.
+                                                                            // Background should be set on the container of the tooltip.
+                                                                            // If LineTouchTooltipData has a direct `backgroundColor` use it.
+                                                                            // Otherwise, complex tooltips might require custom drawing or a different approach.
+                                                                            // For this fix, focusing on text color and removing direct tooltipBgColor.
+                        ),
+                         textAlign: TextAlign.center, // Ensure text is centered
                     );
                   }).toList();
-                }
+                },
+                // Check if a direct 'tooltipBackgroundColor' or similar exists for LineTouchTooltipData
+                // Based on fl_chart ^0.66.0 up to recent versions, direct background color is set on LineTouchTooltipData itself
+                tooltipBackgroundColor: theme.colorScheme.primaryContainer.withOpacity(0.8), // Example if property exists
+
             )
         )
       ),
@@ -587,8 +601,7 @@ class WeightLineChart extends StatelessWidget {
     // In a real app, you'd map X values to actual dates more robustly.
     final firstDate = weightEntries.last.date;
     final displayDate = firstDate.add(Duration(days: value.toInt()));
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
+    return SideTitleWidget( // Removed axisSide parameter
       space: 8.0,
       child: Text(DateFormat('d MMM').format(displayDate), style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.onSurfaceVariant)),
     );

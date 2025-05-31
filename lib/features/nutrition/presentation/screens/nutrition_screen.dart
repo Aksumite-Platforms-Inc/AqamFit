@@ -3,6 +3,7 @@ import 'package:aksumfit/models/meal.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:aksumfit/features/nutrition/presentation/screens/log_meal_screen.dart';
+import 'package:aksumfit/core/extensions/string_extensions.dart'; // Import for capitalize
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -290,8 +291,4 @@ class _NutritionScreenState extends State<NutritionScreen> {
 }
 
 extension StringExtension on String {
-  String capitalize() {
-    if (this.isEmpty) return this;
-    return this[0].toUpperCase() + this.substring(1);
-  }
-}
+// Removed local StringExtension for capitalize (if it existed here)
