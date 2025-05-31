@@ -40,13 +40,12 @@ class MainScaffoldState extends State<MainScaffold> {
             _currentIndex = index;
           });
         },
+        // Updated PageView children to 5 tabs
         children: const [
           HomeScreen(),
-          ExploreScreen(),
-          WorkoutPlansScreen(), // Changed to WorkoutPlansScreen
-          ProgressScreen(), // Added ProgressScreen
+          WorkoutPlansScreen(), // Assuming this is the intended 'Workout' tab screen
           NutritionScreen(),
-          SocialScreen(),
+          SocialScreen(),     // Assuming this is the intended 'Community' tab screen
           ProfileScreen(),
         ],
       ),
@@ -54,33 +53,27 @@ class MainScaffoldState extends State<MainScaffold> {
         currentIndex: _currentIndex,
         onTap: (index) {
           _pageController.jumpToPage(index);
-          setState(() {
-            _currentIndex = index;
-          });
+          // setState(() { // Already handled by onPageChanged
+          //   _currentIndex = index;
+          // });
         },
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant, // For better theme adaptation
+        type: BottomNavigationBarType.fixed, // Ensures all labels are visible for 5 items
+        // Updated BottomNavigationBar items to 5 tabs
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
             label: 'Workout',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart), // Progress Icon
-            label: 'Progress',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant),
+            icon: Icon(Icons.restaurant_menu), // Changed icon
             label: 'Nutrition',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.group),
-            label: 'Social',
+            label: 'Community',
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.person), label: 'Profile'),

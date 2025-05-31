@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:aksumfit/services/auth_manager.dart';
+import 'package:aksumfit/services/settings_service.dart';
+
 // Remove OnboardingScreen import if it's not used after navigation change
 // import 'package:aksumfit/screens/onboarding_screen.dart'; // This might be the old path
 
@@ -71,10 +75,26 @@ class _SplashScreenState extends State<SplashScreen>
     _slideController.forward();
 
     // Navigate to next screen after animations
-    await Future.delayed(const Duration(milliseconds: 2000));
+    // Total animation time is roughly 300 + 200 + 300 + (longest of 1500, 1200, 1000) = 800 + 1500 = 2300ms
+    // Adding a small delay for user to perceive the full animation.
+    await Future.delayed(const Duration(milliseconds: 700)); // Adjusted delay
+
     if (mounted) {
-      // Navigate to the login screen after splash
-      context.go('/login');
+      final authManager = Provider.of<AuthManager>(context, listen: false);
+      final settingsService = Provider.of<SettingsService>(context, listen: false);
+
+      final bool isLoggedIn = authManager.isUserLoggedIn; // Assuming isUserLoggedIn is the correct getter
+      final bool hasCompletedOnboarding = settingsService.hasCompletedOnboarding;
+
+      if (isLoggedIn) {
+        context.go('/main');
+      } else {
+        if (hasCompletedOnboarding) {
+          context.go('/login');
+        } else {
+          context.go('/onboarding');
+        }
+      }
     }
   }
 
@@ -88,12 +108,28 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Define the gradient background
+    const BoxDecoration gradientBackground = BoxDecoration(
+      gradient: LinearGradient(
+        colors: [
+          Color(0xFF0F172A), // Deep blue (dark slate 900)
+          Color(0xFF1E293B), // Mid blue (dark slate 800)
+          Color(0xFF3B82F6), // Lighter blue (blue 500) - for a touch of "health-tech"
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: [0.0, 0.5, 1.0],
+      ),
+    );
+
     return Scaffold(
       body: CupertinoPageScaffold(
-        backgroundColor: CupertinoColors.systemGroupedBackground,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        // backgroundColor: CupertinoColors.systemGroupedBackground, // Replaced by Container with gradient
+        child: Container( // Wrap with Container for gradient
+          decoration: gradientBackground,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo Animation
               AnimatedBuilder(
@@ -122,11 +158,12 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          CupertinoIcons.heart_fill,
-                          size: 60,
-                          color: CupertinoColors.white,
-                        ),
+                        // child: const Icon(
+                        //   CupertinoIcons.heart_fill, // Replaced
+                        //   size: 60,
+                        //   color: CupertinoColors.white,
+                        // ),
+                        child: const FlutterLogo(size: 60), // Placeholder logo
                       ),
                     ),
                   );
@@ -148,17 +185,17 @@ class _SplashScreenState extends State<SplashScreen>
                             .textTheme
                             .navLargeTitleTextStyle
                             .copyWith(
-                                color: CupertinoColors.label,
+                                color: CupertinoColors.white, // Adjusted for dark background
                                 fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'AI Powered Fitness',
+                        'The Future of Personalized Fitness', // Changed tagline
                         style: CupertinoTheme.of(context)
                             .textTheme
                             .textStyle
                             .copyWith(
-                                color: CupertinoColors.secondaryLabel,
+                                color: CupertinoColors.systemGrey2, // Adjusted for dark background
                                 letterSpacing: 1),
                       ),
                     ],
@@ -180,13 +217,14 @@ class _SplashScreenState extends State<SplashScreen>
                       style: CupertinoTheme.of(context)
                           .textTheme
                           .tabLabelTextStyle
-                          .copyWith(color: CupertinoColors.tertiaryLabel),
+                          .copyWith(color: CupertinoColors.systemGrey3), // Adjusted for dark background
                     ),
                   ],
                 ),
               ),
             ],
           ),
+        ),
         ),
       ),
     );
