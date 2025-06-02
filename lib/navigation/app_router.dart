@@ -29,6 +29,8 @@ import '../features/onboarding/presentation/setup_flow/training_prefs_screen.dar
 import '../features/onboarding/presentation/setup_flow/additional_info_screen.dart';
 // Explore Screens
 import '../features/explore/presentation/screens/browse_workouts_screen.dart';
+// Progress Screens
+import '../features/progress/presentation/screens/detailed_progress_screen.dart';
 
 // Example of a simple "Not Authorized" screen
 class NotAuthorizedScreen extends StatelessWidget {
@@ -235,9 +237,13 @@ final GoRouter router = GoRouter(
       path: '/log-meal-quick', // For logging a meal with today's date
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
-        // LogMealScreen needs a date. We pass today's date.
-        // Optional: could also pass a specific MealType via `extra` if quick actions were more specific.
-        child: LogMealScreen(date: DateTime.now()),
+        child: Builder(builder: (context) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final imagePath = extra?['imagePath'] as String?;
+          // Ensure date is still handled, default to DateTime.now() if not provided in extra
+          final date = extra?['date'] as DateTime? ?? DateTime.now();
+          return LogMealScreen(date: date, imagePath: imagePath);
+        }),
       ),
     ),
     // Setup Flow Routes
@@ -274,6 +280,13 @@ final GoRouter router = GoRouter(
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
         child: const BrowseWorkoutsScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/detailed-progress',
+      pageBuilder: (context, state) => const CupertinoPage(
+        key: ValueKey('detailed_progress'),
+        child: DetailedProgressScreen(),
       ),
     ),
   ],
