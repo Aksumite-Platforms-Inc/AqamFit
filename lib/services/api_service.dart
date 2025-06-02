@@ -549,7 +549,7 @@ extension WorkoutApiService on ApiService {
     ],
     // tags: ["hiit", "cardio", "fat burning", "quick workout"], // Remove, not supported in WorkoutPlan
   ),
-];
+]
 extension WorkoutApiService on ApiService {
   Future<WorkoutPlan> saveWorkoutPlan(WorkoutPlan plan) async {
     await _simulateNetworkDelay(delay: 300);
@@ -577,7 +577,7 @@ extension WorkoutApiService on ApiService {
 }
 
 // --- Workout Log Mock Data & Service ---
-final List<WorkoutLog> _mockWorkoutLogs = [
+final List<WorkoutLog> mockWorkoutLogs = [
   WorkoutLog(
     id: _uuid.v4(),
     userId: "demo_user_001",
@@ -646,15 +646,15 @@ extension WorkoutLogApiService on ApiService {
   Future<WorkoutLog> saveWorkoutLog(WorkoutLog log) async {
     await _simulateNetworkDelay(delay: 300);
     final logWithId = log.id.isEmpty ? log.copyWith(id: _uuid.v4()) : log;
-    _mockWorkoutLogs.add(logWithId);
+    mockWorkoutLogs.add(logWithId);
     if (kDebugMode) print('📝 WorkoutLog saved: ${logWithId.planName ?? 'Ad-hoc workout'}');
     return logWithId;
   }
   Future<List<WorkoutLog>> getWorkoutLogs({String? userId, DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay(delay: 200);
-    if (userId == null) return List.from(_mockWorkoutLogs); // Return all if no userId
+    if (userId == null) return List.from(mockWorkoutLogs); // Return all if no userId
 
-    var userLogs = _mockWorkoutLogs.where((log) => log.userId == userId);
+    var userLogs = mockWorkoutLogs.where((log) => log.userId == userId);
 
     if (startDate != null) {
         userLogs = userLogs.where((log) => !log.startTime.isBefore(startDate));
@@ -667,7 +667,7 @@ extension WorkoutLogApiService on ApiService {
   Future<WorkoutLog?> getWorkoutLogById(String id) async {
     await _simulateNetworkDelay(delay: 100);
     try {
-      return _mockWorkoutLogs.firstWhere((log) => log.id == id);
+      return mockWorkoutLogs.firstWhere((log) => log.id == id);
     } catch (e) {
       return null;
     }
@@ -675,7 +675,7 @@ extension WorkoutLogApiService on ApiService {
 }
 
 // --- Nutrition Service Mock Data & Methods ---
-final Map<String, DailyMealLog> _mockDailyMealLogs = {};
+final Map<String, DailyMealLog> mockDailyMealLogs = {};
 extension NutritionApiService on ApiService {
   Future<List<FoodItem>> searchFoodItems(String query) async {
     await _simulateNetworkDelay(delay: 250);
@@ -687,23 +687,23 @@ extension NutritionApiService on ApiService {
   Future<DailyMealLog> saveDailyMealLog(DailyMealLog log) async {
     await _simulateNetworkDelay(delay: 300);
     final dateKey = DateFormat('yyyy-MM-dd').format(log.date);
-    _mockDailyMealLogs["${log.userId}_$dateKey"] = log;
+    mockDailyMealLogs["${log.userId}_$dateKey"] = log;
     if (kDebugMode) print('🥗 Saved DailyMealLog for ${log.userId} on $dateKey');
     return log;
   }
   Future<DailyMealLog?> getDailyMealLog(String userId, DateTime date) async {
     await _simulateNetworkDelay(delay: 200);
-    return _mockDailyMealLogs["${userId}_${DateFormat('yyyy-MM-dd').format(date)}"];
+    return mockDailyMealLogs["${userId}_${DateFormat('yyyy-MM-dd').format(date)}"];
   }
   Future<List<DailyMealLog>> getDailyMealLogsDateRange(String userId, DateTime start, DateTime end) async { /* ... */ return []; } // Simplified
 }
 
 // --- Progress Tracking Service Mock Data & Methods ---
-final List<WeightEntry> _mockWeightEntries = [];
-final List<BodyMeasurementEntry> _mockBodyMeasurementEntries = [];
-final List<PerformanceMetricEntry> _mockPerformanceMetricEntries = [];
-final List<Goal> _mockGoals = [];
-final List<PersonalRecord> _mockPersonalRecords = [
+final List<WeightEntry> mockWeightEntries = [];
+final List<BodyMeasurementEntry> mockBodyMeasurementEntries = [];
+final List<PerformanceMetricEntry> mockPerformanceMetricEntries = [];
+final List<Goal> mockGoals = [];
+final List<PersonalRecord> mockPersonalRecords = [
   PersonalRecord(
     id: _uuid.v4(),
     userId: "demo_user_001",
@@ -742,17 +742,17 @@ extension ProgressApiService on ApiService {
   // Weight Entries
   Future<WeightEntry> saveWeightEntry(WeightEntry entry) async {
     await _simulateNetworkDelay();
-    _mockWeightEntries.removeWhere((e) => e.id == entry.id);
-    _mockWeightEntries.add(entry);
-    _mockWeightEntries.sort((a, b) => b.date.compareTo(a.date));
-    _updateGoalCurrentValues(entry.userId, GoalMetricType.weight, entry.weightKg, entry.date);
+    mockWeightEntries.removeWhere((e) => e.id == entry.id);
+    mockWeightEntries.add(entry);
+    mockWeightEntries.sort((a, b) => b.date.compareTo(a.date));
+    updateGoalCurrentValues(entry.userId, GoalMetricType.weight, entry.weightKg, entry.date);
     if (kDebugMode) print('⚖️ Saved WeightEntry: ${entry.weightKg} kg for ${entry.userId}');
     return entry;
   }
 
   Future<List<WeightEntry>> getWeightEntries(String userId, {DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay();
-    return _mockWeightEntries.where((e) => e.userId == userId &&
+    return mockWeightEntries.where((e) => e.userId == userId &&
         (startDate == null || e.date.isAfter(startDate.subtract(const Duration(days:1)))) &&
         (endDate == null || e.date.isBefore(endDate.add(const Duration(days:1))))
     ).toList();
@@ -761,18 +761,18 @@ extension ProgressApiService on ApiService {
   // Body Measurement Entries
   Future<BodyMeasurementEntry> saveBodyMeasurementEntry(BodyMeasurementEntry entry) async {
     await _simulateNetworkDelay();
-    _mockBodyMeasurementEntries.removeWhere((e) => e.id == entry.id);
-    _mockBodyMeasurementEntries.add(entry);
-    _mockBodyMeasurementEntries.sort((a, b) => b.date.compareTo(a.date));
-    if(entry.bodyFatPercentage != null) _updateGoalCurrentValues(entry.userId, GoalMetricType.bodyFatPercentage, entry.bodyFatPercentage!, entry.date);
-    if(entry.muscleMassKg != null) _updateGoalCurrentValues(entry.userId, GoalMetricType.muscleMass, entry.muscleMassKg!, entry.date);
+    mockBodyMeasurementEntries.removeWhere((e) => e.id == entry.id);
+    mockBodyMeasurementEntries.add(entry);
+    mockBodyMeasurementEntries.sort((a, b) => b.date.compareTo(a.date));
+    if(entry.bodyFatPercentage != null) updateGoalCurrentValues(entry.userId, GoalMetricType.bodyFatPercentage, entry.bodyFatPercentage!, entry.date);
+    if(entry.muscleMassKg != null) updateGoalCurrentValues(entry.userId, GoalMetricType.muscleMass, entry.muscleMassKg!, entry.date);
     if (kDebugMode) print('📏 Saved BodyMeasurementEntry for ${entry.userId}');
     return entry;
   }
 
   Future<List<BodyMeasurementEntry>> getBodyMeasurementEntries(String userId, {DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay();
-    return _mockBodyMeasurementEntries.where((e) => e.userId == userId &&
+    return mockBodyMeasurementEntries.where((e) => e.userId == userId &&
         (startDate == null || e.date.isAfter(startDate.subtract(const Duration(days:1)))) &&
         (endDate == null || e.date.isBefore(endDate.add(const Duration(days:1))))
     ).toList();
@@ -781,16 +781,16 @@ extension ProgressApiService on ApiService {
   // Performance Metric Entries
   Future<PerformanceMetricEntry> savePerformanceMetricEntry(PerformanceMetricEntry entry) async {
     await _simulateNetworkDelay();
-    _mockPerformanceMetricEntries.removeWhere((e) => e.id == entry.id);
-    _mockPerformanceMetricEntries.add(entry);
-    _mockPerformanceMetricEntries.sort((a, b) => b.date.compareTo(a.date));
+    mockPerformanceMetricEntries.removeWhere((e) => e.id == entry.id);
+    mockPerformanceMetricEntries.add(entry);
+    mockPerformanceMetricEntries.sort((a, b) => b.date.compareTo(a.date));
     if (kDebugMode) print('🏆 Saved PerformanceMetricEntry: ${entry.exerciseName}');
     return entry;
   }
 
   Future<List<PerformanceMetricEntry>> getPerformanceMetricEntries(String userId, {String? exerciseName, PerformanceMetricType? metricType, DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay();
-    return _mockPerformanceMetricEntries.where((e) => e.userId == userId &&
+    return mockPerformanceMetricEntries.where((e) => e.userId == userId &&
         (exerciseName == null || e.exerciseName.toLowerCase() == exerciseName.toLowerCase()) &&
         (metricType == null || e.metricType == metricType) &&
         (startDate == null || e.date.isAfter(startDate.subtract(const Duration(days:1)))) &&
@@ -801,11 +801,11 @@ extension ProgressApiService on ApiService {
   // Goals
   Future<Goal> saveGoal(Goal goal) async {
     await _simulateNetworkDelay();
-    final existingIndex = _mockGoals.indexWhere((g) => g.id == goal.id);
+    final existingIndex = mockGoals.indexWhere((g) => g.id == goal.id);
     if (existingIndex != -1) {
-       _mockGoals[existingIndex] = goal.copyWith(updatedAt: DateTime.now());
+       mockGoals[existingIndex] = goal.copyWith(updatedAt: DateTime.now());
     } else {
-      _mockGoals.add(goal.id.isEmpty ? goal.copyWith(id: _uuid.v4()) : goal);
+      mockGoals.add(goal.id.isEmpty ? goal.copyWith(id: _uuid.v4()) : goal);
     }
     if (kDebugMode) print('🎯 Saved Goal: ${goal.name}');
     return goal;
@@ -813,7 +813,7 @@ extension ProgressApiService on ApiService {
 
   Future<List<Goal>> getGoals(String userId, {bool? isActive}) async {
     await _simulateNetworkDelay();
-    return _mockGoals.where((g) => g.userId == userId && (isActive == null || g.isActive == isActive)).toList();
+    return mockGoals.where((g) => g.userId == userId && (isActive == null || g.isActive == isActive)).toList();
   }
 
   Future<Goal> updateGoal(Goal goal) async { // Alias for saveGoal for now
@@ -822,21 +822,21 @@ extension ProgressApiService on ApiService {
 
   Future<bool> deleteGoal(String goalId) async {
     await _simulateNetworkDelay();
-    final initialLength = _mockGoals.length;
-    _mockGoals.removeWhere((g) => g.id == goalId);
-    return _mockGoals.length < initialLength;
+    final initialLength = mockGoals.length;
+    mockGoals.removeWhere((g) => g.id == goalId);
+    return mockGoals.length < initialLength;
   }
 
   // Personal Records
   Future<List<PersonalRecord>> getPersonalRecords(String userId) async {
     await _simulateNetworkDelay(delay: 200);
-    return _mockPersonalRecords.where((pr) => pr.userId == userId).toList();
+    return mockPersonalRecords.where((pr) => pr.userId == userId).toList();
   }
 
   // TODO: Add savePersonalRecord if needed in future
 
-  void _updateGoalCurrentValues(String userId, GoalMetricType metricType, double newValue, DateTime entryDate, {String? exerciseName}) {
-    final relevantGoals = _mockGoals.where((g) =>
+  void updateGoalCurrentValues(String userId, GoalMetricType metricType, double newValue, DateTime entryDate, {String? exerciseName}) {
+    final relevantGoals = mockGoals.where((g) =>
         g.userId == userId && g.isActive && g.metricType == metricType &&
         (g.exerciseName == null || g.exerciseName?.toLowerCase() == exerciseName?.toLowerCase()) &&
         (g.targetDate == null || g.targetDate!.isAfter(entryDate) || g.targetDate!.isAtSameMomentAs(entryDate))

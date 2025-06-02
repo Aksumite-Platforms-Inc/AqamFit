@@ -5,7 +5,7 @@ import 'package:intl/intl.dart'; // For date formatting
 import 'setup_flow_viewmodel.dart';
 import '../../../../services/auth_manager.dart';
 import '../../../../repositories/user_repository.dart';
-import '../../../../models/user.dart'; // Required for User type if used directly
+// Required for User type if used directly
 
 class AdditionalInfoScreen extends StatefulWidget {
   const AdditionalInfoScreen({super.key});

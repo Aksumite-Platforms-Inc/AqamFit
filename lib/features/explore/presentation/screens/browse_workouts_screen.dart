@@ -84,7 +84,7 @@ class _BrowseWorkoutsScreenState extends State<BrowseWorkoutsScreen> {
           value: category.toString(), // Use enum.toString() as value
           child: Text(category.displayName),
         );
-      }).toList(),
+      }),
     ];
 
     return Scaffold(

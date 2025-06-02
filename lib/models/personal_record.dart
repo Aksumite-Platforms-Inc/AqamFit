@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart'; // For @required in older Flutter versions, or for general utility.
+// For @required in older Flutter versions, or for general utility.
 
 class PersonalRecord {
   final String id;

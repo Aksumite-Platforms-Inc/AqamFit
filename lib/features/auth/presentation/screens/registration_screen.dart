@@ -40,7 +40,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         Provider.of<AuthManager>(context, listen: false).setUser(user);
         Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true); // This seems to be for general app onboarding, not profile setup
 
-        if (user != null && user.hasCompletedSetup == true) {
+        if (user.hasCompletedSetup == true) {
           context.go('/main');
         } else {
           // User is new or hasn't completed setup, navigate to setup flow

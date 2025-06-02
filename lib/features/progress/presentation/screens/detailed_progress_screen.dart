@@ -3,9 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:aksumfit/services/auth_manager.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/models/goal.dart';
-import 'package:aksumfit/models/workout_log.dart';
 import 'package:aksumfit/models/personal_record.dart';
-import 'package:aksumfit/core/extensions/string_extensions.dart'; // For capitalize
+// For capitalize
 import 'package:intl/intl.dart'; // For date formatting
 
 // Helper function to format duration

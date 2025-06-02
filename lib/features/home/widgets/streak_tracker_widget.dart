@@ -101,7 +101,7 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
                   children: [
                     ScaleTransition(
                       scale: _scaleAnimation,
-                      child: Icon(
+                      child: const Icon(
                         CupertinoIcons.flame_fill,
                         color: Colors.orangeAccent, // Changed for better visibility
                         size: 24,

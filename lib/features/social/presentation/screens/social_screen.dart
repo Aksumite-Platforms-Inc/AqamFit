@@ -176,7 +176,7 @@ class _SocialScreenState extends State<SocialScreen> {
             _isLoadingChallenges
                 ? const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()))
                 : _challengesError != null
-                    ? Center(child: Padding(padding: EdgeInsets.all(16.0), child: Text(_challengesError!, style: TextStyle(color: theme.colorScheme.error))))
+                    ? Center(child: Padding(padding: const EdgeInsets.all(16.0), child: Text(_challengesError!, style: TextStyle(color: theme.colorScheme.error))))
                     : _featuredChallenges.isEmpty
                         ? Container(
                             height: 150, alignment: Alignment.center, margin: const EdgeInsets.symmetric(vertical: 12.0),
@@ -202,7 +202,7 @@ class _SocialScreenState extends State<SocialScreen> {
              _isLoadingChallenges
                 ? const Center(child: Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator()))
                 : _challengesError != null // Assuming same error applies or fetch them separately with own error handling
-                    ? Center(child: Padding(padding: EdgeInsets.all(16.0), child: Text(_challengesError!, style: TextStyle(color: theme.colorScheme.error))))
+                    ? Center(child: Padding(padding: const EdgeInsets.all(16.0), child: Text(_challengesError!, style: TextStyle(color: theme.colorScheme.error))))
                     : _hotChallenges.isEmpty
                         ? Container(
                             height: 150, alignment: Alignment.center, margin: const EdgeInsets.symmetric(vertical: 12.0),

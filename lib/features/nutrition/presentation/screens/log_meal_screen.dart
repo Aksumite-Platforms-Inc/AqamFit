@@ -1,14 +1,11 @@
 import 'dart:io'; // Import for File
-import 'package:aksumfit/models/daily_meal_log.dart';
 import 'package:aksumfit/models/food_item.dart';
 import 'package:aksumfit/models/meal.dart';
 import 'package:aksumfit/models/meal_item.dart';
 import 'package:aksumfit/services/api_service.dart';
-import 'package:aksumfit/services/auth_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'; // Keep for ScaffoldMessenger, showDialog, AlertDialog
 import 'package:aksumfit/core/extensions/string_extensions.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 
@@ -36,7 +33,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
   List<FoodItem> _searchResults = [];
   String? _capturedImagePath;
   bool _isLoadingFood = false;
-  bool _isSavingMeal = false;
+  final bool _isSavingMeal = false;
 
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _customFoodNameController = TextEditingController();
