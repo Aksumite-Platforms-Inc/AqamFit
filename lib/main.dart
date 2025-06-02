@@ -200,8 +200,8 @@ class AxumFitApp extends StatelessWidget {
       ),
 
       // Dialog Theme
-      dialogTheme: DialogTheme(
-        backgroundColor: const Color(0xFF1E293B), // Dark slate for dialogs
+ dialogTheme: DialogThemeData(
+ backgroundColor: const Color(0xFF1E293B), // Dark slate for dialogs
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         titleTextStyle: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
         contentTextStyle: GoogleFonts.inter(fontSize: 14, color: Colors.white.withOpacity(0.8)),
@@ -361,7 +361,7 @@ class AxumFitApp extends StatelessWidget {
       ),
 
       // Dialog Theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: const Color(0xFFFFFFFF), // White dialogs
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         titleTextStyle: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF1F2937)),

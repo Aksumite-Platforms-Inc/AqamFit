@@ -577,7 +577,7 @@ class WeightLineChart extends StatelessWidget {
              touchTooltipData: LineTouchTooltipData(
                 // tooltipBgColor is likely deprecated. Use tooltipData on LineChartData or style LineTooltipItem.
                 // For now, we'll rely on default background or style the item directly.
-                tooltipRoundedRadius: 8.0, // Common property
+ tooltipBorderRadius: BorderRadius.circular(8.0), // Common property
                 getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                   return touchedBarSpots.map((barSpot) {
                     final flSpot = barSpot;

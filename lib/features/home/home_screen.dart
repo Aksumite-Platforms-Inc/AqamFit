@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPlaceholderCard(String message) {
     final theme = Theme.of(context);
     return Card(
-      elevation: 2,
+      elevation: 2, // Dark slate for dialogs
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         padding: const EdgeInsets.all(16.0),
