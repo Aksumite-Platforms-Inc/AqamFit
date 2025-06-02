@@ -110,24 +110,26 @@ class _ExperienceLevelScreenState extends State<ExperienceLevelScreen> {
                       borderRadius: BorderRadius.circular(12.0),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Column( // Use column for icon and text
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              level.icon,
-                              size: 30,
-                              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              level.name,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                        child: SingleChildScrollView(
+                          child: Column( // Use column for icon and text
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                level.icon,
+                                size: 30,
+                                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              Text(
+                                level.name,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
