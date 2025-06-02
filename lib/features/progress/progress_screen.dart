@@ -13,6 +13,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
+// Add go_router import if using go_router for navigation
+// import 'package:go_router/go_router.dart';
 
 const _uuid = Uuid();
 
@@ -67,8 +69,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
       Map<String, int> activityCounts = {};
       for (var log in recentLogs) {
         for (var loggedExercise in log.completedExercises) {
-          // Use the static method from ApiService extension
-          final exerciseDetails = ApiService.getExerciseDetailsById(loggedExercise.exerciseId);
+          // Use the top-level function for exercise details
+          final exerciseDetails = getExerciseDetailsById(loggedExercise.exerciseId);
           if (exerciseDetails != null && exerciseDetails.muscleGroups.isNotEmpty) {
             for (String muscleGroup in exerciseDetails.muscleGroups) {
               activityCounts[muscleGroup] = (activityCounts[muscleGroup] ?? 0) + 1;
@@ -474,7 +476,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         textStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
-                      onPressed: () => context.go('/detailed-progress'), // Assuming this route will be created
+                      // If using go_router, uncomment the next line:
+                      // onPressed: () => context.go('/detailed-progress'), // Assuming this route will be created
+                      // If not using go_router, use Navigator.push or similar:
+                      onPressed: () {
+                        // Navigator.pushNamed(context, '/detailed-progress');
+                      },
                       child: const Text("View Detailed Progress"),
                     ),
                   ),

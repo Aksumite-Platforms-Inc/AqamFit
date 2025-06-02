@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart'; // For @required if needed, or general utility.
+import 'package:uuid/uuid.dart';
 
 class Challenge {
   final String id;
@@ -25,7 +26,7 @@ class Challenge {
     required this.unit,
     this.isFeatured = false,
     this.isHot = false,
-  }) : id = id ?? const Uuid().v4(); // Auto-generate ID if not provided
+  }) : id = id ?? Uuid().v4(); // Auto-generate ID if not provided
 
 
   factory Challenge.fromJson(Map<String, dynamic> json) {

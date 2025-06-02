@@ -8,6 +8,8 @@ import '../models/user.dart';
 import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/models/workout_plan_exercise.dart';
 import 'package:aksumfit/models/workout_log.dart';
+import 'package:aksumfit/models/logged_exercise.dart';
+import 'package:aksumfit/models/logged_set.dart';
 import 'package:aksumfit/models/personal_record.dart'; // Import PersonalRecord model
 import 'package:aksumfit/models/challenge.dart'; // Import Challenge model
 import 'package:aksumfit/features/nutrition/data/mock_food_database.dart';
@@ -17,6 +19,7 @@ import 'package:aksumfit/models/goal.dart';
 import 'package:aksumfit/models/weight_entry.dart';
 import 'package:aksumfit/models/body_measurement_entry.dart';
 import 'package:aksumfit/models/performance_metric_entry.dart';
+import 'package:aksumfit/models/exercise.dart'; // <-- Add this import
 import 'package:intl/intl.dart'; // For DateFormat
 import 'package:uuid/uuid.dart'; // For generating IDs for mock data
 
@@ -30,6 +33,21 @@ class ApiService {
 
   late final Dio _dio;
 
+  // Social/Challenges API methods for SocialScreen
+  Future<List<Challenge>> getFeaturedChallenges() async {
+    // TODO: Replace with real API call or mock data as needed
+    await _simulateNetworkDelay(delay: 200);
+    // Return a subset of mock challenges, or empty list for now
+    return [];
+  }
+
+  Future<List<Challenge>> getHotChallenges() async {
+    // TODO: Replace with real API call or mock data as needed
+    await _simulateNetworkDelay(delay: 200);
+    // Return a subset of mock challenges, or empty list for now
+    return [];
+  }
+
   // API Configuration
   static const String _baseUrl = 'https://api.axumfit.com/v1';
   static const Duration _connectTimeout = Duration(seconds: 30);
@@ -37,14 +55,15 @@ class ApiService {
   static const int _maxRetries = 3;
 
   // Initialize the service
+  // Secure storage instance
+  late final FlutterSecureStorage _secureStorage;
+
   void initialize() {
     _secureStorage = const FlutterSecureStorage(
       aOptions: AndroidOptions(
         encryptedSharedPreferences: true,
       ),
-      iOptions: IOSOptions(
-        // accessibility: IOSAccessibility.unlocked_this_device, // Removed invalid/undefined option
-      ),
+      iOptions: IOSOptions(),
     );
 
     _dio = Dio(BaseOptions(
@@ -56,8 +75,26 @@ class ApiService {
         'Accept': 'application/json',
         'X-App-Version': '1.0.0',
         'X-Platform': 'mobile',
-      },
-    ));
+      }
+
+    )); // End of BaseOptions
+
+// --- Social/Challenges API Stubs ---
+
+// Social/Challenges API methods for SocialScreen
+Future<List<Challenge>> getFeaturedChallenges() async {
+  // TODO: Replace with real API call or mock data as needed
+  await _simulateNetworkDelay(delay: 200);
+  // Return a subset of mock challenges, or empty list for now
+  return [];
+}
+
+Future<List<Challenge>> getHotChallenges() async {
+  // TODO: Replace with real API call or mock data as needed
+  await _simulateNetworkDelay(delay: 200);
+  // Return a subset of mock challenges, or empty list for now
+  return [];
+}
 
     _setupInterceptors();
   }
@@ -301,7 +338,7 @@ extension HomeScreenApiService on ApiService {
     // Mock: Simulate fetching weekly workout counts and active minutes
     await _simulateNetworkDelay(delay: 200);
     // In a real app, query WorkoutLogs for the past week
-    int workoutsThisWeek = _mockWorkoutLogs.where((log) =>
+    int workoutsThisWeek = mockWorkoutLogs.where((log) =>
         log.userId == userId &&
         log.startTime.isAfter(DateTime.now().subtract(const Duration(days: 7)))
     ).length;
@@ -315,7 +352,7 @@ extension HomeScreenApiService on ApiService {
 
   Future<WeightEntry?> getLatestWeightEntry(String userId) async {
     await _simulateNetworkDelay(delay: 100);
-    final userEntries = _mockWeightEntries.where((e) => e.userId == userId).toList();
+    final userEntries = mockWeightEntries.where((e) => e.userId == userId).toList();
     userEntries.sort((a,b) => b.date.compareTo(a.date)); // Ensure latest is first
     if (userEntries.isNotEmpty) return userEntries.first;
     return null;
@@ -347,44 +384,38 @@ const Uuid _uuid = Uuid();
 // However, for patching, we can define it here and then modify _mockWorkoutPlans.
 // For a cleaner final structure, _mockExercisesDatabase would be defined before _mockWorkoutPlans.
 final List<Exercise> _mockExercisesDatabase = [
-  Exercise(id: "ex001", name: "Squats", type: ExerciseType.strength, muscleGroups: ["Quads", "Glutes", "Hamstrings", "Core"], description: "A compound lower body exercise.", equipmentNeeded: ["Barbell", "Rack"]),
-  Exercise(id: "ex002", name: "Push-ups", type: ExerciseType.strength, muscleGroups: ["Chest", "Triceps", "Shoulders", "Core"], description: "A bodyweight exercise for upper body strength.", equipmentNeeded: []),
-  Exercise(id: "ex003", name: "Rows (Dumbbell or Machine)", type: ExerciseType.strength, muscleGroups: ["Back (Lats)", "Biceps", "Rear Delts"], description: "Pulls weight towards your torso, works the back.", equipmentNeeded: ["Dumbbells or Machine"]),
-  Exercise(id: "ex004", name: "Plank", type: ExerciseType.strength, muscleGroups: ["Core", "Abs"], description: "An isometric core strength exercise.", equipmentNeeded: []),
-  Exercise(id: "ex005", name: "Leg Press", type: ExerciseType.strength, muscleGroups: ["Quads", "Glutes"], description: "A machine-based lower body exercise.", equipmentNeeded: ["Leg Press Machine"]),
-  Exercise(id: "ex006", name: "Romanian Deadlifts (RDLs)", type: ExerciseType.strength, muscleGroups: ["Hamstrings", "Glutes", "Lower Back"], description: "Focuses on hamstring and glute development.", equipmentNeeded: ["Barbell or Dumbbells"]),
-  Exercise(id: "ex007", name: "Leg Extensions", type: ExerciseType.strength, muscleGroups: ["Quads"], description: "Isolation exercise for quadriceps.", equipmentNeeded: ["Leg Extension Machine"]),
-  Exercise(id: "ex008", name: "Hamstring Curls", type: ExerciseType.strength, muscleGroups: ["Hamstrings"], description: "Isolation exercise for hamstrings.", equipmentNeeded: ["Hamstring Curl Machine"]),
-  Exercise(id: "ex009", name: "Calf Raises", type: ExerciseType.strength, muscleGroups: ["Calves"], description: "Strengthens calf muscles.", equipmentNeeded: ["Bodyweight or Weights"]),
-  Exercise(id: "yg001", name: "Sun Salutation A", type: ExerciseType.stretch, muscleGroups: ["Full Body", "Core", "Flexibility"], description: "A sequence of yoga poses.", equipmentNeeded: ["Yoga Mat"]),
-  Exercise(id: "yg002", name: "Downward-Facing Dog", type: ExerciseType.stretch, muscleGroups: ["Hamstrings", "Calves", "Shoulders", "Back"], description: "A common yoga pose.", equipmentNeeded: ["Yoga Mat"]),
-  Exercise(id: "yg003", name: "Warrior II (Right & Left)", type: ExerciseType.stretch, muscleGroups: ["Legs", "Core", "Shoulders"], description: "A standing yoga pose.", equipmentNeeded: ["Yoga Mat"]),
-  Exercise(id: "yg004", name: "Triangle Pose (Right & Left)", type: ExerciseType.stretch, muscleGroups: ["Hamstrings", "Groin", "Hips", "Core"], description: "A standing yoga pose.", equipmentNeeded: ["Yoga Mat"]),
-  Exercise(id: "yg005", name: "Child's Pose", type: ExerciseType.stretch, muscleGroups: ["Back", "Hips", "Thighs"], description: "A resting yoga pose.", equipmentNeeded: ["Yoga Mat"]),
-  Exercise(id: "hiit001", name: "Jumping Jacks", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio"], description: "A full-body cardio exercise.", equipmentNeeded: []),
-  Exercise(id: "hiit002", name: "High Knees", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio", "Core", "Legs"], description: "A cardio exercise that engages the core.", equipmentNeeded: []),
-  Exercise(id: "hiit003", name: "Burpees", type: ExerciseType.plyometrics, muscleGroups: ["Full Body", "Cardio", "Strength"], description: "A challenging full-body exercise.", equipmentNeeded: []),
-  Exercise(id: "hiit004", name: "Mountain Climbers", type: ExerciseType.cardio, muscleGroups: ["Core", "Cardio", "Shoulders"], description: "A dynamic core and cardio exercise.", equipmentNeeded: []),
-  Exercise(id: "hiit005", name: "Sprint in Place", type: ExerciseType.cardio, muscleGroups: ["Legs", "Cardio"], description: "High-intensity cardio exercise.", equipmentNeeded: []),
-  Exercise(id: "hiit006", name: "Cool Down Jog/Walk", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio"], description: "Low-intensity cardio for cool down.", equipmentNeeded: []),
+  Exercise(id: "ex001", name: "Squats", type: ExerciseType.strength, muscleGroups: ["Quads", "Glutes", "Hamstrings", "Core"], description: "A compound lower body exercise.", equipment: ["Barbell", "Rack"]),
+  Exercise(id: "ex002", name: "Push-ups", type: ExerciseType.strength, muscleGroups: ["Chest", "Triceps", "Shoulders", "Core"], description: "A bodyweight exercise for upper body strength.", equipment: []),
+  Exercise(id: "ex003", name: "Rows (Dumbbell or Machine)", type: ExerciseType.strength, muscleGroups: ["Back (Lats)", "Biceps", "Rear Delts"], description: "Pulls weight towards your torso, works the back.", equipment: ["Dumbbells or Machine"]),
+  Exercise(id: "ex004", name: "Plank", type: ExerciseType.strength, muscleGroups: ["Core", "Abs"], description: "An isometric core strength exercise.", equipment: []),
+  Exercise(id: "ex005", name: "Leg Press", type: ExerciseType.strength, muscleGroups: ["Quads", "Glutes"], description: "A machine-based lower body exercise.", equipment: ["Leg Press Machine"]),
+  Exercise(id: "ex006", name: "Romanian Deadlifts (RDLs)", type: ExerciseType.strength, muscleGroups: ["Hamstrings", "Glutes", "Lower Back"], description: "Focuses on hamstring and glute development.", equipment: ["Barbell or Dumbbells"]),
+  Exercise(id: "ex007", name: "Leg Extensions", type: ExerciseType.strength, muscleGroups: ["Quads"], description: "Isolation exercise for quadriceps.", equipment: ["Leg Extension Machine"]),
+  Exercise(id: "ex008", name: "Hamstring Curls", type: ExerciseType.strength, muscleGroups: ["Hamstrings"], description: "Isolation exercise for hamstrings.", equipment: ["Hamstring Curl Machine"]),
+  Exercise(id: "ex009", name: "Calf Raises", type: ExerciseType.strength, muscleGroups: ["Calves"], description: "Strengthens calf muscles.", equipment: ["Bodyweight or Weights"]),
+  Exercise(id: "yg001", name: "Sun Salutation A", type: ExerciseType.stretch, muscleGroups: ["Full Body", "Core", "Flexibility"], description: "A sequence of yoga poses.", equipment: ["Yoga Mat"]),
+  Exercise(id: "yg002", name: "Downward-Facing Dog", type: ExerciseType.stretch, muscleGroups: ["Hamstrings", "Calves", "Shoulders", "Back"], description: "A common yoga pose.", equipment: ["Yoga Mat"]),
+  Exercise(id: "yg003", name: "Warrior II (Right & Left)", type: ExerciseType.stretch, muscleGroups: ["Legs", "Core", "Shoulders"], description: "A standing yoga pose.", equipment: ["Yoga Mat"]),
+  Exercise(id: "yg004", name: "Triangle Pose (Right & Left)", type: ExerciseType.stretch, muscleGroups: ["Hamstrings", "Groin", "Hips", "Core"], description: "A standing yoga pose.", equipment: ["Yoga Mat"]),
+  Exercise(id: "yg005", name: "Child's Pose", type: ExerciseType.stretch, muscleGroups: ["Back", "Hips", "Thighs"], description: "A resting yoga pose.", equipment: ["Yoga Mat"]),
+  Exercise(id: "hiit001", name: "Jumping Jacks", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio"], description: "A full-body cardio exercise.", equipment: []),
+  Exercise(id: "hiit002", name: "High Knees", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio", "Core", "Legs"], description: "A cardio exercise that engages the core.", equipment: []),
+  Exercise(id: "hiit003", name: "Burpees", type: ExerciseType.plyometrics, muscleGroups: ["Full Body", "Cardio", "Strength"], description: "A challenging full-body exercise.", equipment: []),
+  Exercise(id: "hiit004", name: "Mountain Climbers", type: ExerciseType.cardio, muscleGroups: ["Core", "Cardio", "Shoulders"], description: "A dynamic core and cardio exercise.", equipment: []),
+  Exercise(id: "hiit005", name: "Sprint in Place", type: ExerciseType.cardio, muscleGroups: ["Legs", "Cardio"], description: "High-intensity cardio exercise.", equipment: []),
+  Exercise(id: "hiit006", name: "Cool Down Jog/Walk", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio"], description: "Low-intensity cardio for cool down.", equipment: []),
 ];
 
 // Helper function to find exercise details by ID
-// Made public and static for access from ProgressScreen
-// Alternatively, ApiService could have an instance method that calls this.
-// For simplicity with mock data, static is okay here.
-// Note: This requires _mockExercisesDatabase to also be accessible, e.g. static or top-level.
-// _mockExercisesDatabase is already top-level.
-extension ExerciseDatabaseAccess on ApiService { // Or just make it a top-level function if preferred
-  static Exercise? getExerciseDetailsById(String exerciseId) {
-    try {
-      return _mockExercisesDatabase.firstWhere((ex) => ex.id == exerciseId);
-    } catch (e) {
-      if (kDebugMode) {
-        print("Warning: Exercise with ID '$exerciseId' not found in _mockExercisesDatabase.");
-      }
-      return null;
+// Top-level function for access from anywhere
+Exercise? getExerciseDetailsById(String exerciseId) {
+  try {
+    return _mockExercisesDatabase.firstWhere((ex) => ex.id == exerciseId);
+  } catch (e) {
+    if (kDebugMode) {
+      print("Warning: Exercise with ID '$exerciseId' not found in _mockExercisesDatabase.");
     }
+    return null;
   }
 }
 
@@ -400,15 +431,15 @@ List<WorkoutPlan> _initializeMockWorkoutPlans() {
       id: _uuid.v4(),
       name: "Beginner Strength Routine",
       description: "A great starting point for building overall strength. Focuses on compound movements.",
-      category: WorkoutPlanCategory.strength,
+      category: WorkoutPlanCategory.hiit, // Use hiit as closest available, since 'cardio' is not in the enum
       difficulty: WorkoutDifficulty.beginner,
       estimatedDurationMinutes: 45,
       authorId: "system_generated_trainer_1",
       exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Squats", sets: "3", reps: "8-12", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex001")),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", name: "Push-ups", sets: "3", reps: "As many as possible", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex002")),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", name: "Rows (Dumbbell or Machine)", sets: "3", reps: "10-15", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex003")),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", name: "Plank", sets: "3", reps: "Hold for 30-60s", restBetweenSetsSeconds: 45, exerciseDetails: _getExerciseDetailsById("ex004")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 3, reps: "8-12", restBetweenSetsSeconds: 60, exerciseDetails: getExerciseDetailsById("ex001")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", order: 1, sets: 3, reps: "As many as possible", restBetweenSetsSeconds: 60, exerciseDetails: getExerciseDetailsById("ex002")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", order: 2, sets: 3, reps: "10-15", restBetweenSetsSeconds: 60, exerciseDetails: getExerciseDetailsById("ex003")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", order: 3, sets: 3, reps: "Hold for 30-60s", restBetweenSetsSeconds: 45, exerciseDetails: getExerciseDetailsById("ex004")),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
       updatedAt: DateTime.now().subtract(const Duration(days: 10)),
@@ -423,12 +454,12 @@ List<WorkoutPlan> _initializeMockWorkoutPlans() {
       estimatedDurationMinutes: 60,
       authorId: "system_generated_trainer_2",
       exercises: [
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Barbell Squats", sets: "4", reps: "8-10", restBetweenSetsSeconds: 90, exerciseDetails: _getExerciseDetailsById("ex001")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", name: "Leg Press", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75, exerciseDetails: _getExerciseDetailsById("ex005")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", name: "Romanian Deadlifts (RDLs)", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75, exerciseDetails: _getExerciseDetailsById("ex006")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", name: "Leg Extensions", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex007")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", name: "Hamstring Curls", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex008")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", name: "Calf Raises", sets: "4", reps: "15-20", restBetweenSetsSeconds: 45, exerciseDetails: _getExerciseDetailsById("ex009")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 4, reps: "8-10", restBetweenSetsSeconds: 90, exerciseDetails: getExerciseDetailsById("ex001")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", order: 1, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75, exerciseDetails: getExerciseDetailsById("ex005")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", order: 2, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75, exerciseDetails: getExerciseDetailsById("ex006")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", order: 3, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60, exerciseDetails: getExerciseDetailsById("ex007")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", order: 4, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60, exerciseDetails: getExerciseDetailsById("ex008")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", order: 5, sets: 4, reps: "15-20", restBetweenSetsSeconds: 45, exerciseDetails: getExerciseDetailsById("ex009")),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 25)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
@@ -443,11 +474,11 @@ List<WorkoutPlan> _initializeMockWorkoutPlans() {
       estimatedDurationMinutes: 30,
       authorId: "system_generated_yogi_1",
       exercises: [
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", name: "Sun Salutation A", sets: "5", reps: "rounds", notes: "Flow through 5 rounds", exerciseDetails: _getExerciseDetailsById("yg001")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", name: "Downward-Facing Dog", sets: "1", reps: "Hold for 5 breaths", exerciseDetails: _getExerciseDetailsById("yg002")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", name: "Warrior II (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths", exerciseDetails: _getExerciseDetailsById("yg003")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", name: "Triangle Pose (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths", exerciseDetails: _getExerciseDetailsById("yg004")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", name: "Child's Pose", sets: "1", reps: "Hold for 5-10 breaths", exerciseDetails: _getExerciseDetailsById("yg005")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", order: 0, sets: 5, reps: "rounds", notes: "Flow through 5 rounds", exerciseDetails: getExerciseDetailsById("yg001")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", order: 1, sets: 1, reps: "Hold for 5 breaths", exerciseDetails: getExerciseDetailsById("yg002")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", order: 2, sets: 1, reps: "Hold each side for 5 breaths", exerciseDetails: getExerciseDetailsById("yg003")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", order: 3, sets: 1, reps: "Hold each side for 5 breaths", exerciseDetails: getExerciseDetailsById("yg004")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", order: 4, sets: 1, reps: "Hold for 5-10 breaths", exerciseDetails: getExerciseDetailsById("yg005")),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
       updatedAt: DateTime.now().subtract(const Duration(days: 2)),
@@ -457,17 +488,17 @@ List<WorkoutPlan> _initializeMockWorkoutPlans() {
       id: _uuid.v4(),
       name: "HIIT Cardio Challenge",
       description: "High-Intensity Interval Training to boost your cardiovascular fitness and burn calories.",
-      category: WorkoutPlanCategory.cardio,
+      category: WorkoutPlanCategory.hiit,
       difficulty: WorkoutDifficulty.intermediate,
       estimatedDurationMinutes: 25,
       authorId: "system_generated_trainer_1",
       exercises: [
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", name: "Jumping Jacks", sets: "1", reps: "60s work, 30s rest", notes: "Warm-up", exerciseDetails: _getExerciseDetailsById("hiit001")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", name: "High Knees", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit002")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", name: "Burpees", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit003")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", name: "Mountain Climbers", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit004")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", name: "Sprint in Place", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit005")),
-          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", name: "Cool Down Jog/Walk", sets: "1", reps: "3-5 minutes", exerciseDetails: _getExerciseDetailsById("hiit006")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", order: 0, sets: 1, reps: "60s work, 30s rest", notes: "Warm-up", exerciseDetails: getExerciseDetailsById("hiit001")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", order: 1, sets: 4, reps: "30s work, 15s rest", exerciseDetails: getExerciseDetailsById("hiit002")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", order: 2, sets: 4, reps: "30s work, 15s rest", exerciseDetails: getExerciseDetailsById("hiit003")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", order: 3, sets: 4, reps: "30s work, 15s rest", exerciseDetails: getExerciseDetailsById("hiit004")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", order: 4, sets: 4, reps: "30s work, 15s rest", exerciseDetails: getExerciseDetailsById("hiit005")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", order: 5, sets: 1, reps: "3-5 minutes", exerciseDetails: getExerciseDetailsById("hiit006")),
       ],
       createdAt: DateTime.now().subtract(const Duration(days: 40)),
       updatedAt: DateTime.now().subtract(const Duration(days: 3)),
@@ -478,78 +509,6 @@ List<WorkoutPlan> _initializeMockWorkoutPlans() {
 
 final List<WorkoutPlan> _mockWorkoutPlans = _initializeMockWorkoutPlans();
 
-extension WorkoutApiService on ApiService {
-  Future<WorkoutPlan> saveWorkoutPlan(WorkoutPlan plan) async {
-    await _simulateNetworkDelay(delay: 300);
-    description: "A great starting point for building overall strength. Focuses on compound movements.",
-    category: WorkoutPlanCategory.strength,
-    difficulty: WorkoutDifficulty.beginner,
-    estimatedDurationMinutes: 45,
-    authorId: "system_generated_trainer_1",
-    exercises: [
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 3, reps: "8-12", restBetweenSetsSeconds: 60),
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", order: 1, sets: 3, reps: "As many as possible", restBetweenSetsSeconds: 60),
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", order: 2, sets: 3, reps: "10-15", restBetweenSetsSeconds: 60),
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", order: 3, sets: 3, reps: "Hold for 30-60s", restBetweenSetsSeconds: 45),
-    ],
-    createdAt: DateTime.now().subtract(const Duration(days: 30)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 10)),
-    tags: ["full body", "beginner friendly", "strength building"],
-  ),
-  WorkoutPlan(
-    id: _uuid.v4(),
-    name: "Leg Day Burner",
-    description: "Intense leg workout to build strength and hypertrophy in your lower body.",
-    category: WorkoutPlanCategory.hypertrophy,
-    difficulty: WorkoutDifficulty.intermediate,
-    estimatedDurationMinutes: 60,
-    authorId: "system_generated_trainer_2",
-    exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 4, reps: "8-10", restBetweenSetsSeconds: 90),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", order: 1, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", order: 2, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", order: 3, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", order: 4, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", order: 5, sets: 4, reps: "15-20", restBetweenSetsSeconds: 45),
-    ],
-    // tags: ["legs", "hypertrophy", "volume"], // Remove, not supported in WorkoutPlan
-  ),
-  WorkoutPlan(
-    id: _uuid.v4(),
-    name: "Morning Yoga Flow",
-    description: "A gentle yoga sequence to start your day with energy and mindfulness.",
-    category: WorkoutPlanCategory.flexibility,
-    difficulty: WorkoutDifficulty.allLevels, // Assuming AllLevels is an option
-    estimatedDurationMinutes: 30,
-    authorId: "system_generated_yogi_1",
-    exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", order: 0, sets: 5, reps: "rounds", notes: "Flow through 5 rounds"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", order: 1, sets: 1, reps: "Hold for 5 breaths"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", order: 2, sets: 1, reps: "Hold each side for 5 breaths"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", order: 3, sets: 1, reps: "Hold each side for 5 breaths"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", order: 4, sets: 1, reps: "Hold for 5-10 breaths"),
-    ],
-    // tags: ["yoga", "flexibility", "morning routine", "mindfulness"], // Remove, not supported in WorkoutPlan
-  ),
-  WorkoutPlan(
-    id: _uuid.v4(),
-    name: "HIIT Cardio Challenge",
-    description: "High-Intensity Interval Training to boost your cardiovascular fitness and burn calories.",
-    category: WorkoutPlanCategory.hiit, // Use 'hiit' as closest available, or add 'cardio' to enum if needed
-    difficulty: WorkoutDifficulty.intermediate,
-    estimatedDurationMinutes: 25,
-    authorId: "system_generated_trainer_1",
-    exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", order: 0, sets: 1, reps: "60s work, 30s rest", notes: "Warm-up"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", order: 1, sets: 4, reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", order: 2, sets: 4, reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", order: 3, sets: 4, reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", order: 4, sets: 4, reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", order: 5, sets: 1, reps: "3-5 minutes"),
-    ],
-    // tags: ["hiit", "cardio", "fat burning", "quick workout"], // Remove, not supported in WorkoutPlan
-  ),
-]
 extension WorkoutApiService on ApiService {
   Future<WorkoutPlan> saveWorkoutPlan(WorkoutPlan plan) async {
     await _simulateNetworkDelay(delay: 300);
@@ -587,14 +546,14 @@ final List<WorkoutLog> mockWorkoutLogs = [
     endTime: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
     completedExercises: [
       LoggedExercise(id: _uuid.v4(), exerciseId: "ex001", exerciseName: "Squats", sets: [
-        LoggedSet(setNumber: 1, reps: 10, weightKg: 50),
-        LoggedSet(setNumber: 2, reps: 10, weightKg: 50),
-        LoggedSet(setNumber: 3, reps: 8, weightKg: 50),
+        LoggedSet(setNumber: 1, repsAchieved: 10, weightUsedKg: 50),
+        LoggedSet(setNumber: 2, repsAchieved: 10, weightUsedKg: 50),
+        LoggedSet(setNumber: 3, repsAchieved: 8, weightUsedKg: 50),
       ]),
       LoggedExercise(id: _uuid.v4(), exerciseId: "ex002", exerciseName: "Push-ups", sets: [
-        LoggedSet(setNumber: 1, reps: 15),
-        LoggedSet(setNumber: 2, reps: 12),
-        LoggedSet(setNumber: 3, reps: 10),
+        LoggedSet(setNumber: 1, repsAchieved: 15),
+        LoggedSet(setNumber: 2, repsAchieved: 12),
+        LoggedSet(setNumber: 3, repsAchieved: 10),
       ]),
     ],
     notes: "Felt good, focused on form.",
@@ -608,17 +567,17 @@ final List<WorkoutLog> mockWorkoutLogs = [
     endTime: DateTime.now().subtract(const Duration(days: 3, hours: 0, minutes: 45)),
     completedExercises: [
       LoggedExercise(id: _uuid.v4(), exerciseId: "ex001", exerciseName: "Barbell Squats", sets: [
-         LoggedSet(setNumber: 1, reps: 8, weightKg: 60),
-         LoggedSet(setNumber: 2, reps: 8, weightKg: 60),
-         LoggedSet(setNumber: 3, reps: 6, weightKg: 60),
+         LoggedSet(setNumber: 1, repsAchieved: 8, weightUsedKg: 60),
+         LoggedSet(setNumber: 2, repsAchieved: 8, weightUsedKg: 60),
+         LoggedSet(setNumber: 3, repsAchieved: 6, weightUsedKg: 60),
       ]),
       LoggedExercise(id: _uuid.v4(), exerciseId: "ex005", exerciseName: "Leg Press", sets: [
-         LoggedSet(setNumber: 1, reps: 10, weightKg: 100),
-         LoggedSet(setNumber: 2, reps: 10, weightKg: 100),
+         LoggedSet(setNumber: 1, repsAchieved: 10, weightUsedKg: 100),
+         LoggedSet(setNumber: 2, repsAchieved: 10, weightUsedKg: 100),
       ]),
       LoggedExercise(id: _uuid.v4(), exerciseId: "ex006", exerciseName: "Romanian Deadlifts (RDLs)", sets: [
-         LoggedSet(setNumber: 1, reps: 12, weightKg: 40),
-         LoggedSet(setNumber: 2, reps: 10, weightKg: 40),
+         LoggedSet(setNumber: 1, repsAchieved: 12, weightUsedKg: 40),
+         LoggedSet(setNumber: 2, repsAchieved: 10, weightUsedKg: 40),
       ]),
     ],
     notes: "Legs are toast!",
@@ -632,12 +591,12 @@ final List<WorkoutLog> mockWorkoutLogs = [
     endTime: DateTime.now().subtract(const Duration(days: 5, hours: 0, minutes: 30)),
     completedExercises: [
       LoggedExercise(id: _uuid.v4(), exerciseId: "hiit003", exerciseName: "Burpees", sets: [ // Burpees are full body
-         LoggedSet(setNumber: 1, reps: 15),
-         LoggedSet(setNumber: 2, reps: 12),
+         LoggedSet(setNumber: 1, repsAchieved: 15),
+         LoggedSet(setNumber: 2, repsAchieved: 12),
       ]),
       LoggedExercise(id: _uuid.v4(), exerciseId: "ex004", exerciseName: "Plank", sets: [ // Plank is core
-         LoggedSet(setNumber: 1, durationSeconds: 60),
-         LoggedSet(setNumber: 2, durationSeconds: 45),
+         LoggedSet(setNumber: 1, durationAchievedSeconds: 60),
+         LoggedSet(setNumber: 2, durationAchievedSeconds: 45),
       ]),
     ],
   ),

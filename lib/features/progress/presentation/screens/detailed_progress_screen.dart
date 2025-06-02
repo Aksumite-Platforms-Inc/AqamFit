@@ -70,8 +70,8 @@ class _DetailedProgressScreenState extends State<DetailedProgressScreen> {
     if (_userId == null) return;
     setState(() { _isLoadingGoals = true; _goalsError = null; });
     try {
-      final active = await ApiService().getGoals(userId: _userId!, isActive: true);
-      final past = await ApiService().getGoals(userId: _userId!, isActive: false);
+      final active = await ApiService().getGoals(_userId!, isActive: true);
+      final past = await ApiService().getGoals(_userId!, isActive: false);
       if (mounted) setState(() { _activeGoals = active; _pastGoals = past; _isLoadingGoals = false; });
     } catch (e) {
       if (mounted) setState(() { _goalsError = "Error fetching goals: ${e.toString()}"; _isLoadingGoals = false; });
@@ -109,7 +109,7 @@ class _DetailedProgressScreenState extends State<DetailedProgressScreen> {
     if (_userId == null) return;
     setState(() { _isLoadingPRs = true; _prError = null; });
     try {
-      final records = await ApiService().getPersonalRecords(userId: _userId!);
+      final records = await ApiService().getPersonalRecords(_userId!);
       records.sort((a, b) => b.dateAchieved.compareTo(a.dateAchieved));
       if (mounted) setState(() { _personalRecords = records; _isLoadingPRs = false; });
     } catch (e) {

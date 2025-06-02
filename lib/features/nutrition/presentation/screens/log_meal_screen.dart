@@ -250,7 +250,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
                 )),
 
             CupertinoListSection.insetGrouped( // Current meal items
-              header: Text("Current Meal Items (${_currentMealItems.length})", style: cupertinoTheme.textTheme.footnoteTextStyle), // Using footnote for section header
+              header: Text("Current Meal Items (${_currentMealItems.length})", style: cupertinoTheme.textTheme.textStyle), // Using textStyle for section header
               children: _currentMealItems.isEmpty
                   ? [const CupertinoListTile(title: Center(child: Text("No items added yet.")))]
                   : _currentMealItems.map((item) => CupertinoListTile.notched(
@@ -266,7 +266,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0), // Add some space above totals
                   child: CupertinoListSection.insetGrouped(
-                    header: Text("Meal Totals", style: cupertinoTheme.textTheme.footnoteTextStyle),
+                    header: Text("Meal Totals", style: cupertinoTheme.textTheme.textStyle),
                     children: [
                       CupertinoListTile(title: const Text("Calories"), additionalInfo: Text("${_currentMealTotalCalories.toStringAsFixed(0)} kcal")),
                       CupertinoListTile(title: const Text("Protein"), additionalInfo: Text("${_currentMealTotalProtein.toStringAsFixed(1)} g")),
