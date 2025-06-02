@@ -24,7 +24,9 @@ import '../features/workout/presentation/screens/workout_summary_screen.dart';
 import '../features/profile/presentation/screens/settings_screen.dart'; // Import SettingsScreen
 // Setup Flow Screens
 import '../features/onboarding/presentation/setup_flow/weight_height_screen.dart';
-import '../features/onboarding/presentation/setup_flow/goals_experience_screen.dart';
+// import '../features/onboarding/presentation/setup_flow/goals_experience_screen.dart'; // Removed
+import '../features/onboarding/presentation/setup_flow/fitness_goal_screen.dart'; // Added
+import '../features/onboarding/presentation/setup_flow/experience_level_screen.dart'; // Added
 import '../features/onboarding/presentation/setup_flow/training_prefs_screen.dart';
 import '../features/onboarding/presentation/setup_flow/additional_info_screen.dart';
 // Explore Screens
@@ -255,10 +257,17 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/setup/goals-experience',
+      path: '/setup/fitness-goal', // New route
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
-        child: const GoalsExperienceScreen(),
+        child: const FitnessGoalScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/setup/experience-level', // New route
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const ExperienceLevelScreen(),
       ),
     ),
     GoRoute(

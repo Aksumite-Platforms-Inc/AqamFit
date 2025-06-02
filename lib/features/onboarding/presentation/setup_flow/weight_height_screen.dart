@@ -83,7 +83,7 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
       print('Weight: ${_viewModel.weight}, Unit: ${_viewModel.weightUnit}');
       print('Height: ${_viewModel.height}, Unit: ${_viewModel.heightUnit}');
 
-      context.go('/setup/goals-experience');
+      context.go('/setup/fitness-goal'); // Updated navigation
     }
   }
 
@@ -100,6 +100,7 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Stats'),
+        centerTitle: true, // Center AppBar title
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -115,99 +116,138 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0), // Consistent padding
         child: Form(
           key: _formKey,
           child: ListView( // Changed to ListView to prevent overflow with keyboard
             children: <Widget>[
-              TextFormField(
-                controller: _weightController,
+              const SizedBox(height: 16), // Add some space at the top
+              Center(
+                child: Text(
+                  'Enter Your Weight',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _weightController,
+                      textAlign: TextAlign.center, // Center the input text
                 decoration: InputDecoration(
                   labelText: 'Weight (${_viewModel.weightUnit})', // Display current unit
                   hintText: 'Enter your weight',
+                  hintStyle: TextStyle(textAlign: TextAlign.center), // Center hint text if possible (might be controlled by textAlign on TextFormField)
                   border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Increased padding
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your weight';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  if (double.parse(value) <= 0) {
-                    return 'Weight must be positive';
-                  }
-                  return null;
-                },
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your weight';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        if (double.parse(value) <= 0) {
+                          return 'Weight must be positive';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    CupertinoSlidingSegmentedControl<String>(
+                      groupValue: currentWeightUnit,
+                      children: const {
+                        'kg': Text('kg'),
+                        'lbs': Text('lbs'),
+                      },
+                      onValueChanged: (value) {
+                        if (value != null) {
+                          _viewModel.setWeightUnit(value);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CupertinoSlidingSegmentedControl<String>(
-                    groupValue: currentWeightUnit,
-                    children: const {
-                      'kg': Text('kg'),
-                      'lbs': Text('lbs'),
-                    },
-                    onValueChanged: (value) {
-                      if (value != null) {
-                        _viewModel.setWeightUnit(value);
-                      }
-                    },
-                  ),
-                ],
+              const SizedBox(height: 24), // Adjusted spacing
+              Center(
+                child: Text(
+                  'Enter Your Height',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
-              const SizedBox(height: 32),
-              TextFormField(
-                controller: _heightController,
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _heightController,
+                      textAlign: TextAlign.center, // Center the input text
                 decoration: InputDecoration(
                   labelText: 'Height (${_viewModel.heightUnit})', // Display current unit
                   hintText: 'Enter your height',
+                  hintStyle: TextStyle(textAlign: TextAlign.center), // Center hint text
                   border: const OutlineInputBorder(),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Increased padding
                 ),
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your height';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                   if (double.parse(value) <= 0) {
-                    return 'Height must be positive';
-                  }
-                  return null;
-                },
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your height';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                         if (double.parse(value) <= 0) {
+                          return 'Height must be positive';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    CupertinoSlidingSegmentedControl<String>(
+                      groupValue: currentHeightUnit,
+                      children: const {
+                        'cm': Text('cm'),
+                        'ft': Text('ft/in'), // Representing feet/inches
+                      },
+                      onValueChanged: (value) {
+                         if (value != null) {
+                          _viewModel.setHeightUnit(value);
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CupertinoSlidingSegmentedControl<String>(
-                    groupValue: currentHeightUnit,
-                    children: const {
-                      'cm': Text('cm'),
-                      'ft': Text('ft/in'), // Representing feet/inches
-                    },
-                    onValueChanged: (value) {
-                       if (value != null) {
-                        _viewModel.setHeightUnit(value);
-                      }
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 32), // Adjusted spacing before button
               ElevatedButton(
                 onPressed: _onNext,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  )
                 ),
                 child: const Text('Next'),
               ),
+              const SizedBox(height: 16), // Add some space at the bottom
             ],
           ),
         ),

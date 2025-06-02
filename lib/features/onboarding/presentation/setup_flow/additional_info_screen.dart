@@ -120,76 +120,130 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Additional Information'),
+        title: const Text('Almost There!'), // Updated AppBar title
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
+        centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0), // Consistent padding
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column( // Changed to Column for better control with Spacer
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              TextFormField(
-                controller: _dateOfBirthController,
-                decoration: const InputDecoration(
-                  labelText: 'Date of Birth',
-                  hintText: 'Select your date of birth',
-                  border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
+              Text(
+                'Just a few more details...', // Main screen title
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Date of Birth Card
+              Center(
+                child: Text(
+                  'Your Birthday',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                readOnly: true,
-                onTap: () => _selectDate(context, viewModel),
-                validator: (value) {
-                  if (viewModel.dateOfBirth == null) { // Check viewModel directly
-                    return 'Please select your date of birth';
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 32),
-              DropdownButtonFormField<String>(
-                value: viewModel.gender,
-                items: _genders.map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  viewModel.updateGender(newValue);
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Gender',
-                  border: OutlineInputBorder(),
-                  hintText: 'Select your gender',
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
-                validator: (value) => value == null ? 'Please select your gender' : null,
-              ),
-              const SizedBox(height: 48),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlinedButton(
-                    onPressed: _isFinishing ? null : () => context.pop(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: const Text('Back'),
+                child: TextFormField(
+                  controller: _dateOfBirthController,
+                  decoration: const InputDecoration(
+                    // labelText: 'Date of Birth', // Label can be part of the card title
+                    hintText: 'Select your date of birth',
+                    border: OutlineInputBorder(),
+                    suffixIcon: Icon(Icons.calendar_today),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                   ),
-                  ElevatedButton(
-                    onPressed: _isFinishing ? null : _finishSetup,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: _isFinishing
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Finish'),
-                  ),
-                ],
+                  readOnly: true,
+                  textAlign: TextAlign.center,
+                  onTap: () => _selectDate(context, viewModel),
+                  validator: (value) {
+                    if (viewModel.dateOfBirth == null) {
+                      return 'Please select your date of birth';
+                    }
+                    return null;
+                  },
+                ),
               ),
+              const SizedBox(height: 24),
+
+              // Gender Card
+              Center(
+                child: Text(
+                  'Your Gender',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Less vertical padding for dropdown
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: DropdownButtonFormField<String>(
+                  value: viewModel.gender,
+                  items: _genders.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Center(child: Text(value)), // Center text in dropdown items
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    viewModel.updateGender(newValue);
+                  },
+                  decoration: const InputDecoration(
+                    // labelText: 'Gender', // Label can be part of the card title
+                    hintText: 'Select your gender',
+                    border: InputBorder.none, // Remove border from dropdown itself to blend with card
+                    prefixIcon: Icon(Icons.wc), // Example gender icon (wc for washroom, general person icon)
+                    // Or Icons.person_outline, Icons.transgender, etc.
+                    contentPadding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 15.0), // Adjust padding
+                  ),
+                  isExpanded: true, // Ensure dropdown takes available width for centering text
+                  alignment: Alignment.center, // Center selected value text
+                  validator: (value) => value == null ? 'Please select your gender' : null,
+                ),
+              ),
+              const Spacer(), // Pushes buttons to the bottom
+
+              ElevatedButton(
+                onPressed: _isFinishing ? null : _finishSetup,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: _isFinishing
+                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('Finish Setup'),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: _isFinishing ? null : () => context.pop(),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(
+                  'Back',
+                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 8), // Some bottom padding
             ],
           ),
         ),

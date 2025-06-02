@@ -40,10 +40,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface, // Use theme background
-      body: Stack( // Wrap SafeArea with Stack for Skip button
-        children: [
+    Future<bool> _onWillPop() async {
+      if (_pageController.page?.round() != 0) {
+        _pageController.previousPage(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+        );
+        return false; // Prevent app from exiting
+      }
+      // If on the first page, show exit confirmation dialog
+      return (await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Exit AksumFit?'),
+          content: const Text('Are you sure you want to exit the app?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Stay in app
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Exit app
+              child: const Text('Exit'),
+            ),
+          ],
+        ),
+      )) ?? false; // Default to false if dialog is dismissed
+    }
+
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: colorScheme.surface, // Use theme background
+        body: Stack( // Wrap SafeArea with Stack for Skip button
+          children: [
           SafeArea(
             child: Column(
               children: [

@@ -11,84 +11,121 @@ class TrainingPrefsScreen extends StatefulWidget {
 }
 
 class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
-  // Define the days of the week
-  final List<String> _daysOfWeek = [
-    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+// Helper class for day data
+class DayPreference {
+  final String abbr; // e.g., "M"
+  final String fullName; // e.g., "Monday"
+
+  DayPreference({required this.abbr, required this.fullName});
+}
+
+class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
+  final List<DayPreference> _days = [
+    DayPreference(abbr: "S", fullName: "Sunday"), // Assuming S M T W T F S order
+    DayPreference(abbr: "M", fullName: "Monday"),
+    DayPreference(abbr: "T", fullName: "Tuesday"),
+    DayPreference(abbr: "W", fullName: "Wednesday"),
+    DayPreference(abbr: "T", fullName: "Thursday"),
+    DayPreference(abbr: "F", fullName: "Friday"),
+    DayPreference(abbr: "S", fullName: "Saturday"),
   ];
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<SetupFlowViewModel>();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Training Preferences'),
+        title: const Text('Training Days'), // Updated AppBar title
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            // No need to save here as selections are updated instantly
+            context.pop();
+          },
         ),
+        centerTitle: true, // Center AppBar title
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column( // Changed to Column to structure content better
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(20.0), // Increased padding
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch, // For button to stretch
           children: <Widget>[
-            const Text(
-              'Select Your Preferred Training Days:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            Text(
+              'Which days do you typically train?', // New centered title
+              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8.0, // Gap between adjacent chips.
-              runSpacing: 4.0, // Gap between lines.
-              children: _daysOfWeek.map((day) {
-                final isSelected = viewModel.preferredTrainingDays.contains(day);
-                return ChoiceChip(
-                  label: Text(day),
-                  selected: isSelected,
-                  onSelected: (bool selected) {
-                    viewModel.toggleTrainingDay(day);
+            const SizedBox(height: 32), // Increased spacing
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround, // Distribute days evenly
+              children: _days.map((day) {
+                final isSelected = viewModel.preferredTrainingDays.contains(day.fullName);
+                return GestureDetector(
+                  onTap: () {
+                    viewModel.toggleTrainingDay(day.fullName);
                   },
-                  selectedColor: Theme.of(context).colorScheme.primary,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Theme.of(context).colorScheme.onPrimary : null,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(
-                      color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey,
-                    )
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 44, // Circular button size
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withOpacity(0.3),
+                        width: isSelected ? 2.0 : 1.0,
+                      ),
+                      boxShadow: isSelected ? [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        )
+                      ] : [],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      day.abbr,
+                      style: TextStyle(
+                        color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 );
               }).toList(),
             ),
             const Spacer(), // Pushes navigation buttons to the bottom
-            Padding( // Add padding for the buttons row
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      context.pop();
-                    },
-                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: const Text('Back'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      // No specific validation needed here unless there's a min/max days requirement
-                      // ViewModel is already updated by ChoiceChip's onSelected
-                      context.go('/setup/additional-info');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: const Text('Next'),
-                  ),
-                ],
+            ElevatedButton(
+              onPressed: () {
+                context.go('/setup/additional-info');
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+              ),
+              child: const Text('Next'),
+            ),
+            const SizedBox(height: 8), // Space for back button or other elements
+             TextButton( // Using TextButton for "Back" for a less prominent look if preferred
+              onPressed: () {
+                context.pop();
+              },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              child: Text(
+                'Back',
+                style: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
               ),
             ),
           ],
