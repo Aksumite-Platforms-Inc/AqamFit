@@ -6,7 +6,10 @@ import '../models/user.dart';
 
 // Models used by various ApiService extensions (centralized imports)
 import 'package:aksumfit/models/workout_plan.dart';
+import 'package:aksumfit/models/workout_plan_exercise.dart';
 import 'package:aksumfit/models/workout_log.dart';
+import 'package:aksumfit/models/personal_record.dart'; // Import PersonalRecord model
+import 'package:aksumfit/models/challenge.dart'; // Import Challenge model
 import 'package:aksumfit/features/nutrition/data/mock_food_database.dart';
 import 'package:aksumfit/models/daily_meal_log.dart';
 import 'package:aksumfit/models/food_item.dart';
@@ -26,7 +29,6 @@ class ApiService {
   ApiService._internal();
 
   late final Dio _dio;
-  late final FlutterSecureStorage _secureStorage;
 
   // API Configuration
   static const String _baseUrl = 'https://api.axumfit.com/v1';
@@ -340,8 +342,214 @@ class AuthResponse {
 // --- Common Uuid instance for mock data generation ---
 const Uuid _uuid = Uuid();
 
+// --- Mock Exercise Database ---
+// (This should ideally be before _mockWorkoutPlans if _mockWorkoutPlans uses it directly in its initialization)
+// However, for patching, we can define it here and then modify _mockWorkoutPlans.
+// For a cleaner final structure, _mockExercisesDatabase would be defined before _mockWorkoutPlans.
+final List<Exercise> _mockExercisesDatabase = [
+  Exercise(id: "ex001", name: "Squats", type: ExerciseType.strength, muscleGroups: ["Quads", "Glutes", "Hamstrings", "Core"], description: "A compound lower body exercise.", equipmentNeeded: ["Barbell", "Rack"]),
+  Exercise(id: "ex002", name: "Push-ups", type: ExerciseType.strength, muscleGroups: ["Chest", "Triceps", "Shoulders", "Core"], description: "A bodyweight exercise for upper body strength.", equipmentNeeded: []),
+  Exercise(id: "ex003", name: "Rows (Dumbbell or Machine)", type: ExerciseType.strength, muscleGroups: ["Back (Lats)", "Biceps", "Rear Delts"], description: "Pulls weight towards your torso, works the back.", equipmentNeeded: ["Dumbbells or Machine"]),
+  Exercise(id: "ex004", name: "Plank", type: ExerciseType.strength, muscleGroups: ["Core", "Abs"], description: "An isometric core strength exercise.", equipmentNeeded: []),
+  Exercise(id: "ex005", name: "Leg Press", type: ExerciseType.strength, muscleGroups: ["Quads", "Glutes"], description: "A machine-based lower body exercise.", equipmentNeeded: ["Leg Press Machine"]),
+  Exercise(id: "ex006", name: "Romanian Deadlifts (RDLs)", type: ExerciseType.strength, muscleGroups: ["Hamstrings", "Glutes", "Lower Back"], description: "Focuses on hamstring and glute development.", equipmentNeeded: ["Barbell or Dumbbells"]),
+  Exercise(id: "ex007", name: "Leg Extensions", type: ExerciseType.strength, muscleGroups: ["Quads"], description: "Isolation exercise for quadriceps.", equipmentNeeded: ["Leg Extension Machine"]),
+  Exercise(id: "ex008", name: "Hamstring Curls", type: ExerciseType.strength, muscleGroups: ["Hamstrings"], description: "Isolation exercise for hamstrings.", equipmentNeeded: ["Hamstring Curl Machine"]),
+  Exercise(id: "ex009", name: "Calf Raises", type: ExerciseType.strength, muscleGroups: ["Calves"], description: "Strengthens calf muscles.", equipmentNeeded: ["Bodyweight or Weights"]),
+  Exercise(id: "yg001", name: "Sun Salutation A", type: ExerciseType.stretch, muscleGroups: ["Full Body", "Core", "Flexibility"], description: "A sequence of yoga poses.", equipmentNeeded: ["Yoga Mat"]),
+  Exercise(id: "yg002", name: "Downward-Facing Dog", type: ExerciseType.stretch, muscleGroups: ["Hamstrings", "Calves", "Shoulders", "Back"], description: "A common yoga pose.", equipmentNeeded: ["Yoga Mat"]),
+  Exercise(id: "yg003", name: "Warrior II (Right & Left)", type: ExerciseType.stretch, muscleGroups: ["Legs", "Core", "Shoulders"], description: "A standing yoga pose.", equipmentNeeded: ["Yoga Mat"]),
+  Exercise(id: "yg004", name: "Triangle Pose (Right & Left)", type: ExerciseType.stretch, muscleGroups: ["Hamstrings", "Groin", "Hips", "Core"], description: "A standing yoga pose.", equipmentNeeded: ["Yoga Mat"]),
+  Exercise(id: "yg005", name: "Child's Pose", type: ExerciseType.stretch, muscleGroups: ["Back", "Hips", "Thighs"], description: "A resting yoga pose.", equipmentNeeded: ["Yoga Mat"]),
+  Exercise(id: "hiit001", name: "Jumping Jacks", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio"], description: "A full-body cardio exercise.", equipmentNeeded: []),
+  Exercise(id: "hiit002", name: "High Knees", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio", "Core", "Legs"], description: "A cardio exercise that engages the core.", equipmentNeeded: []),
+  Exercise(id: "hiit003", name: "Burpees", type: ExerciseType.plyometrics, muscleGroups: ["Full Body", "Cardio", "Strength"], description: "A challenging full-body exercise.", equipmentNeeded: []),
+  Exercise(id: "hiit004", name: "Mountain Climbers", type: ExerciseType.cardio, muscleGroups: ["Core", "Cardio", "Shoulders"], description: "A dynamic core and cardio exercise.", equipmentNeeded: []),
+  Exercise(id: "hiit005", name: "Sprint in Place", type: ExerciseType.cardio, muscleGroups: ["Legs", "Cardio"], description: "High-intensity cardio exercise.", equipmentNeeded: []),
+  Exercise(id: "hiit006", name: "Cool Down Jog/Walk", type: ExerciseType.cardio, muscleGroups: ["Full Body", "Cardio"], description: "Low-intensity cardio for cool down.", equipmentNeeded: []),
+];
+
+// Helper function to find exercise details by ID
+// Made public and static for access from ProgressScreen
+// Alternatively, ApiService could have an instance method that calls this.
+// For simplicity with mock data, static is okay here.
+// Note: This requires _mockExercisesDatabase to also be accessible, e.g. static or top-level.
+// _mockExercisesDatabase is already top-level.
+extension ExerciseDatabaseAccess on ApiService { // Or just make it a top-level function if preferred
+  static Exercise? getExerciseDetailsById(String exerciseId) {
+    try {
+      return _mockExercisesDatabase.firstWhere((ex) => ex.id == exerciseId);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Warning: Exercise with ID '$exerciseId' not found in _mockExercisesDatabase.");
+      }
+      return null;
+    }
+  }
+}
+
+
 // --- Workout Plan Mock Data & Service ---
-final List<WorkoutPlan> _mockWorkoutPlans = [];
+// Note: The initialization of _mockWorkoutPlans will be modified to include exerciseDetails.
+// This requires _mockExercisesDatabase to be defined above or accessible.
+// For the diff, we'll assume _mockExercisesDatabase is accessible and modify _mockWorkoutPlans.
+
+List<WorkoutPlan> _initializeMockWorkoutPlans() {
+  return [
+    WorkoutPlan(
+      id: _uuid.v4(),
+      name: "Beginner Strength Routine",
+      description: "A great starting point for building overall strength. Focuses on compound movements.",
+      category: WorkoutPlanCategory.strength,
+      difficulty: WorkoutDifficulty.beginner,
+      estimatedDurationMinutes: 45,
+      authorId: "system_generated_trainer_1",
+      exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Squats", sets: "3", reps: "8-12", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex001")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", name: "Push-ups", sets: "3", reps: "As many as possible", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex002")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", name: "Rows (Dumbbell or Machine)", sets: "3", reps: "10-15", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex003")),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", name: "Plank", sets: "3", reps: "Hold for 30-60s", restBetweenSetsSeconds: 45, exerciseDetails: _getExerciseDetailsById("ex004")),
+      ],
+      createdAt: DateTime.now().subtract(const Duration(days: 30)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 10)),
+      tags: ["full body", "beginner friendly", "strength building"],
+    ),
+    WorkoutPlan(
+      id: _uuid.v4(),
+      name: "Leg Day Burner",
+      description: "Intense leg workout to build strength and hypertrophy in your lower body.",
+      category: WorkoutPlanCategory.hypertrophy,
+      difficulty: WorkoutDifficulty.intermediate,
+      estimatedDurationMinutes: 60,
+      authorId: "system_generated_trainer_2",
+      exercises: [
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Barbell Squats", sets: "4", reps: "8-10", restBetweenSetsSeconds: 90, exerciseDetails: _getExerciseDetailsById("ex001")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", name: "Leg Press", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75, exerciseDetails: _getExerciseDetailsById("ex005")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", name: "Romanian Deadlifts (RDLs)", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75, exerciseDetails: _getExerciseDetailsById("ex006")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", name: "Leg Extensions", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex007")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", name: "Hamstring Curls", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60, exerciseDetails: _getExerciseDetailsById("ex008")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", name: "Calf Raises", sets: "4", reps: "15-20", restBetweenSetsSeconds: 45, exerciseDetails: _getExerciseDetailsById("ex009")),
+      ],
+      createdAt: DateTime.now().subtract(const Duration(days: 25)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 5)),
+      tags: ["legs", "hypertrophy", "volume"],
+    ),
+    WorkoutPlan(
+      id: _uuid.v4(),
+      name: "Morning Yoga Flow",
+      description: "A gentle yoga sequence to start your day with energy and mindfulness.",
+      category: WorkoutPlanCategory.flexibility,
+      difficulty: WorkoutDifficulty.allLevels,
+      estimatedDurationMinutes: 30,
+      authorId: "system_generated_yogi_1",
+      exercises: [
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", name: "Sun Salutation A", sets: "5", reps: "rounds", notes: "Flow through 5 rounds", exerciseDetails: _getExerciseDetailsById("yg001")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", name: "Downward-Facing Dog", sets: "1", reps: "Hold for 5 breaths", exerciseDetails: _getExerciseDetailsById("yg002")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", name: "Warrior II (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths", exerciseDetails: _getExerciseDetailsById("yg003")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", name: "Triangle Pose (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths", exerciseDetails: _getExerciseDetailsById("yg004")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", name: "Child's Pose", sets: "1", reps: "Hold for 5-10 breaths", exerciseDetails: _getExerciseDetailsById("yg005")),
+      ],
+      createdAt: DateTime.now().subtract(const Duration(days: 15)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 2)),
+      tags: ["yoga", "flexibility", "morning routine", "mindfulness"],
+    ),
+    WorkoutPlan(
+      id: _uuid.v4(),
+      name: "HIIT Cardio Challenge",
+      description: "High-Intensity Interval Training to boost your cardiovascular fitness and burn calories.",
+      category: WorkoutPlanCategory.cardio,
+      difficulty: WorkoutDifficulty.intermediate,
+      estimatedDurationMinutes: 25,
+      authorId: "system_generated_trainer_1",
+      exercises: [
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", name: "Jumping Jacks", sets: "1", reps: "60s work, 30s rest", notes: "Warm-up", exerciseDetails: _getExerciseDetailsById("hiit001")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", name: "High Knees", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit002")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", name: "Burpees", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit003")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", name: "Mountain Climbers", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit004")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", name: "Sprint in Place", sets: "4", reps: "30s work, 15s rest", exerciseDetails: _getExerciseDetailsById("hiit005")),
+          WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", name: "Cool Down Jog/Walk", sets: "1", reps: "3-5 minutes", exerciseDetails: _getExerciseDetailsById("hiit006")),
+      ],
+      createdAt: DateTime.now().subtract(const Duration(days: 40)),
+      updatedAt: DateTime.now().subtract(const Duration(days: 3)),
+      tags: ["hiit", "cardio", "fat burning", "quick workout"],
+    ),
+  ];
+}
+
+final List<WorkoutPlan> _mockWorkoutPlans = _initializeMockWorkoutPlans();
+
+extension WorkoutApiService on ApiService {
+  Future<WorkoutPlan> saveWorkoutPlan(WorkoutPlan plan) async {
+    await _simulateNetworkDelay(delay: 300);
+    description: "A great starting point for building overall strength. Focuses on compound movements.",
+    category: WorkoutPlanCategory.strength,
+    difficulty: WorkoutDifficulty.beginner,
+    estimatedDurationMinutes: 45,
+    authorId: "system_generated_trainer_1",
+    exercises: [
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 3, reps: "8-12", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", order: 1, sets: 3, reps: "As many as possible", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", order: 2, sets: 3, reps: "10-15", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", order: 3, sets: 3, reps: "Hold for 30-60s", restBetweenSetsSeconds: 45),
+    ],
+    createdAt: DateTime.now().subtract(const Duration(days: 30)),
+    updatedAt: DateTime.now().subtract(const Duration(days: 10)),
+    tags: ["full body", "beginner friendly", "strength building"],
+  ),
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "Leg Day Burner",
+    description: "Intense leg workout to build strength and hypertrophy in your lower body.",
+    category: WorkoutPlanCategory.hypertrophy,
+    difficulty: WorkoutDifficulty.intermediate,
+    estimatedDurationMinutes: 60,
+    authorId: "system_generated_trainer_2",
+    exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 4, reps: "8-10", restBetweenSetsSeconds: 90),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", order: 1, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", order: 2, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", order: 3, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", order: 4, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", order: 5, sets: 4, reps: "15-20", restBetweenSetsSeconds: 45),
+    ],
+    // tags: ["legs", "hypertrophy", "volume"], // Remove, not supported in WorkoutPlan
+  ),
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "Morning Yoga Flow",
+    description: "A gentle yoga sequence to start your day with energy and mindfulness.",
+    category: WorkoutPlanCategory.flexibility,
+    difficulty: WorkoutDifficulty.allLevels, // Assuming AllLevels is an option
+    estimatedDurationMinutes: 30,
+    authorId: "system_generated_yogi_1",
+    exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", order: 0, sets: 5, reps: "rounds", notes: "Flow through 5 rounds"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", order: 1, sets: 1, reps: "Hold for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", order: 2, sets: 1, reps: "Hold each side for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", order: 3, sets: 1, reps: "Hold each side for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", order: 4, sets: 1, reps: "Hold for 5-10 breaths"),
+    ],
+    // tags: ["yoga", "flexibility", "morning routine", "mindfulness"], // Remove, not supported in WorkoutPlan
+  ),
+  WorkoutPlan(
+    id: _uuid.v4(),
+    name: "HIIT Cardio Challenge",
+    description: "High-Intensity Interval Training to boost your cardiovascular fitness and burn calories.",
+    category: WorkoutPlanCategory.hiit, // Use 'hiit' as closest available, or add 'cardio' to enum if needed
+    difficulty: WorkoutDifficulty.intermediate,
+    estimatedDurationMinutes: 25,
+    authorId: "system_generated_trainer_1",
+    exercises: [
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", order: 0, sets: 1, reps: "60s work, 30s rest", notes: "Warm-up"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", order: 1, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", order: 2, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", order: 3, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", order: 4, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", order: 5, sets: 1, reps: "3-5 minutes"),
+    ],
+    // tags: ["hiit", "cardio", "fat burning", "quick workout"], // Remove, not supported in WorkoutPlan
+  ),
+]
 extension WorkoutApiService on ApiService {
   Future<WorkoutPlan> saveWorkoutPlan(WorkoutPlan plan) async {
     await _simulateNetworkDelay(delay: 300);
@@ -369,21 +577,105 @@ extension WorkoutApiService on ApiService {
 }
 
 // --- Workout Log Mock Data & Service ---
-final List<WorkoutLog> _mockWorkoutLogs = [];
+final List<WorkoutLog> mockWorkoutLogs = [
+  WorkoutLog(
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    planId: _mockWorkoutPlans[0].id, // Assumes Beginner Strength Routine
+    planName: _mockWorkoutPlans[0].name,
+    startTime: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
+    endTime: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
+    completedExercises: [
+      LoggedExercise(id: _uuid.v4(), exerciseId: "ex001", exerciseName: "Squats", sets: [
+        LoggedSet(setNumber: 1, reps: 10, weightKg: 50),
+        LoggedSet(setNumber: 2, reps: 10, weightKg: 50),
+        LoggedSet(setNumber: 3, reps: 8, weightKg: 50),
+      ]),
+      LoggedExercise(id: _uuid.v4(), exerciseId: "ex002", exerciseName: "Push-ups", sets: [
+        LoggedSet(setNumber: 1, reps: 15),
+        LoggedSet(setNumber: 2, reps: 12),
+        LoggedSet(setNumber: 3, reps: 10),
+      ]),
+    ],
+    notes: "Felt good, focused on form.",
+  ),
+  WorkoutLog(
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    planId: _mockWorkoutPlans[1].id, // Assumes Leg Day Burner
+    planName: _mockWorkoutPlans[1].name,
+    startTime: DateTime.now().subtract(const Duration(days: 3, hours: 2)),
+    endTime: DateTime.now().subtract(const Duration(days: 3, hours: 0, minutes: 45)),
+    completedExercises: [
+      LoggedExercise(id: _uuid.v4(), exerciseId: "ex001", exerciseName: "Barbell Squats", sets: [
+         LoggedSet(setNumber: 1, reps: 8, weightKg: 60),
+         LoggedSet(setNumber: 2, reps: 8, weightKg: 60),
+         LoggedSet(setNumber: 3, reps: 6, weightKg: 60),
+      ]),
+      LoggedExercise(id: _uuid.v4(), exerciseId: "ex005", exerciseName: "Leg Press", sets: [
+         LoggedSet(setNumber: 1, reps: 10, weightKg: 100),
+         LoggedSet(setNumber: 2, reps: 10, weightKg: 100),
+      ]),
+      LoggedExercise(id: _uuid.v4(), exerciseId: "ex006", exerciseName: "Romanian Deadlifts (RDLs)", sets: [
+         LoggedSet(setNumber: 1, reps: 12, weightKg: 40),
+         LoggedSet(setNumber: 2, reps: 10, weightKg: 40),
+      ]),
+    ],
+    notes: "Legs are toast!",
+  ),
+   WorkoutLog( // Log with an exercise that hits different muscle groups
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    planId: _mockWorkoutPlans[3].id, // Assumes HIIT Cardio Challenge
+    planName: _mockWorkoutPlans[3].name,
+    startTime: DateTime.now().subtract(const Duration(days: 5, hours: 1)),
+    endTime: DateTime.now().subtract(const Duration(days: 5, hours: 0, minutes: 30)),
+    completedExercises: [
+      LoggedExercise(id: _uuid.v4(), exerciseId: "hiit003", exerciseName: "Burpees", sets: [ // Burpees are full body
+         LoggedSet(setNumber: 1, reps: 15),
+         LoggedSet(setNumber: 2, reps: 12),
+      ]),
+      LoggedExercise(id: _uuid.v4(), exerciseId: "ex004", exerciseName: "Plank", sets: [ // Plank is core
+         LoggedSet(setNumber: 1, durationSeconds: 60),
+         LoggedSet(setNumber: 2, durationSeconds: 45),
+      ]),
+    ],
+  ),
+];
 extension WorkoutLogApiService on ApiService {
   Future<WorkoutLog> saveWorkoutLog(WorkoutLog log) async {
     await _simulateNetworkDelay(delay: 300);
     final logWithId = log.id.isEmpty ? log.copyWith(id: _uuid.v4()) : log;
-    _mockWorkoutLogs.add(logWithId);
+    mockWorkoutLogs.add(logWithId);
     if (kDebugMode) print('📝 WorkoutLog saved: ${logWithId.planName ?? 'Ad-hoc workout'}');
     return logWithId;
   }
-  Future<List<WorkoutLog>> getWorkoutLogs({String? userId}) async { /* ... */ return []; } // Simplified
-  Future<WorkoutLog?> getWorkoutLogById(String id) async { /* ... */ return null; } // Simplified
+  Future<List<WorkoutLog>> getWorkoutLogs({String? userId, DateTime? startDate, DateTime? endDate}) async {
+    await _simulateNetworkDelay(delay: 200);
+    if (userId == null) return List.from(mockWorkoutLogs); // Return all if no userId
+
+    var userLogs = mockWorkoutLogs.where((log) => log.userId == userId);
+
+    if (startDate != null) {
+        userLogs = userLogs.where((log) => !log.startTime.isBefore(startDate));
+    }
+    if (endDate != null) {
+        userLogs = userLogs.where((log) => !log.startTime.isAfter(endDate));
+    }
+    return userLogs.toList();
+  }
+  Future<WorkoutLog?> getWorkoutLogById(String id) async {
+    await _simulateNetworkDelay(delay: 100);
+    try {
+      return mockWorkoutLogs.firstWhere((log) => log.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }
 
 // --- Nutrition Service Mock Data & Methods ---
-final Map<String, DailyMealLog> _mockDailyMealLogs = {};
+final Map<String, DailyMealLog> mockDailyMealLogs = {};
 extension NutritionApiService on ApiService {
   Future<List<FoodItem>> searchFoodItems(String query) async {
     await _simulateNetworkDelay(delay: 250);
@@ -395,38 +687,72 @@ extension NutritionApiService on ApiService {
   Future<DailyMealLog> saveDailyMealLog(DailyMealLog log) async {
     await _simulateNetworkDelay(delay: 300);
     final dateKey = DateFormat('yyyy-MM-dd').format(log.date);
-    _mockDailyMealLogs["${log.userId}_$dateKey"] = log;
+    mockDailyMealLogs["${log.userId}_$dateKey"] = log;
     if (kDebugMode) print('🥗 Saved DailyMealLog for ${log.userId} on $dateKey');
     return log;
   }
   Future<DailyMealLog?> getDailyMealLog(String userId, DateTime date) async {
     await _simulateNetworkDelay(delay: 200);
-    return _mockDailyMealLogs["${userId}_${DateFormat('yyyy-MM-dd').format(date)}"];
+    return mockDailyMealLogs["${userId}_${DateFormat('yyyy-MM-dd').format(date)}"];
   }
   Future<List<DailyMealLog>> getDailyMealLogsDateRange(String userId, DateTime start, DateTime end) async { /* ... */ return []; } // Simplified
 }
 
 // --- Progress Tracking Service Mock Data & Methods ---
-final List<WeightEntry> _mockWeightEntries = [];
-final List<BodyMeasurementEntry> _mockBodyMeasurementEntries = [];
-final List<PerformanceMetricEntry> _mockPerformanceMetricEntries = [];
-final List<Goal> _mockGoals = [];
+final List<WeightEntry> mockWeightEntries = [];
+final List<BodyMeasurementEntry> mockBodyMeasurementEntries = [];
+final List<PerformanceMetricEntry> mockPerformanceMetricEntries = [];
+final List<Goal> mockGoals = [];
+final List<PersonalRecord> mockPersonalRecords = [
+  PersonalRecord(
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    exerciseName: "Bench Press",
+    recordType: "1 Rep Max",
+    value: "100 kg",
+    dateAchieved: DateTime.now().subtract(const Duration(days: 30)),
+  ),
+  PersonalRecord(
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    exerciseName: "Pull-ups",
+    recordType: "Max Reps",
+    value: "15 reps",
+    dateAchieved: DateTime.now().subtract(const Duration(days: 10)),
+  ),
+  PersonalRecord(
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    exerciseName: "Squat",
+    recordType: "1 Rep Max",
+    value: "140 kg",
+    dateAchieved: DateTime.now().subtract(const Duration(days: 45)),
+  ),
+  PersonalRecord(
+    id: _uuid.v4(),
+    userId: "demo_user_001",
+    exerciseName: "Running",
+    recordType: "Fastest 5k",
+    value: "22:30",
+    dateAchieved: DateTime.now().subtract(const Duration(days: 5)),
+  ),
+];
 
 extension ProgressApiService on ApiService {
   // Weight Entries
   Future<WeightEntry> saveWeightEntry(WeightEntry entry) async {
     await _simulateNetworkDelay();
-    _mockWeightEntries.removeWhere((e) => e.id == entry.id);
-    _mockWeightEntries.add(entry);
-    _mockWeightEntries.sort((a, b) => b.date.compareTo(a.date));
-    _updateGoalCurrentValues(entry.userId, GoalMetricType.weight, entry.weightKg, entry.date);
+    mockWeightEntries.removeWhere((e) => e.id == entry.id);
+    mockWeightEntries.add(entry);
+    mockWeightEntries.sort((a, b) => b.date.compareTo(a.date));
+    updateGoalCurrentValues(entry.userId, GoalMetricType.weight, entry.weightKg, entry.date);
     if (kDebugMode) print('⚖️ Saved WeightEntry: ${entry.weightKg} kg for ${entry.userId}');
     return entry;
   }
 
   Future<List<WeightEntry>> getWeightEntries(String userId, {DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay();
-    return _mockWeightEntries.where((e) => e.userId == userId &&
+    return mockWeightEntries.where((e) => e.userId == userId &&
         (startDate == null || e.date.isAfter(startDate.subtract(const Duration(days:1)))) &&
         (endDate == null || e.date.isBefore(endDate.add(const Duration(days:1))))
     ).toList();
@@ -435,18 +761,18 @@ extension ProgressApiService on ApiService {
   // Body Measurement Entries
   Future<BodyMeasurementEntry> saveBodyMeasurementEntry(BodyMeasurementEntry entry) async {
     await _simulateNetworkDelay();
-    _mockBodyMeasurementEntries.removeWhere((e) => e.id == entry.id);
-    _mockBodyMeasurementEntries.add(entry);
-    _mockBodyMeasurementEntries.sort((a, b) => b.date.compareTo(a.date));
-    if(entry.bodyFatPercentage != null) _updateGoalCurrentValues(entry.userId, GoalMetricType.bodyFatPercentage, entry.bodyFatPercentage!, entry.date);
-    if(entry.muscleMassKg != null) _updateGoalCurrentValues(entry.userId, GoalMetricType.muscleMass, entry.muscleMassKg!, entry.date);
+    mockBodyMeasurementEntries.removeWhere((e) => e.id == entry.id);
+    mockBodyMeasurementEntries.add(entry);
+    mockBodyMeasurementEntries.sort((a, b) => b.date.compareTo(a.date));
+    if(entry.bodyFatPercentage != null) updateGoalCurrentValues(entry.userId, GoalMetricType.bodyFatPercentage, entry.bodyFatPercentage!, entry.date);
+    if(entry.muscleMassKg != null) updateGoalCurrentValues(entry.userId, GoalMetricType.muscleMass, entry.muscleMassKg!, entry.date);
     if (kDebugMode) print('📏 Saved BodyMeasurementEntry for ${entry.userId}');
     return entry;
   }
 
   Future<List<BodyMeasurementEntry>> getBodyMeasurementEntries(String userId, {DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay();
-    return _mockBodyMeasurementEntries.where((e) => e.userId == userId &&
+    return mockBodyMeasurementEntries.where((e) => e.userId == userId &&
         (startDate == null || e.date.isAfter(startDate.subtract(const Duration(days:1)))) &&
         (endDate == null || e.date.isBefore(endDate.add(const Duration(days:1))))
     ).toList();
@@ -455,16 +781,16 @@ extension ProgressApiService on ApiService {
   // Performance Metric Entries
   Future<PerformanceMetricEntry> savePerformanceMetricEntry(PerformanceMetricEntry entry) async {
     await _simulateNetworkDelay();
-    _mockPerformanceMetricEntries.removeWhere((e) => e.id == entry.id);
-    _mockPerformanceMetricEntries.add(entry);
-    _mockPerformanceMetricEntries.sort((a, b) => b.date.compareTo(a.date));
+    mockPerformanceMetricEntries.removeWhere((e) => e.id == entry.id);
+    mockPerformanceMetricEntries.add(entry);
+    mockPerformanceMetricEntries.sort((a, b) => b.date.compareTo(a.date));
     if (kDebugMode) print('🏆 Saved PerformanceMetricEntry: ${entry.exerciseName}');
     return entry;
   }
 
   Future<List<PerformanceMetricEntry>> getPerformanceMetricEntries(String userId, {String? exerciseName, PerformanceMetricType? metricType, DateTime? startDate, DateTime? endDate}) async {
     await _simulateNetworkDelay();
-    return _mockPerformanceMetricEntries.where((e) => e.userId == userId &&
+    return mockPerformanceMetricEntries.where((e) => e.userId == userId &&
         (exerciseName == null || e.exerciseName.toLowerCase() == exerciseName.toLowerCase()) &&
         (metricType == null || e.metricType == metricType) &&
         (startDate == null || e.date.isAfter(startDate.subtract(const Duration(days:1)))) &&
@@ -475,11 +801,11 @@ extension ProgressApiService on ApiService {
   // Goals
   Future<Goal> saveGoal(Goal goal) async {
     await _simulateNetworkDelay();
-    final existingIndex = _mockGoals.indexWhere((g) => g.id == goal.id);
+    final existingIndex = mockGoals.indexWhere((g) => g.id == goal.id);
     if (existingIndex != -1) {
-       _mockGoals[existingIndex] = goal.copyWith(updatedAt: DateTime.now());
+       mockGoals[existingIndex] = goal.copyWith(updatedAt: DateTime.now());
     } else {
-      _mockGoals.add(goal.id.isEmpty ? goal.copyWith(id: _uuid.v4()) : goal);
+      mockGoals.add(goal.id.isEmpty ? goal.copyWith(id: _uuid.v4()) : goal);
     }
     if (kDebugMode) print('🎯 Saved Goal: ${goal.name}');
     return goal;
@@ -487,7 +813,7 @@ extension ProgressApiService on ApiService {
 
   Future<List<Goal>> getGoals(String userId, {bool? isActive}) async {
     await _simulateNetworkDelay();
-    return _mockGoals.where((g) => g.userId == userId && (isActive == null || g.isActive == isActive)).toList();
+    return mockGoals.where((g) => g.userId == userId && (isActive == null || g.isActive == isActive)).toList();
   }
 
   Future<Goal> updateGoal(Goal goal) async { // Alias for saveGoal for now
@@ -496,13 +822,21 @@ extension ProgressApiService on ApiService {
 
   Future<bool> deleteGoal(String goalId) async {
     await _simulateNetworkDelay();
-    final initialLength = _mockGoals.length;
-    _mockGoals.removeWhere((g) => g.id == goalId);
-    return _mockGoals.length < initialLength;
+    final initialLength = mockGoals.length;
+    mockGoals.removeWhere((g) => g.id == goalId);
+    return mockGoals.length < initialLength;
   }
 
-  void _updateGoalCurrentValues(String userId, GoalMetricType metricType, double newValue, DateTime entryDate, {String? exerciseName}) {
-    final relevantGoals = _mockGoals.where((g) =>
+  // Personal Records
+  Future<List<PersonalRecord>> getPersonalRecords(String userId) async {
+    await _simulateNetworkDelay(delay: 200);
+    return mockPersonalRecords.where((pr) => pr.userId == userId).toList();
+  }
+
+  // TODO: Add savePersonalRecord if needed in future
+
+  void updateGoalCurrentValues(String userId, GoalMetricType metricType, double newValue, DateTime entryDate, {String? exerciseName}) {
+    final relevantGoals = mockGoals.where((g) =>
         g.userId == userId && g.isActive && g.metricType == metricType &&
         (g.exerciseName == null || g.exerciseName?.toLowerCase() == exerciseName?.toLowerCase()) &&
         (g.targetDate == null || g.targetDate!.isAfter(entryDate) || g.targetDate!.isAtSameMomentAs(entryDate))
@@ -537,10 +871,5 @@ class RetryInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // ... (existing retry logic)
-  }
-
-  bool _shouldRetry(DioException error) {
-    // ... (existing shouldRetry logic)
-    return false; // Simplified
   }
 }

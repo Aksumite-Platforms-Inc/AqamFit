@@ -59,53 +59,86 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
     final TextTheme textTheme = theme.textTheme;
+    const double cardBorderRadius = 12.0; // Define for consistency
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      clipBehavior: Clip.antiAlias, // Ensures content respects card's shape
+      shape: RoundedRectangleBorder( // Ensure Card shape is defined if not default
+        borderRadius: BorderRadius.circular(cardBorderRadius),
+      ),
+      child: Stack(
+        children: [
+          // Layer 1: Background Image
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+              child: Image.asset(
+                'assets/images/streak_background.png', // Path to your image
+                fit: BoxFit.cover,
+                // Optional: Add errorBuilder for placeholder if image fails to load
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(color: Colors.grey[300], child: const Center(child: Icon(Icons.image_not_supported)));
+                },
+              ),
+            ),
+          ),
+          // Layer 2: Semi-transparent Overlay
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(cardBorderRadius),
+              child: Container(
+                color: Colors.black.withOpacity(0.4), // Adjust opacity as needed
+              ),
+            ),
+          ),
+          // Layer 3: Content
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Icon(
-                    CupertinoIcons.flame_fill,
-                    color: widget.streakCount > 0 ? colorScheme.tertiary : colorScheme.onSurfaceVariant.withOpacity(0.5),
-                    size: 24,
+                Row(
+                  children: [
+                    ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: const Icon(
+                        CupertinoIcons.flame_fill,
+                        color: Colors.orangeAccent, // Changed for better visibility
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Current Streak",
+                      style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white, // Changed for better visibility
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "${widget.streakCount} Day${widget.streakCount == 1 ? '' : 's'}",
+                  style: GoogleFonts.inter(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Changed for better visibility (or a light primary shade)
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(height: 6),
                 Text(
-                  "Current Streak",
+                  widget.streakCount > 0 ? "Keep the fire alive!" : "Log a workout to start a streak!",
                   style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: textTheme.titleLarge?.color,
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.85), // Changed for better visibility
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              "${widget.streakCount} Day${widget.streakCount == 1 ? '' : 's'}",
-              style: GoogleFonts.inter(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: widget.streakCount > 0 ? colorScheme.primary : colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              widget.streakCount > 0 ? "Keep the fire alive!" : "Log a workout to start a streak!",
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: textTheme.bodyMedium?.color?.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

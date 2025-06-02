@@ -31,6 +31,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
   // Chart time range selection
   TimeRange _selectedTimeRange = TimeRange.threeMonths;
 
+  // Heatmap state variables
+  Map<String, int> _muscleActivityData = {};
+  bool _isLoadingHeatmap = true;
+  String? _heatmapError;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +43,52 @@ class _ProgressScreenState extends State<ProgressScreen> {
     _userId = authManager.currentUser?.id;
     if (_userId != null) {
       _loadData();
+    }
+  }
+
+  Future<void> _fetchAndProcessHeatmapData() async {
+    if (_userId == null) return;
+    setState(() {
+      _isLoadingHeatmap = true;
+      _heatmapError = null;
+    });
+
+    try {
+      final now = DateTime.now();
+      final sevenDaysAgo = now.subtract(const Duration(days: 7));
+      // Fetch all logs for the user first
+      final allLogs = await ApiService().getWorkoutLogs(userId: _userId!);
+
+      // Filter logs for the last 7 days client-side
+      final recentLogs = allLogs.where((log) =>
+        log.startTime.isAfter(sevenDaysAgo) && log.startTime.isBefore(now.add(const Duration(days: 1))) // Ensure today's logs are included
+      ).toList();
+
+      Map<String, int> activityCounts = {};
+      for (var log in recentLogs) {
+        for (var loggedExercise in log.completedExercises) {
+          // Use the static method from ApiService extension
+          final exerciseDetails = ApiService.getExerciseDetailsById(loggedExercise.exerciseId);
+          if (exerciseDetails != null && exerciseDetails.muscleGroups.isNotEmpty) {
+            for (String muscleGroup in exerciseDetails.muscleGroups) {
+              activityCounts[muscleGroup] = (activityCounts[muscleGroup] ?? 0) + 1;
+            }
+          }
+        }
+      }
+      if (mounted) {
+        setState(() {
+          _muscleActivityData = activityCounts;
+          _isLoadingHeatmap = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _heatmapError = "Error processing heatmap: ${e.toString()}";
+          _isLoadingHeatmap = false;
+        });
+      }
     }
   }
 
@@ -64,6 +115,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
       _weightEntriesFuture = ApiService().getWeightEntries(_userId!, startDate: startDate, endDate: now);
       _goalsFuture = ApiService().getGoals(_userId!, isActive: true); // Load active goals
     });
+    _fetchAndProcessHeatmapData(); // Call heatmap data fetching
   }
 
   Future<void> _showLogWeightDialog({WeightEntry? entryToEdit}) async {
@@ -381,6 +433,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ),
                   const Divider(height: 30),
 
+                  // Muscle Activity Heatmap Section
+                  Text("Muscle Activity (Last 7 Days)", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 10),
+                  _buildHeatmapSection(theme), // New method to build this section
+                  const Divider(height: 30),
+
                   // Placeholder for Body Measurements Chart
                   Text("Body Measurements", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 10),
@@ -405,6 +463,19 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       icon: const Icon(CupertinoIcons.add_circled),
                       label: const Text("Log Performance"),
                       onPressed: () { /* TODO: _showLogPerformanceMetricDialog(); */ },
+                    ),
+                  ),
+                  const Divider(height: 30),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 44), // Full width, standard height
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        textStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      onPressed: () => context.go('/detailed-progress'), // Assuming this route will be created
+                      child: const Text("View Detailed Progress"),
                     ),
                   ),
                 ],
@@ -478,6 +549,155 @@ class _ProgressScreenState extends State<ProgressScreen> {
           )).toList(),
         );
       },
+    );
+  }
+
+  Widget _buildHeatmapSection(ThemeData theme) {
+    if (_isLoadingHeatmap) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_heatmapError != null) {
+      return Center(child: Text(_heatmapError!, style: TextStyle(color: theme.colorScheme.error)));
+    }
+    if (_muscleActivityData.isEmpty) {
+      return Center(child: Text("No recent muscle activity logged in the last 7 days.", style: GoogleFonts.inter(color: theme.colorScheme.onSurfaceVariant)));
+    }
+
+    // For now, just display the data. Actual heatmap rendering will be a future task.
+    // List<Widget> activityTexts = [];
+    // _muscleActivityData.forEach((muscle, count) {
+    //   activityTexts.add(Text("$muscle: $count session(s)"));
+    // });
+
+    const double imageDisplayHeight = 200.0; // Keep consistent with previous height
+    const double dotRadius = 5.0;
+
+    // Define muscle coordinates (relative 0.0-1.0 for dx, dy)
+    // These are approximate and need adjustment for your specific images.
+    const Map<String, Offset> frontMuscleCoordinates = {
+      "Chest": Offset(0.5, 0.28),
+      "Abs": Offset(0.5, 0.45),
+      "Quads": Offset(0.5, 0.65),
+      "Biceps": Offset(0.35, 0.35), // Left bicep from viewer's perspective
+      "Shoulders": Offset(0.4, 0.2), // Approx center of deltoid group
+      "Core": Offset(0.5, 0.4), // General core, could be same as Abs or separate
+      // TODO: Add more specific points if needed e.g. "Obliques", "Forearms"
+    };
+    const Map<String, Offset> backMuscleCoordinates = {
+      "Back (Lats)": Offset(0.5, 0.35),
+      "Glutes": Offset(0.5, 0.55),
+      "Hamstrings": Offset(0.5, 0.7),
+      "Triceps": Offset(0.6, 0.3),  // Right tricep from viewer's perspective
+      "Shoulders": Offset(0.5, 0.2), // Rear delts / upper back
+      "Calves": Offset(0.5, 0.85),
+      "Lower Back": Offset(0.5, 0.48),
+      // TODO: Add more e.g. "Traps"
+    };
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildMuscleImageWithDots(
+              theme: theme,
+              title: "Front",
+              imagePath: 'assets/images/muscles_front.png',
+              coordinatesMap: frontMuscleCoordinates,
+              activityData: _muscleActivityData,
+              imageHeight: imageDisplayHeight,
+              dotRadius: dotRadius,
+            ),
+            _buildMuscleImageWithDots(
+              theme: theme,
+              title: "Back",
+              imagePath: 'assets/images/muscles_back.png',
+              coordinatesMap: backMuscleCoordinates,
+              activityData: _muscleActivityData,
+              imageHeight: imageDisplayHeight,
+              dotRadius: dotRadius,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        // if (activityTexts.isNotEmpty) ...[
+        //     const Text("Processed Data (counts):", style: TextStyle(fontWeight: FontWeight.bold)),
+        //     const SizedBox(height: 5),
+        //     ...activityTexts,
+        // ] else if (!_isLoadingHeatmap) {
+        //     const Text("No specific muscle group data processed from recent logs."),
+        // ],
+        // const SizedBox(height: 10),
+        Center(child: Text("Heatmap intensity based on workout frequency.", style: theme.textTheme.bodySmall)),
+      ],
+    );
+  }
+
+  Widget _buildMuscleImageWithDots({
+    required ThemeData theme,
+    required String title,
+    required String imagePath,
+    required Map<String, Offset> coordinatesMap,
+    required Map<String, int> activityData,
+    required double imageHeight,
+    required double dotRadius,
+  }) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
+          children: [
+            Text(title, style: theme.textTheme.titleMedium),
+            const SizedBox(height: 4),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Assuming the image maintains its aspect ratio.
+                // If the image asset has a known aspect ratio, use that.
+                // For now, we use constraints.maxWidth and the fixed imageHeight.
+                // This might stretch the image if its aspect ratio is different.
+                // A better way would be to know the image's native aspect ratio.
+                final imageDisplayWidth = constraints.maxWidth;
+
+                List<Widget> stackChildren = [
+                  Image.asset(
+                    imagePath,
+                    height: imageHeight,
+                    width: imageDisplayWidth, // Let it fill the width provided by LayoutBuilder
+                    fit: BoxFit.contain, // Use contain or cover as per your image aspect ratio
+                    errorBuilder: (context, error, stackTrace) =>
+                        Center(child: Text('Error loading $title view', style: const TextStyle(fontSize: 10))),
+                  ),
+                ];
+
+                activityData.forEach((muscleGroup, count) {
+                  if (count > 0 && coordinatesMap.containsKey(muscleGroup)) {
+                    final offset = coordinatesMap[muscleGroup]!;
+                    stackChildren.add(
+                      Positioned(
+                        left: offset.dx * imageDisplayWidth - dotRadius,
+                        top: offset.dy * imageHeight - dotRadius,
+                        child: Container(
+                          width: dotRadius * 2,
+                          height: dotRadius * 2,
+                          decoration: BoxDecoration(
+                            // Intensity can be mapped from 'count'
+                            color: Colors.red.withOpacity(0.6 + (count * 0.1).clamp(0.0, 0.4)),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.redAccent.shade700, width: 1.0)
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                });
+
+                return Stack(children: stackChildren);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

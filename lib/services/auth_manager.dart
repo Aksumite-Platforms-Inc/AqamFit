@@ -39,4 +39,15 @@ class AuthManager extends ChangeNotifier {
   bool isUser() => _currentUserRole == UserRole.user;
   bool isTrainer() => _currentUserRole == UserRole.trainer;
   bool isNutritionist() => _currentUserRole == UserRole.nutritionist;
+
+  /// Updates the current user's profile, particularly after setup.
+  /// and notifies listeners.
+  Future<void> completeOnboardingSetup(User updatedUser) async {
+    // Assuming updatedUser includes hasCompletedSetup = true from the repository
+    _currentUser = updatedUser;
+    if (_currentUser != null) {
+      _currentUserRole = _currentUser!.role; // Ensure role is also updated if it could change
+    }
+    notifyListeners();
+  }
 }

@@ -12,11 +12,51 @@ enum WorkoutPlanCategory {
   // Add more as needed
 }
 
+extension WorkoutPlanCategoryExtension on WorkoutPlanCategory {
+  String get displayName {
+    switch (this) {
+      case WorkoutPlanCategory.strength:
+        return 'Strength';
+      case WorkoutPlanCategory.hypertrophy:
+        return 'Hypertrophy';
+      case WorkoutPlanCategory.endurance:
+        return 'Endurance';
+      case WorkoutPlanCategory.flexibility:
+        return 'Flexibility';
+      case WorkoutPlanCategory.functional:
+        return 'Functional';
+      case WorkoutPlanCategory.hiit:
+        return 'HIIT';
+      case WorkoutPlanCategory.custom:
+        return 'Custom';
+      default:
+        return name;
+    }
+  }
+}
+
 enum WorkoutDifficulty {
   beginner,
   intermediate,
   advanced,
   allLevels,
+}
+
+extension WorkoutDifficultyExtension on WorkoutDifficulty {
+  String get displayName {
+    switch (this) {
+      case WorkoutDifficulty.beginner:
+        return 'Beginner';
+      case WorkoutDifficulty.intermediate:
+        return 'Intermediate';
+      case WorkoutDifficulty.advanced:
+        return 'Advanced';
+      case WorkoutDifficulty.allLevels:
+        return 'All Levels';
+      default:
+        return name;
+    }
+  }
 }
 
 class WorkoutPlan {
@@ -30,6 +70,7 @@ class WorkoutPlan {
   final String authorId; // ID of the user who created it, or a system ID for predefined plans
   final DateTime createdAt;
   final DateTime updatedAt;
+  final List<String>? tags; // Optional tags for the workout plan
 
   WorkoutPlan({
     required this.id,
@@ -42,6 +83,7 @@ class WorkoutPlan {
     required this.authorId,
     DateTime? createdAt,
     DateTime? updatedAt,
+    this.tags,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -65,6 +107,7 @@ class WorkoutPlan {
       authorId: json['authorId'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
     );
   }
 
@@ -80,6 +123,7 @@ class WorkoutPlan {
       'authorId': authorId,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      if (tags != null) 'tags': tags,
     };
   }
 

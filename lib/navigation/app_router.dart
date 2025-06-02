@@ -22,6 +22,15 @@ import '../features/nutrition/presentation/screens/nutrition_screen.dart';
 import '../features/social/presentation/screens/social_screen.dart';
 import '../features/workout/presentation/screens/workout_summary_screen.dart';
 import '../features/profile/presentation/screens/settings_screen.dart'; // Import SettingsScreen
+// Setup Flow Screens
+import '../features/onboarding/presentation/setup_flow/weight_height_screen.dart';
+import '../features/onboarding/presentation/setup_flow/goals_experience_screen.dart';
+import '../features/onboarding/presentation/setup_flow/training_prefs_screen.dart';
+import '../features/onboarding/presentation/setup_flow/additional_info_screen.dart';
+// Explore Screens
+import '../features/explore/presentation/screens/browse_workouts_screen.dart';
+// Progress Screens
+import '../features/progress/presentation/screens/detailed_progress_screen.dart';
 
 // Example of a simple "Not Authorized" screen
 class NotAuthorizedScreen extends StatelessWidget {
@@ -53,35 +62,56 @@ final GoRouter router = GoRouter(
   refreshListenable: AuthManager(), // Re-evaluate routes when AuthManager notifies listeners
   redirect: (BuildContext context, GoRouterState state) async {
     final authManager = AuthManager();
-    final bool isLoggedIn = authManager.isLoggedIn; // Or await ApiService().isAuthenticated();
+    final bool isLoggedIn = authManager.isLoggedIn;
+    final User? currentUser = authManager.currentUser;
 
     final String location = state.uri.toString();
     final bool isSplash = location == '/splash';
     final bool isOnboarding = location == '/onboarding';
     final bool isLoggingIn = location == '/login';
     final bool isRegistering = location == '/register';
+    final bool isNavigatingToSetupFlow = location.startsWith('/setup/');
 
-    // If on splash, let it build. Splash screen will navigate away.
+    // 1. If on splash, let it build. Splash screen will navigate away.
     if (isSplash) {
       return null;
     }
 
-    // If logged in and trying to access auth/onboarding pages, redirect to main
-    if (isLoggedIn && (isOnboarding || isLoggingIn || isRegistering)) {
-      return '/main';
+    // 2. Handle redirection for logged-in users
+    if (isLoggedIn) {
+      // 2a. User has NOT completed setup
+      if (currentUser != null && currentUser.hasCompletedSetup != true) {
+        // If trying to access auth/onboarding pages OR any other page that is NOT setup flow, redirect to setup
+        if (isOnboarding || isLoggingIn || isRegistering) {
+          return '/setup/weight-height'; // From auth pages, go to setup
+        }
+        if (!isNavigatingToSetupFlow) {
+          return '/setup/weight-height'; // From any other page, go to setup
+        }
+      }
+      // 2b. User HAS completed setup
+      else if (currentUser != null && currentUser.hasCompletedSetup == true) {
+        // If trying to access auth/onboarding pages or setup flow, redirect to main
+        if (isOnboarding || isLoggingIn || isRegistering || isNavigatingToSetupFlow) {
+          return '/main';
+        }
+      }
+    }
+    // 3. Handle redirection for logged-out users
+    else {
+      // If not logged in and trying to access a protected route (anything not auth/onboarding/splash)
+      if (!isLoggingIn && !isRegistering && !isOnboarding) {
+        return '/login'; // Or '/onboarding' if you want to force onboarding for new sessions
+      }
     }
 
-    // If not logged in and trying to access a protected route (anything not auth/onboarding)
-    if (!isLoggedIn && !isLoggingIn && !isRegistering && !isOnboarding) {
-      return '/login'; // Or '/onboarding' if you want to force onboarding for new sessions
-    }
-
-    // Role-based redirection example for a hypothetical '/admin' route
+    // 4. Role-based redirection example (can be placed here or after other general checks)
     if (location == '/admin' && isLoggedIn && !authManager.hasRole(UserRole.trainer)) { // Assuming trainer is admin
         return '/not-authorized';
     }
 
-    return null; // No redirection needed
+    // 5. No redirection needed
+    return null;
   },
   routes: [
     GoRoute(
@@ -207,9 +237,56 @@ final GoRouter router = GoRouter(
       path: '/log-meal-quick', // For logging a meal with today's date
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
-        // LogMealScreen needs a date. We pass today's date.
-        // Optional: could also pass a specific MealType via `extra` if quick actions were more specific.
-        child: LogMealScreen(date: DateTime.now()),
+        child: Builder(builder: (context) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final imagePath = extra?['imagePath'] as String?;
+          // Ensure date is still handled, default to DateTime.now() if not provided in extra
+          final date = extra?['date'] as DateTime? ?? DateTime.now();
+          return LogMealScreen(date: date, imagePath: imagePath);
+        }),
+      ),
+    ),
+    // Setup Flow Routes
+    GoRoute(
+      path: '/setup/weight-height',
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const WeightHeightScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/setup/goals-experience',
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const GoalsExperienceScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/setup/training-prefs',
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const TrainingPrefsScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/setup/additional-info',
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const AdditionalInfoScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/browse-workouts',
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const BrowseWorkoutsScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/detailed-progress',
+      pageBuilder: (context, state) => const CupertinoPage(
+        key: ValueKey('detailed_progress'),
+        child: DetailedProgressScreen(),
       ),
     ),
   ],

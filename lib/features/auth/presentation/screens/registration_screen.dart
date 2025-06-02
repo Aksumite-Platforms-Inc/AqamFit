@@ -36,10 +36,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       );
 
       if (mounted) {
-        Provider.of<AuthManager>(context, listen: false).setUser(authResponse.user);
-        Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
-        context.go('/main');
+        final user = authResponse.user;
+        Provider.of<AuthManager>(context, listen: false).setUser(user);
+        Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true); // This seems to be for general app onboarding, not profile setup
+
+        if (user.hasCompletedSetup == true) {
+          context.go('/main');
+        } else {
+          // User is new or hasn't completed setup, navigate to setup flow
+          context.go('/setup/weight-height');
+        }
       } else {
+        // This case might be rare if mounted is false, but good to have a fallback.
+        // If not mounted, can't use context.go. Error message is for the current screen if it were to rebuild.
         setState(() {
           _errorMessage = "Registration failed. Please try again.";
         });
