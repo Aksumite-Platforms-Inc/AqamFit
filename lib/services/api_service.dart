@@ -6,6 +6,7 @@ import '../models/user.dart';
 
 // Models used by various ApiService extensions (centralized imports)
 import 'package:aksumfit/models/workout_plan.dart';
+import 'package:aksumfit/models/workout_plan_exercise.dart';
 import 'package:aksumfit/models/workout_log.dart';
 import 'package:aksumfit/features/nutrition/data/mock_food_database.dart';
 import 'package:aksumfit/models/daily_meal_log.dart';
@@ -26,7 +27,6 @@ class ApiService {
   ApiService._internal();
 
   late final Dio _dio;
-  late final FlutterSecureStorage _secureStorage;
 
   // API Configuration
   static const String _baseUrl = 'https://api.axumfit.com/v1';
@@ -351,10 +351,10 @@ final List<WorkoutPlan> _mockWorkoutPlans = [
     estimatedDurationMinutes: 45,
     authorId: "system_generated_trainer_1",
     exercises: [
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Squats", sets: "3", reps: "8-12", restBetweenSetsSeconds: 60),
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", name: "Push-ups", sets: "3", reps: "As many as possible", restBetweenSetsSeconds: 60),
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", name: "Rows (Dumbbell or Machine)", sets: "3", reps: "10-15", restBetweenSetsSeconds: 60),
-      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", name: "Plank", sets: "3", reps: "Hold for 30-60s", restBetweenSetsSeconds: 45),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 3, reps: "8-12", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex002", order: 1, sets: 3, reps: "As many as possible", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex003", order: 2, sets: 3, reps: "10-15", restBetweenSetsSeconds: 60),
+      WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex004", order: 3, sets: 3, reps: "Hold for 30-60s", restBetweenSetsSeconds: 45),
     ],
     createdAt: DateTime.now().subtract(const Duration(days: 30)),
     updatedAt: DateTime.now().subtract(const Duration(days: 10)),
@@ -369,16 +369,14 @@ final List<WorkoutPlan> _mockWorkoutPlans = [
     estimatedDurationMinutes: 60,
     authorId: "system_generated_trainer_2",
     exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", name: "Barbell Squats", sets: "4", reps: "8-10", restBetweenSetsSeconds: 90),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", name: "Leg Press", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", name: "Romanian Deadlifts (RDLs)", sets: "3", reps: "10-12", restBetweenSetsSeconds: 75),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", name: "Leg Extensions", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", name: "Hamstring Curls", sets: "3", reps: "12-15", restBetweenSetsSeconds: 60),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", name: "Calf Raises", sets: "4", reps: "15-20", restBetweenSetsSeconds: 45),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex001", order: 0, sets: 4, reps: "8-10", restBetweenSetsSeconds: 90),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex005", order: 1, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex006", order: 2, sets: 3, reps: "10-12", restBetweenSetsSeconds: 75),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex007", order: 3, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex008", order: 4, sets: 3, reps: "12-15", restBetweenSetsSeconds: 60),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "ex009", order: 5, sets: 4, reps: "15-20", restBetweenSetsSeconds: 45),
     ],
-    createdAt: DateTime.now().subtract(const Duration(days: 25)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-    tags: ["legs", "hypertrophy", "volume"],
+    // tags: ["legs", "hypertrophy", "volume"], // Remove, not supported in WorkoutPlan
   ),
   WorkoutPlan(
     id: _uuid.v4(),
@@ -389,35 +387,31 @@ final List<WorkoutPlan> _mockWorkoutPlans = [
     estimatedDurationMinutes: 30,
     authorId: "system_generated_yogi_1",
     exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", name: "Sun Salutation A", sets: "5", reps: "rounds", notes: "Flow through 5 rounds"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", name: "Downward-Facing Dog", sets: "1", reps: "Hold for 5 breaths"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", name: "Warrior II (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", name: "Triangle Pose (Right & Left)", sets: "1", reps: "Hold each side for 5 breaths"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", name: "Child's Pose", sets: "1", reps: "Hold for 5-10 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg001", order: 0, sets: 5, reps: "rounds", notes: "Flow through 5 rounds"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg002", order: 1, sets: 1, reps: "Hold for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg003", order: 2, sets: 1, reps: "Hold each side for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg004", order: 3, sets: 1, reps: "Hold each side for 5 breaths"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "yg005", order: 4, sets: 1, reps: "Hold for 5-10 breaths"),
     ],
-    createdAt: DateTime.now().subtract(const Duration(days: 15)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-    tags: ["yoga", "flexibility", "morning routine", "mindfulness"],
+    // tags: ["yoga", "flexibility", "morning routine", "mindfulness"], // Remove, not supported in WorkoutPlan
   ),
   WorkoutPlan(
     id: _uuid.v4(),
     name: "HIIT Cardio Challenge",
     description: "High-Intensity Interval Training to boost your cardiovascular fitness and burn calories.",
-    category: WorkoutPlanCategory.cardio,
+    category: WorkoutPlanCategory.hiit, // Use 'hiit' as closest available, or add 'cardio' to enum if needed
     difficulty: WorkoutDifficulty.intermediate,
     estimatedDurationMinutes: 25,
     authorId: "system_generated_trainer_1",
     exercises: [
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", name: "Jumping Jacks", sets: "1", reps: "60s work, 30s rest", notes: "Warm-up"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", name: "High Knees", sets: "4", reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", name: "Burpees", sets: "4", reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", name: "Mountain Climbers", sets: "4", reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", name: "Sprint in Place", sets: "4", reps: "30s work, 15s rest"),
-        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", name: "Cool Down Jog/Walk", sets: "1", reps: "3-5 minutes"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit001", order: 0, sets: 1, reps: "60s work, 30s rest", notes: "Warm-up"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit002", order: 1, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit003", order: 2, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit004", order: 3, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit005", order: 4, sets: 4, reps: "30s work, 15s rest"),
+        WorkoutPlanExercise(id: _uuid.v4(), exerciseId: "hiit006", order: 5, sets: 1, reps: "3-5 minutes"),
     ],
-    createdAt: DateTime.now().subtract(const Duration(days: 40)),
-    updatedAt: DateTime.now().subtract(const Duration(days: 3)),
-    tags: ["hiit", "cardio", "fat burning", "quick workout"],
+    // tags: ["hiit", "cardio", "fat burning", "quick workout"], // Remove, not supported in WorkoutPlan
   ),
 ];
 extension WorkoutApiService on ApiService {
@@ -615,10 +609,5 @@ class RetryInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // ... (existing retry logic)
-  }
-
-  bool _shouldRetry(DioException error) {
-    // ... (existing shouldRetry logic)
-    return false; // Simplified
   }
 }

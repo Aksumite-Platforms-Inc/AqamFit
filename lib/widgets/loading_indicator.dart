@@ -5,8 +5,8 @@ class LoadingIndicatorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
+    return Scaffold(
+      body: const Center(
         child: Image.asset('assets/images/logo.png'), // Assuming logo.png is in assets/images/
       ),
     );
