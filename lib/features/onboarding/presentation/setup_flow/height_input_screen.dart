@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'setup_flow_viewmodel.dart';
 import 'dart:math'; // For pow in DoublePrecision
 
@@ -26,7 +25,7 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double cmToFeetFactor = 1 / 30.48;
-  int _initialHeightCm = 170;
+  final int _initialHeightCm = 170;
   // double _initialHeightFeet = 5.57; // Not directly used for init, derived from cm.
 
   double _currentDisplayHeight = 170.0; // Local display value
@@ -106,7 +105,7 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(

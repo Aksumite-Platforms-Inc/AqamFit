@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'setup_flow_viewmodel.dart';
 import 'dart:math'; // For pow in DoublePrecision
 
@@ -26,7 +25,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double kgToLbsFactor = 2.20462;
-  double _initialWeightKg = 70.0;
+  final double _initialWeightKg = 70.0;
   // double _initialWeightLbs = 154.0; // Not directly used for initialization in this screen's logic
 
   double _currentDisplayWeight = 70.0; // Local display value
@@ -104,7 +103,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
