@@ -10,29 +10,36 @@ class FitnessGoalScreen extends StatefulWidget {
   State<FitnessGoalScreen> createState() => _FitnessGoalScreenState();
 }
 
+// Simple class to hold goal title and icon
+class _FitnessGoalItem {
+  final String title;
+  final IconData icon;
+
+  _FitnessGoalItem({required this.title, required this.icon});
+}
+
 class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
-  final List<String> _fitnessGoals = [
-    "Lose Weight",
-    "Build Muscle",
-    "Maintenance",
-    "Improve Endurance",
-    "Overall Health",
+  final List<_FitnessGoalItem> _fitnessGoalItems = [
+    _FitnessGoalItem(title: "Lose Weight", icon: Icons.local_fire_department_outlined),
+    _FitnessGoalItem(title: "Build Muscle", icon: Icons.fitness_center_outlined),
+    _FitnessGoalItem(title: "Maintenance", icon: Icons.check_circle_outline),
+    _FitnessGoalItem(title: "Improve Endurance", icon: Icons.directions_run_outlined),
+    _FitnessGoalItem(title: "Overall Health", icon: Icons.favorite_border_outlined),
   ];
-  String? _selectedGoal;
+  String? _selectedGoalTitle; // Store the title of the selected goal
 
   @override
   void initState() {
     super.initState();
-    // Initialize _selectedGoal from ViewModel if already set
-    _selectedGoal = context.read<SetupFlowViewModel>().fitnessGoal;
+    // Initialize _selectedGoalTitle from ViewModel if already set
+    _selectedGoalTitle = context.read<SetupFlowViewModel>().fitnessGoal;
   }
 
   void _onNext() {
-    if (_selectedGoal != null) {
-      context.read<SetupFlowViewModel>().updateFitnessGoal(_selectedGoal);
+    if (_selectedGoalTitle != null) {
+      context.read<SetupFlowViewModel>().updateFitnessGoal(_selectedGoalTitle);
       context.go('/setup/experience-level');
     } else {
-      // Optionally show a snackbar or alert if no goal is selected
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a fitness goal.')),
       );
@@ -41,9 +48,9 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
 
   void _onBack() {
     // Save current selection before going back, in case user returns
-    context.read<SetupFlowViewModel>().updateFitnessGoal(_selectedGoal);
-    if (Navigator.canPop(context)) {
-      context.pop();
+    context.read<SetupFlowViewModel>().updateFitnessGoal(_selectedGoalTitle);
+    if (GoRouter.of(context).canPop()) {
+      GoRouter.of(context).pop();
     } else {
       // Fallback if direct navigation or deep link
       context.go('/setup/weight-height');
@@ -53,7 +60,9 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    _selectedGoal = context.watch<SetupFlowViewModel>().fitnessGoal; // Keep selection in sync
+    // Keep selection in sync with ViewModel, especially if it can change from elsewhere
+    // or to ensure correct state on rebuild after pop.
+    _selectedGoalTitle = context.watch<SetupFlowViewModel>().fitnessGoal;
 
     return Scaffold(
       appBar: AppBar(
@@ -66,6 +75,7 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0), // Consistent padding
+        padding: const EdgeInsets.all(20.0), // Consistent padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -77,10 +87,10 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
             const SizedBox(height: 24),
             Expanded(
               child: ListView.builder(
-                itemCount: _fitnessGoals.length,
+                itemCount: _fitnessGoalItems.length,
                 itemBuilder: (context, index) {
-                  final goal = _fitnessGoals[index];
-                  final isSelected = goal == _selectedGoal;
+                  final goalItem = _fitnessGoalItems[index];
+                  final isSelected = goalItem.title == _selectedGoalTitle;
                   return Card(
                     elevation: isSelected ? 8.0 : 2.0,
                     shape: RoundedRectangleBorder(
@@ -94,23 +104,31 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
                     child: InkWell(
                       onTap: () {
                         setState(() {
-                          _selectedGoal = goal;
+                          _selectedGoalTitle = goalItem.title;
                         });
-                        // Update ViewModel immediately on tap as well
-                        context.read<SetupFlowViewModel>().updateFitnessGoal(goal);
+                        context.read<SetupFlowViewModel>().updateFitnessGoal(goalItem.title);
                       },
                       borderRadius: BorderRadius.circular(12.0),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-                        child: Center(
-                          child: Text(
-                            goal,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                        child: Column( // Use Column for Icon and Text
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              goalItem.icon,
+                              size: 40, // Adjust size as needed
+                              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
+                            const SizedBox(height: 12), // Spacing between icon and text
+                            Text(
+                              goalItem.title,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -44,8 +44,8 @@ class _ExperienceLevelScreenState extends State<ExperienceLevelScreen> {
 
   void _onBack() {
     context.read<SetupFlowViewModel>().updateExperienceLevel(_selectedLevelName);
-    if (Navigator.canPop(context)) {
-      context.pop();
+    if (GoRouter.of(context).canPop()) {
+      GoRouter.of(context).pop();
     } else {
       // Fallback, should go to fitness goal screen
       context.go('/setup/fitness-goal');

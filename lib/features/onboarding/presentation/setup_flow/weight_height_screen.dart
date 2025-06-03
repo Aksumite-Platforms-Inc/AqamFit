@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'setup_flow_viewmodel.dart'; // Adjusted path assuming it's in the same directory
+import 'package:numberpicker/numberpicker.dart'; // Added import
+import 'setup_flow_viewmodel.dart';
 
 class WeightHeightScreen extends StatefulWidget {
   const WeightHeightScreen({super.key});
@@ -12,230 +13,247 @@ class WeightHeightScreen extends StatefulWidget {
 }
 
 class _WeightHeightScreenState extends State<WeightHeightScreen> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _weightController;
-  late TextEditingController _heightController;
+  // No longer using FormKey or TextEditingControllers for pickers
+  // final _formKey = GlobalKey<FormState>();
   late SetupFlowViewModel _viewModel;
+
+  // Conversion factors
+  static const double kgToLbsFactor = 2.20462;
+  static const double cmToFeetFactor = 1 / 30.48; // 1 foot = 30.48 cm
+
+  // Default initial values for pickers if ViewModel is null
+  // These should be in the selected unit.
+  double _initialWeightKg = 70.0;
+  double _initialWeightLbs = 154.0;
+  int _initialHeightCm = 170;
+  double _initialHeightFeet = 5.5; // Approx 168cm
+
+  // Local display values for pickers, derived from ViewModel's base values
+  double _currentDisplayWeight = 70.0;
+  double _currentDisplayHeight = 170.0;
+
 
   @override
   void initState() {
     super.initState();
     _viewModel = context.read<SetupFlowViewModel>();
 
-    _weightController = TextEditingController(
-        text: _viewModel.weight?.toString() ?? '');
-    _heightController = TextEditingController(
-        text: _viewModel.height?.toString() ?? '');
-
-    _weightController.addListener(() {
-      final weight = double.tryParse(_weightController.text);
-      // Check if the value is different to avoid unnecessary updates and potential loops
-      if (weight != _viewModel.weight) {
-        _viewModel.updateWeight(weight);
-      }
-    });
-
-    _heightController.addListener(() {
-      final height = double.tryParse(_heightController.text);
-      // Check if the value is different
-      if (height != _viewModel.height) {
-        _viewModel.updateHeight(height);
-      }
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // If viewmodel values change from outside, update controllers.
-    // This is less common if this screen is the source of truth during its active time.
-    // However, good for scenarios like pre-filling data or if viewModel could be updated by other means.
-    // Check if controller text differs from viewmodel to prevent cursor jumps.
-    final viewModelWeight = _viewModel.weight?.toString() ?? '';
-    if (_weightController.text != viewModelWeight) {
-      _weightController.text = viewModelWeight;
+    // Initialize ViewModel with base unit defaults if null
+    if (_viewModel.weight == null) {
+      _viewModel.updateWeight(_initialWeightKg); // Store in kg
     }
-    final viewModelHeight = _viewModel.height?.toString() ?? '';
-    if (_heightController.text != viewModelHeight) {
-      _heightController.text = viewModelHeight;
+    if (_viewModel.height == null) {
+       _viewModel.updateHeight(_initialHeightCm.toDouble()); // Store in cm
     }
   }
 
+  // No need for didChangeDependencies to sync controllers anymore
 
   @override
   void dispose() {
-    _weightController.dispose();
-    _heightController.dispose();
+    // No controllers to dispose
     super.dispose();
   }
 
   void _onNext() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save(); // Good practice if using Form's onSaved
-
-      // Values should already be in ViewModel due to listeners
-      // But explicit update here ensures latest controller values are set if listeners somehow didn't fire
-      _viewModel.updateWeight(double.tryParse(_weightController.text));
-      _viewModel.updateHeight(double.tryParse(_heightController.text));
-
-      // Log current ViewModel state before navigating
-      print('ViewModel state before navigating:');
-      print('Weight: ${_viewModel.weight}, Unit: ${_viewModel.weightUnit}');
-      print('Height: ${_viewModel.height}, Unit: ${_viewModel.heightUnit}');
-
-      context.go('/setup/fitness-goal'); // Updated navigation
+    // No form validation needed for pickers as they constrain values.
+    // Values are updated in ViewModel directly via onChanged.
+    // We might want to ensure values are not null if that's a requirement,
+    // but pickers usually have a default/current value.
+    if (_viewModel.weight == null || _viewModel.height == null) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please ensure weight and height are selected.')),
+      );
+      return;
     }
+
+    // Log current ViewModel state before navigating
+    print('ViewModel state before navigating:');
+      print('Weight: ${_viewModel.weight} ${_viewModel.weightUnit}');
+      print('Height: ${_viewModel.height} ${_viewModel.heightUnit}');
+
+      context.go('/setup/fitness-goal');
+    // } // Removed form validation
   }
 
   @override
   Widget build(BuildContext context) {
-    // Use Consumer to rebuild parts of the UI if the ViewModel changes from elsewhere
-    // or if we want to directly react to viewModel changes in the build method.
-    // For this screen, we primarily update the ViewModel, so direct use of _viewModel is often fine.
-    // However, for the SegmentedControl, consuming is good.
-    final currentWeightUnit = context.watch<SetupFlowViewModel>().weightUnit;
-    final currentHeightUnit = context.watch<SetupFlowViewModel>().heightUnit;
+    _viewModel = context.watch<SetupFlowViewModel>(); // Ensure we watch for rebuilds
+    final theme = Theme.of(context);
+
+    // --- Weight Picker Configuration ---
+    double minDisplayWeight, maxDisplayWeight;
+    int displayWeightDecimalPlaces = 1;
+    _currentDisplayWeight = _viewModel.weight ?? _initialWeightKg; // Base value from VM (kg)
+
+    if (_viewModel.weightUnit == 'kg') {
+      minDisplayWeight = 30.0; maxDisplayWeight = 200.0;
+      // _currentDisplayWeight is already in kg
+    } else { // lbs
+      minDisplayWeight = (30.0 * kgToLbsFactor).roundToDouble(); // e.g. 66 lbs
+      maxDisplayWeight = (200.0 * kgToLbsFactor).roundToDouble(); // e.g. 440 lbs
+      _currentDisplayWeight = _currentDisplayWeight * kgToLbsFactor; // Convert base kg to lbs for display
+    }
+    // Clamp display value to its min/max for the current unit
+    _currentDisplayWeight = _currentDisplayWeight.clamp(minDisplayWeight, maxDisplayWeight);
+
+
+    // --- Height Picker Configuration ---
+    double minDisplayHeight, maxDisplayHeight;
+    int displayHeightDecimalPlaces;
+    _currentDisplayHeight = _viewModel.height ?? _initialHeightCm.toDouble(); // Base value from VM (cm)
+
+    if (_viewModel.heightUnit == 'cm') {
+      minDisplayHeight = 100.0; maxDisplayHeight = 250.0;
+      displayHeightDecimalPlaces = 0;
+      // _currentDisplayHeight is already in cm
+    } else { // ft
+      minDisplayHeight = (100.0 * cmToFeetFactor).toPrecision(1); // e.g. 3.3 ft
+      maxDisplayHeight = (250.0 * cmToFeetFactor).toPrecision(1); // e.g. 8.2 ft
+      displayHeightDecimalPlaces = 1;
+      _currentDisplayHeight = _currentDisplayHeight * cmToFeetFactor; // Convert base cm to ft for display
+    }
+    // Clamp display value
+    _currentDisplayHeight = _currentDisplayHeight.toPrecision(displayHeightDecimalPlaces).clamp(minDisplayHeight, maxDisplayHeight);
 
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Stats'),
-        centerTitle: true, // Center AppBar title
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Potentially show a confirmation dialog if data has been entered
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
+            if (GoRouter.of(context).canPop()) {
+              GoRouter.of(context).pop();
             } else {
-              // If cannot pop (e.g. this is the first screen in a nested navigator or deep link)
-              // decide where to go, e.g. back to home or login
-              context.go('/main'); // Example: go to main if it's a root of a flow
+              context.go('/main');
             }
           },
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Consistent padding
-        child: Form(
-          key: _formKey,
-          child: ListView( // Changed to ListView to prevent overflow with keyboard
-            children: <Widget>[
-              const SizedBox(height: 16), // Add some space at the top
-              Center(
-                child: Text(
-                  'Enter Your Weight',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+        padding: const EdgeInsets.all(20.0),
+        // Removed Form widget as TextFormFields are gone
+        child: ListView(
+          children: <Widget>[
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                'Select Your Weight', // Updated title
+                style: theme.textTheme.titleLarge,
               ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _weightController,
-                      textAlign: TextAlign.center, // Center the input text
-                decoration: InputDecoration(
-                  labelText: 'Weight (${_viewModel.weightUnit})', // Display current unit
-                  hintText: 'Enter your weight',
-                  hintStyle: TextStyle(), // Removed textAlign from TextStyle
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Increased padding
-                ),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your weight';
-                        }
-                        if (double.tryParse(value) == null) {
-                          return 'Please enter a valid number';
-                        }
-                        if (double.parse(value) <= 0) {
-                          return 'Weight must be positive';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    CupertinoSlidingSegmentedControl<String>(
-                      groupValue: currentWeightUnit,
-                      children: const {
-                        'kg': Text('kg'),
-                        'lbs': Text('lbs'),
-                      },
-                      onValueChanged: (value) {
-                        if (value != null) {
-                          _viewModel.setWeightUnit(value);
-                        }
-                      },
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12.0),
               ),
-              const SizedBox(height: 24), // Adjusted spacing
-              Center(
-                child: Text(
-                  'Enter Your Height',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+              child: Column(
+                children: [
+                  Text('Weight (${_viewModel.weightUnit})', style: theme.textTheme.labelLarge),
+                  const SizedBox(height: 8),
+                  DecimalNumberPicker(
+                    minValue: minDisplayWeight, // double
+                    maxValue: maxDisplayWeight, // double
+                    value: _currentDisplayWeight,
+                    decimalPlaces: displayWeightDecimalPlaces,
+                    onChanged: (value) {
+                      double valueToStore = value;
+                      if (_viewModel.weightUnit == 'lbs') {
+                        valueToStore = value / kgToLbsFactor; // Convert lbs to kg for storage
+                      }
+                      _viewModel.updateWeight(valueToStore.toPrecision(1)); // Store with 1 decimal precision
+                    },
+                    itemHeight: 40,
+                    selectedTextStyle: TextStyle(fontSize: 20, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  CupertinoSlidingSegmentedControl<String>(
+                    groupValue: _viewModel.weightUnit,
+                    children: const {
+                      'kg': Text('kg'),
+                      'lbs': Text('lbs'),
+                    },
+                    onValueChanged: (value) {
+                      if (value != null) {
+                        _viewModel.setWeightUnit(value);
+                        // No need to convert stored value here, build() will re-calculate displayValue
+                      }
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _heightController,
-                      textAlign: TextAlign.center, // Center the input text
-                decoration: InputDecoration(
-                  labelText: 'Height (${_viewModel.heightUnit})', // Display current unit
-                  hintText: 'Enter your height',
-                  hintStyle: TextStyle(), // Removed textAlign from TextStyle
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Increased padding
-                ),
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your height';
-                        }
-                        if (double.tryParse(value) == null) {
-                          return 'Please enter a valid number';
-                        }
-                         if (double.parse(value) <= 0) {
-                          return 'Height must be positive';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    CupertinoSlidingSegmentedControl<String>(
-                      groupValue: currentHeightUnit,
-                      children: const {
-                        'cm': Text('cm'),
-                        'ft': Text('ft/in'), // Representing feet/inches
-                      },
-                      onValueChanged: (value) {
-                         if (value != null) {
-                          _viewModel.setHeightUnit(value);
-                        }
-                      },
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 24),
+            Center(
+              child: Text(
+                'Select Your Height', // Updated title
+                style: theme.textTheme.titleLarge,
               ),
-              const SizedBox(height: 32), // Adjusted spacing before button
-              ElevatedButton(
-                onPressed: _onNext,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              child: Column(
+                children: [
+                   Text('Height (${_viewModel.heightUnit})', style: theme.textTheme.labelLarge),
+                   const SizedBox(height: 8),
+                  _viewModel.heightUnit == 'cm'
+                  ? NumberPicker(
+                      minValue: minDisplayHeight.floor(),
+                      maxValue: maxDisplayHeight.ceil(),
+                      value: _currentDisplayHeight.round(),
+                      onChanged: (value) {
+                        // Value from NumberPicker is int, store as double in cm
+                        _viewModel.updateHeight(value.toDouble());
+                      },
+                      itemHeight: 40,
+                      selectedTextStyle: TextStyle(fontSize: 20, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                    )
+                  : DecimalNumberPicker(
+                      minValue: minDisplayHeight, // double
+                      maxValue: maxDisplayHeight, // double
+                      value: _currentDisplayHeight,
+                      decimalPlaces: displayHeightDecimalPlaces,
+                      onChanged: (value) {
+                        double valueToStore = value;
+                        if (_viewModel.heightUnit == 'ft') {
+                           valueToStore = value / cmToFeetFactor; // Convert ft to cm for storage
+                        }
+                        // For cm, NumberPicker returns int, but updateHeight expects double.
+                        // The previous NumberPicker for cm already called value.toDouble()
+                        _viewModel.updateHeight(valueToStore.toPrecision(1));
+                      },
+                      itemHeight: 40,
+                      selectedTextStyle: TextStyle(fontSize: 20, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                    ),
+                  const SizedBox(height: 16),
+                  CupertinoSlidingSegmentedControl<String>(
+                    groupValue: _viewModel.heightUnit,
+                    children: const {
+                      'cm': Text('cm'),
+                      'ft': Text('ft'), // Changed from 'ft/in' to 'ft'
+                    },
+                    onValueChanged: (value) {
+                      if (value != null) {
+                         _viewModel.setHeightUnit(value);
+                        // No need to convert stored value here, build() will re-calculate displayValue
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _onNext,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

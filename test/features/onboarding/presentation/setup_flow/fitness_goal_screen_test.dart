@@ -22,8 +22,8 @@ void main() {
 
     // Default stubs for ViewModel
     when(mockSetupFlowViewModel.fitnessGoal).thenReturn(null);
-    when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn([]);
-
+    // Ensure other properties accessed by any screen are given default values if necessary
+    // For FitnessGoalScreen, only fitnessGoal is directly relevant from the ViewModel for its primary function.
 
     // Default stub for go_router's canPop
     when(mockGoRouter.canPop()).thenReturn(true);
@@ -61,58 +61,81 @@ void main() {
   testWidgets('renders fitness goal cards', (WidgetTester tester) async {
     await pumpFitnessGoalScreen(tester);
 
-    for (final goal in fitnessGoals) {
-      expect(find.text(goal), findsOneWidget);
+    for (final goalTitle in fitnessGoals) {
+      expect(find.text(goalTitle), findsOneWidget);
+      // Also check for an icon within the card containing this text.
+      // This assumes a Column structure: Card -> InkWell -> Padding -> Column -> [Icon, SizedBox, Text]
+      final cardFinder = find.ancestor(of: find.text(goalTitle), matching: find.byType(Card));
+      expect(find.descendant(of: cardFinder, matching: find.byType(Icon)), findsOneWidget);
     }
     expect(find.widgetWithText(ElevatedButton, 'Next'), findsOneWidget);
   });
 
-  testWidgets('selecting a goal updates its appearance and ViewModel', (WidgetTester tester) async {
+  testWidgets('selecting a goal updates its appearance (text, icon color) and ViewModel', (WidgetTester tester) async {
     await pumpFitnessGoalScreen(tester);
 
-    final targetGoal = fitnessGoals[1]; // "Build Muscle"
+    final targetGoalTitle = fitnessGoals[1]; // "Build Muscle"
 
-    // Stub the getter to reflect the change for UI update
-    // This simulates that after `updateFitnessGoal` is called and `notifyListeners` fires,
-    // the getter for `fitnessGoal` will return the new value.
-    when(mockSetupFlowViewModel.fitnessGoal).thenAnswer((_) => targetGoal);
+    // Before selection
+    Text unselectedTextWidget = tester.widget<Text>(find.text(targetGoalTitle));
+    expect(unselectedTextWidget.style?.fontWeight, FontWeight.normal);
 
-    await tester.tap(find.text(targetGoal));
-    await tester.pumpAndSettle(); // For UI changes (elevation, border)
+    final cardFinderUnselected = find.ancestor(of: find.text(targetGoalTitle), matching: find.byType(Card));
+    Icon unselectedIconWidget = tester.widget<Icon>(find.descendant(of: cardFinderUnselected, matching: find.byType(Icon)));
+    // Assuming default icon color is onSurfaceVariant based on screen code
+    expect(unselectedIconWidget.color, Theme.of(tester.element(cardFinderUnselected)).colorScheme.onSurfaceVariant);
 
-    verify(mockSetupFlowViewModel.updateFitnessGoal(targetGoal)).called(2); // Once in initState (null), once on tap. Or just 1 if initState doesn't call.
-                                                                        // The screen's initState reads, but doesn't call update.
-                                                                        // The screen's build method reads via watch.
-                                                                        // The tap calls setState and then read.updateFitnessGoal.
-                                                                        // So, 1 direct call from tap, then the watch updates.
-                                                                        // Let's refine: updateFitnessGoal is called on tap.
 
-    // To verify appearance change, we'd need to inspect Card properties.
-    // This is harder without specific keys or more detailed finder.
-    // For now, trust that selection calls the ViewModel.
-    // A simple check: the selected card might have a different text style (e.g. bold).
-    // The FitnessGoalScreen uses `fontWeight: isSelected ? FontWeight.bold : FontWeight.normal`
-    final textFinder = find.text(targetGoal);
-    final textWidget = tester.widget<Text>(textFinder);
-    expect(textWidget.style?.fontWeight, FontWeight.bold);
+    // Simulate ViewModel update for UI check
+    when(mockSetupFlowViewModel.fitnessGoal).thenReturn(targetGoalTitle);
 
-    // Verify other goals are not bold (if they were boldable)
-     final unselectedGoal = fitnessGoals[0];
-     final unselectedTextWidget = tester.widget<Text>(find.text(unselectedGoal));
-     expect(unselectedTextWidget.style?.fontWeight, FontWeight.normal);
+    await tester.tap(find.text(targetGoalTitle));
+    // The screen uses setState for _selectedGoalTitle, then calls viewmodel.
+    // The watch on viewModel.fitnessGoal will then rebuild with the updated value from viewmodel.
+    await tester.pumpAndSettle();
+
+    verify(mockSetupFlowViewModel.updateFitnessGoal(targetGoalTitle)).called(1);
+
+    // After selection
+    final Text selectedTextWidget = tester.widget<Text>(find.text(targetGoalTitle));
+    expect(selectedTextWidget.style?.fontWeight, FontWeight.bold);
+    expect(selectedTextWidget.style?.color, Theme.of(tester.element(find.text(targetGoalTitle))).colorScheme.primary);
+
+    final cardFinderSelected = find.ancestor(of: find.text(targetGoalTitle), matching: find.byType(Card));
+    final Icon selectedIconWidget = tester.widget<Icon>(find.descendant(of: cardFinderSelected, matching: find.byType(Icon)));
+    expect(selectedIconWidget.color, Theme.of(tester.element(cardFinderSelected)).colorScheme.primary);
+
+    // Verify another goal is not selected
+    final unselectedGoalTitle = fitnessGoals[0];
+    final Text stillUnselectedTextWidget = tester.widget<Text>(find.text(unselectedGoalTitle));
+    expect(stillUnselectedTextWidget.style?.fontWeight, FontWeight.normal);
+     final cardFinderStillUnselected = find.ancestor(of: find.text(unselectedGoalTitle), matching: find.byType(Card));
+    final Icon stillUnselectedIconWidget = tester.widget<Icon>(find.descendant(of: cardFinderStillUnselected, matching: find.byType(Icon)));
+    expect(stillUnselectedIconWidget.color, Theme.of(tester.element(cardFinderStillUnselected)).colorScheme.onSurfaceVariant);
   });
 
 
   testWidgets('"Next" button navigates if a goal is selected', (WidgetTester tester) async {
-    when(mockSetupFlowViewModel.fitnessGoal).thenReturn(fitnessGoals[0]); // Pre-select a goal
+    final selectedGoal = fitnessGoals[0];
+    // Screen's initState reads this, then `_onNext` also reads it from local state `_selectedGoalTitle`
+    // which should have been set by a tap or pre-filled from viewmodel.
+    when(mockSetupFlowViewModel.fitnessGoal).thenReturn(selectedGoal);
 
     await pumpFitnessGoalScreen(tester);
+
+    // Ensure the local state _selectedGoalTitle is set, mimicking a selection or initState behavior
+    // This is needed because _onNext uses the local _selectedGoalTitle.
+    // If we rely on initState, it's fine. If we want to simulate a fresh selection:
+    // await tester.tap(find.text(selectedGoal));
+    // await tester.pumpAndSettle();
+    // The when(mockGoRouter.fitnessGoal) will make the UI reflect selection.
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Next'));
     await tester.pumpAndSettle();
 
-    // Verify that updateFitnessGoal was called with the selected goal by _onNext
-    verify(mockSetupFlowViewModel.updateFitnessGoal(fitnessGoals[0])).called(1);
+    // _onNext calls updateFitnessGoal with its local _selectedGoalTitle.
+    // If _selectedGoalTitle was set from viewModel.fitnessGoal in initState/build, this is correct.
+    verify(mockSetupFlowViewModel.updateFitnessGoal(selectedGoal)).called(1);
     verify(mockGoRouter.go('/setup/experience-level')).called(1);
   });
 
