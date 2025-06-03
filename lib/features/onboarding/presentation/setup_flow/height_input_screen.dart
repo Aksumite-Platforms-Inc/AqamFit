@@ -26,7 +26,7 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double cmToFeetFactor = 1 / 30.48;
-  int _initialHeightCm = 170;
+  final int _initialHeightCm = 170;
   // double _initialHeightFeet = 5.57; // Not directly used for init, derived from cm.
 
   double _currentDisplayHeight = 170.0; // Local display value
@@ -106,7 +106,7 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
@@ -115,8 +115,8 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
                    const SizedBox(height: 8),
                   _viewModel.heightUnit == 'cm'
                   ? NumberPicker(
-                      minValue: minDisplayHeight.floor(),
-                      maxValue: maxDisplayHeight.ceil(),
+                      minValue: minDisplayHeight.toInt(),
+                      maxValue: maxDisplayHeight.toInt(),
                       value: _currentDisplayHeight.round(),
                       onChanged: (value) {
                         _viewModel.updateHeight(value.toDouble());
@@ -126,14 +126,14 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
                       textStyle: TextStyle(fontSize: 20, color: theme.colorScheme.onSurfaceVariant),
                       selectedTextStyle: TextStyle(fontSize: 28, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
                       axis: Axis.horizontal,
-                       decoration: BoxDecoration(
+                      decoration: BoxDecoration(
                         border: Border.all(color: theme.colorScheme.outline), // Use theme.colorScheme.outline
                         borderRadius: BorderRadius.circular(8),
                       ),
                     )
                   : DecimalNumberPicker(
-                      minValue: minDisplayHeight,
-                      maxValue: maxDisplayHeight,
+                      minValue: minDisplayHeight.toInt(),
+                      maxValue: maxDisplayHeight.toInt(),
                       value: _currentDisplayHeight,
                       decimalPlaces: displayHeightDecimalPlaces,
                       onChanged: (value) {

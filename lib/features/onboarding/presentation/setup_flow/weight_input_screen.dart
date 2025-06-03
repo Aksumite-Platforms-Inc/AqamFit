@@ -26,7 +26,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double kgToLbsFactor = 2.20462;
-  double _initialWeightKg = 70.0;
+  final double _initialWeightKg = 70.0;
   // double _initialWeightLbs = 154.0; // Not directly used for initialization in this screen's logic
 
   double _currentDisplayWeight = 70.0; // Local display value
@@ -104,39 +104,57 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
                 children: [
                   Text('Weight (${_viewModel.weightUnit})', style: theme.textTheme.labelLarge),
                   const SizedBox(height: 8),
-                  DecimalNumberPicker(
-                    minValue: minDisplayWeight,
-                    maxValue: maxDisplayWeight,
-                    value: _currentDisplayWeight,
-                    decimalPlaces: displayWeightDecimalPlaces,
-                    onChanged: (value) {
-                      double valueToStore = value;
-                      if (_viewModel.weightUnit == 'lbs') {
-                        valueToStore = value / kgToLbsFactor;
-                      }
-                      _viewModel.updateWeight(valueToStore.toPrecision(1));
-                    },
-                    itemHeight: 70,
-                    itemWidth: 60,
-                    textStyle: TextStyle(fontSize: 20, color: theme.colorScheme.onSurfaceVariant),
-                    selectedTextStyle: TextStyle(fontSize: 28, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
-                    axis: Axis.horizontal,
-                    integerDecoration: BoxDecoration(
-                      border: Border.all(color: theme.colorScheme.outline), // Use theme.colorScheme.outline
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    decimalDecoration: BoxDecoration(
-                      border: Border.all(color: theme.colorScheme.outline), // Use theme.colorScheme.outline
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
+                  _viewModel.weightUnit == 'kg'
+                      ? NumberPicker(
+                          minValue: minDisplayWeight.toInt(),
+                          maxValue: maxDisplayWeight.toInt(),
+                          value: _currentDisplayWeight.round(),
+                          onChanged: (value) {
+                            _viewModel.updateWeight(value.toDouble());
+                          },
+                          itemHeight: 70,
+                          itemWidth: 60,
+                          textStyle: TextStyle(fontSize: 20, color: theme.colorScheme.onSurfaceVariant),
+                          selectedTextStyle: TextStyle(fontSize: 28, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                          axis: Axis.horizontal,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: theme.colorScheme.outline),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        )
+                      : DecimalNumberPicker(
+                          minValue: minDisplayWeight.toInt(),
+                          maxValue: maxDisplayWeight.toInt(),
+                          value: _currentDisplayWeight,
+                          decimalPlaces: displayWeightDecimalPlaces,
+                          onChanged: (value) {
+                            double valueToStore = value;
+                            if (_viewModel.weightUnit == 'lbs') {
+                              valueToStore = value / kgToLbsFactor;
+                            }
+                            _viewModel.updateWeight(valueToStore.toPrecision(1));
+                          },
+                          itemHeight: 70,
+                          itemWidth: 60,
+                          textStyle: TextStyle(fontSize: 20, color: theme.colorScheme.onSurfaceVariant),
+                          selectedTextStyle: TextStyle(fontSize: 28, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                          axis: Axis.horizontal,
+                          integerDecoration: BoxDecoration(
+                            border: Border.all(color: theme.colorScheme.outline),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          decimalDecoration: BoxDecoration(
+                            border: Border.all(color: theme.colorScheme.outline),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                   const SizedBox(height: 24),
                   CupertinoSlidingSegmentedControl<String>(
                     groupValue: _viewModel.weightUnit,

@@ -15,9 +15,7 @@ class AdditionalInfoScreen extends StatefulWidget {
 }
 
 class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
-  // _formKey might still be useful if we want to trigger all validations at once,
-  // but individual field validators are removed.
-  // final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final List<String> _genders = ["Male", "Female", "Other", "Prefer not to say"];
   bool _isFinishing = false;
 
@@ -84,7 +82,6 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       _isFinishing = true;
     });
 
-    final viewModel = context.read<SetupFlowViewModel>();
     final authManager = context.read<AuthManager>();
     final userRepository = context.read<UserRepository>();
 
@@ -178,7 +175,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0), // Reduced padding for ListTile
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: ListTile(
@@ -212,7 +209,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Wrap(

@@ -10,8 +10,6 @@ class TrainingPrefsScreen extends StatefulWidget {
   State<TrainingPrefsScreen> createState() => _TrainingPrefsScreenState();
 }
 
-class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
-// Helper class for day data
 class DayPreference {
   final String abbr; // e.g., "M"
   final String fullName; // e.g., "Monday"
@@ -126,7 +124,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                     width: 44, // Circular button size
                     height: 44,
                     decoration: BoxDecoration(
-                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withOpacity(0.3),
