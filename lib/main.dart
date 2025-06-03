@@ -86,8 +86,11 @@ class _AxumFitAppState extends State<AxumFitApp> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      // Assuming LoadingIndicatorWidget includes its own Scaffold
-      return const LoadingIndicatorWidget();
+      // Wrap LoadingIndicatorWidget with Directionality to provide text direction
+      return const Directionality(
+        textDirection: TextDirection.ltr,
+        child: LoadingIndicatorWidget(),
+      );
     }
 
     // Listen to SettingsService for theme changes

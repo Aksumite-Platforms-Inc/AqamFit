@@ -11,6 +11,13 @@ class SetupFlowViewModel extends ChangeNotifier {
   List<String> _preferredTrainingDays = [];
   DateTime? _dateOfBirth;
   String? _gender;
+  String? _selectedFrequencyPreset; // Added for frequency preset
+
+  // Static map for day order if sorting is needed
+  static const Map<String, int> dayOrder = {
+    "Monday": 1, "Tuesday": 2, "Wednesday": 3, "Thursday": 4,
+    "Friday": 5, "Saturday": 6, "Sunday": 7,
+  };
 
   // Public getters
   double? get weight => _weight;
@@ -22,6 +29,15 @@ class SetupFlowViewModel extends ChangeNotifier {
   List<String> get preferredTrainingDays => _preferredTrainingDays;
   DateTime? get dateOfBirth => _dateOfBirth;
   String? get gender => _gender;
+  String? get selectedFrequencyPreset => _selectedFrequencyPreset; // Added
+
+  // Predefined frequency presets
+  // Using full day names as stored in _preferredTrainingDays
+  static final Map<String, List<String>> frequencyPresets = {
+    "3 days/week": ["Monday", "Wednesday", "Friday"],
+    "4 days/week": ["Monday", "Tuesday", "Thursday", "Friday"],
+    "5 days/week": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+  };
 
   // Public methods to update fields and notify listeners
 
@@ -56,10 +72,43 @@ class SetupFlowViewModel extends ChangeNotifier {
   }
 
   void toggleTrainingDay(String day) {
-    if (_preferredTrainingDays.contains(day)) {
-      _preferredTrainingDays.remove(day);
+    // If a preset was active, and user clicks a day, they are now in custom mode.
+    // The days from the preset should ideally remain as a starting point.
+    if (_selectedFrequencyPreset != null) {
+      _selectedFrequencyPreset = null; // Or a special "Custom" identifier string
+    }
+
+    final newDays = List<String>.from(_preferredTrainingDays);
+    if (newDays.contains(day)) {
+      newDays.remove(day);
     } else {
-      _preferredTrainingDays.add(day);
+      newDays.add(day);
+      // Optional: Sort days after adding for consistent order
+      newDays.sort((a, b) => (dayOrder[a] ?? 8).compareTo(dayOrder[b] ?? 8));
+    }
+    _preferredTrainingDays = newDays;
+    notifyListeners();
+  }
+
+  void selectFrequencyPreset(String? presetName) {
+    if (presetName == null || !frequencyPresets.containsKey(presetName)) {
+      _selectedFrequencyPreset = null;
+      // When deselecting a preset or if preset name is invalid,
+      // We can choose to clear days or leave them as they are (custom).
+      // For now, let's assume deselecting a preset chip means going custom with current days,
+      // so we don't modify _preferredTrainingDays here unless presetName is valid.
+      // If a chip is tapped and it's already selected, it might mean "deselect".
+      if (presetName == null && _selectedFrequencyPreset != null){
+          // This case means a preset was active, and now we want to clear it.
+          // Days should probably remain as they were.
+      }
+       _selectedFrequencyPreset = null;
+
+
+    } else { // Valid preset name
+      _selectedFrequencyPreset = presetName;
+      // Set days according to preset, preserving order from definition
+      _preferredTrainingDays = List.from(frequencyPresets[presetName]!);
     }
     notifyListeners();
   }
@@ -90,6 +139,7 @@ class SetupFlowViewModel extends ChangeNotifier {
     _preferredTrainingDays = [];
     _dateOfBirth = null;
     _gender = null;
+    _selectedFrequencyPreset = null; // Reset preset
     notifyListeners();
   }
 }
