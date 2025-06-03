@@ -40,7 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    Future<bool> onWillPop() async {
+    Future<bool> _onWillPop() async {
       if (_pageController.page?.round() != 0) {
         _pageController.previousPage(
           duration: const Duration(milliseconds: 400),
@@ -69,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     return WillPopScope(
-      onWillPop: onWillPop,
+      onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: colorScheme.surface, // Use theme background
         body: Stack( // Wrap SafeArea with Stack for Skip button

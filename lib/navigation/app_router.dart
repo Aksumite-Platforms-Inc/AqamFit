@@ -23,10 +23,11 @@ import '../features/social/presentation/screens/social_screen.dart';
 import '../features/workout/presentation/screens/workout_summary_screen.dart';
 import '../features/profile/presentation/screens/settings_screen.dart'; // Import SettingsScreen
 // Setup Flow Screens
-import '../features/onboarding/presentation/setup_flow/weight_height_screen.dart';
-// import '../features/onboarding/presentation/setup_flow/goals_experience_screen.dart'; // Removed
-import '../features/onboarding/presentation/setup_flow/fitness_goal_screen.dart'; // Added
-import '../features/onboarding/presentation/setup_flow/experience_level_screen.dart'; // Added
+// import '../features/onboarding/presentation/setup_flow/weight_height_screen.dart'; // Will be removed
+import '../features/onboarding/presentation/setup_flow/weight_input_screen.dart';   // Added
+import '../features/onboarding/presentation/setup_flow/height_input_screen.dart';  // Added
+import '../features/onboarding/presentation/setup_flow/fitness_goal_screen.dart';
+import '../features/onboarding/presentation/setup_flow/experience_level_screen.dart';
 import '../features/onboarding/presentation/setup_flow/training_prefs_screen.dart';
 import '../features/onboarding/presentation/setup_flow/additional_info_screen.dart';
 // Explore Screens
@@ -85,10 +86,10 @@ final GoRouter router = GoRouter(
       if (currentUser != null && currentUser.hasCompletedSetup != true) {
         // If trying to access auth/onboarding pages OR any other page that is NOT setup flow, redirect to setup
         if (isOnboarding || isLoggingIn || isRegistering) {
-          return '/setup/weight-height'; // From auth pages, go to setup
+          return '/setup/weight-input'; // Updated redirect to new first screen
         }
         if (!isNavigatingToSetupFlow) {
-          return '/setup/weight-height'; // From any other page, go to setup
+          return '/setup/weight-input'; // Updated redirect to new first screen
         }
       }
       // 2b. User HAS completed setup
@@ -250,21 +251,28 @@ final GoRouter router = GoRouter(
     ),
     // Setup Flow Routes
     GoRoute(
-      path: '/setup/weight-height',
+      path: '/setup/weight-input', // New route
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
-        child: const WeightHeightScreen(),
+        child: const WeightInputScreen(),
       ),
     ),
     GoRoute(
-      path: '/setup/fitness-goal', // New route
+      path: '/setup/height-input', // New route
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const HeightInputScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/setup/fitness-goal',
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
         child: const FitnessGoalScreen(),
       ),
     ),
     GoRoute(
-      path: '/setup/experience-level', // New route
+      path: '/setup/experience-level',
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
         child: const ExperienceLevelScreen(),
