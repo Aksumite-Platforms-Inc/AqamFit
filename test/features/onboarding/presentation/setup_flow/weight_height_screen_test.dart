@@ -77,7 +77,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextFormField, 'Enter your weight'), '70');
     await tester.pump(); // Let listeners fire
     verify(mockSetupFlowViewModel.updateWeight(70.0)).called(1);
-    
+
     await tester.enterText(find.widgetWithText(TextFormField, 'Enter your height'), '175');
     await tester.pump();
     verify(mockSetupFlowViewModel.updateHeight(175.0)).called(1);
@@ -132,12 +132,12 @@ void main() {
 
     // Check initial label for weight
     expect(find.text('Weight (kg)'), findsOneWidget);
-    
+
     // Change weight unit to lbs
     when(mockSetupFlowViewModel.weightUnit).thenReturn('lbs'); // Simulate ViewModel update
     await tester.tap(find.text('lbs'));
     await tester.pumpAndSettle(); // Rebuild with new state from ViewModel
-    
+
     verify(mockSetupFlowViewModel.setWeightUnit('lbs')).called(1);
     // To test the label change, the ViewModel provider needs to actually trigger a rebuild.
     // The mock SetupFlowViewModel's notifyListeners() should be effective.

@@ -71,7 +71,7 @@ void main() {
     await pumpFitnessGoalScreen(tester);
 
     final targetGoal = fitnessGoals[1]; // "Build Muscle"
-    
+
     // Stub the getter to reflect the change for UI update
     // This simulates that after `updateFitnessGoal` is called and `notifyListeners` fires,
     // the getter for `fitnessGoal` will return the new value.
@@ -86,7 +86,7 @@ void main() {
                                                                         // The tap calls setState and then read.updateFitnessGoal.
                                                                         // So, 1 direct call from tap, then the watch updates.
                                                                         // Let's refine: updateFitnessGoal is called on tap.
-    
+
     // To verify appearance change, we'd need to inspect Card properties.
     // This is harder without specific keys or more detailed finder.
     // For now, trust that selection calls the ViewModel.
@@ -107,7 +107,7 @@ void main() {
     when(mockSetupFlowViewModel.fitnessGoal).thenReturn(fitnessGoals[0]); // Pre-select a goal
 
     await pumpFitnessGoalScreen(tester);
-    
+
     await tester.tap(find.widgetWithText(ElevatedButton, 'Next'));
     await tester.pumpAndSettle();
 

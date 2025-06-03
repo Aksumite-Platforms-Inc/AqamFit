@@ -143,7 +143,7 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
                 decoration: InputDecoration(
                   labelText: 'Weight (${_viewModel.weightUnit})', // Display current unit
                   hintText: 'Enter your weight',
-                  hintStyle: TextStyle(), // Center hint text if possible (might be controlled by textAlign on TextFormField)
+                  hintStyle: TextStyle(textAlign: TextAlign.center), // Center hint text if possible (might be controlled by textAlign on TextFormField)
                   border: const OutlineInputBorder(),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Increased padding
                 ),
@@ -199,7 +199,7 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
                 decoration: InputDecoration(
                   labelText: 'Height (${_viewModel.heightUnit})', // Display current unit
                   hintText: 'Enter your height',
-                  hintStyle: TextStyle(), // Center hint text
+                  hintStyle: TextStyle(textAlign: TextAlign.center), // Center hint text
                   border: const OutlineInputBorder(),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Increased padding
                 ),

@@ -19,28 +19,24 @@ class MockSetupFlowViewModel extends Mock implements SetupFlowViewModel {
   String _weightUnit = 'kg';
   double? _height;
   String _heightUnit = 'cm';
+  String? _selectedFrequencyPreset; // New internal state
 
   MockSetupFlowViewModel() {
-    // Provide default stubs for methods that might be called without specific test setup
-    // This helps prevent MissingStubError if a listener calls a method.
+    // Initialize with default stubs to prevent MissingStubError
+    _initializeStubs();
+  }
+
+  void _initializeStubs() {
+    // Default stubs for existing methods
     when(updateFitnessGoal(any)).thenAnswer((realInvocation) {
       _fitnessGoal = realInvocation.positionalArguments.first as String?;
-      notifyListeners(); // Ensure mock can also notify if needed, though typically state is managed by test
+      notifyListeners();
     });
     when(updateExperienceLevel(any)).thenAnswer((realInvocation) {
       _experienceLevel = realInvocation.positionalArguments.first as String?;
       notifyListeners();
     });
-    when(toggleTrainingDay(any)).thenAnswer((realInvocation) {
-      final day = realInvocation.positionalArguments.first as String;
-      if (_preferredTrainingDays.contains(day)) {
-        _preferredTrainingDays.remove(day);
-      } else {
-        _preferredTrainingDays.add(day);
-      }
-      notifyListeners();
-    });
-     when(updateDateOfBirth(any)).thenAnswer((realInvocation) {
+    when(updateDateOfBirth(any)).thenAnswer((realInvocation) {
       _dateOfBirth = realInvocation.positionalArguments.first as DateTime?;
       notifyListeners();
     });
@@ -64,10 +60,63 @@ class MockSetupFlowViewModel extends Mock implements SetupFlowViewModel {
       _heightUnit = realInvocation.positionalArguments.first as String;
       notifyListeners();
     });
+
+    // Stubs for new/modified methods related to training preferences
+    when(toggleTrainingDay(any)).thenAnswer((realInvocation) {
+      final day = realInvocation.positionalArguments.first as String;
+      _selectedFrequencyPreset = null; // A key behavior change
+
+      final newDays = List<String>.from(_preferredTrainingDays);
+      if (newDays.contains(day)) {
+        newDays.remove(day);
+      } else {
+        newDays.add(day);
+        // Use the real ViewModel's static dayOrder for sorting if needed by tests
+        // For simplicity, mock won't sort unless explicitly coded here or test verifies unsorted.
+        // Let's assume tests will provide sorted lists if order matters for verification.
+      }
+      _preferredTrainingDays = newDays;
+      notifyListeners();
+    });
+
+    when(selectFrequencyPreset(any)).thenAnswer((realInvocation) {
+      final presetName = realInvocation.positionalArguments.first as String?;
+      if (presetName == null || !SetupFlowViewModel.frequencyPresets.containsKey(presetName)) {
+        _selectedFrequencyPreset = null;
+        // _preferredTrainingDays remains unchanged as per current VM logic for custom flow
+      } else {
+        _selectedFrequencyPreset = presetName;
+        _preferredTrainingDays = List.from(SetupFlowViewModel.frequencyPresets[presetName]!);
+      }
+      notifyListeners();
+    });
+     when(setPreferredTrainingDays(any)).thenAnswer((realInvocation) {
+      _preferredTrainingDays = List<String>.from(realInvocation.positionalArguments.first as List<String>);
+      _selectedFrequencyPreset = null; // Custom days imply no preset
+      notifyListeners();
+    });
   }
 
+  // Reset mock state before each test if needed, or manage via when().thenReturn() per test.
+  void resetMockState() {
+    _fitnessGoal = null;
+    _experienceLevel = null;
+    _preferredTrainingDays = [];
+    _dateOfBirth = null;
+    _gender = null;
+    _weight = null;
+    _weightUnit = 'kg';
+    _height = null;
+    _heightUnit = 'cm';
+    _selectedFrequencyPreset = null;
 
-  // Override getters to return internal state or default, can be stubbed in tests too
+    // Clear previous interactions if using Mockito's verify framework heavily.
+    // clearInteractions(this); // 'this' might not work if not a real mockito generated mock.
+    // Re-initialize stubs if they were changed by tests.
+    // _initializeStubs(); // Or ensure tests don't modify global stubs.
+  }
+
+  // Override getters
   @override
   String? get fitnessGoal => _fitnessGoal;
   @override
@@ -86,37 +135,35 @@ class MockSetupFlowViewModel extends Mock implements SetupFlowViewModel {
   double? get height => _height;
   @override
   String get heightUnit => _heightUnit;
+  @override
+  String? get selectedFrequencyPreset => _selectedFrequencyPreset; // New getter
 
-  // Mock addListener and removeListener to satisfy ChangeNotifier interface
-  // Store listeners if you need to test that they are added/removed,
-  // or to manually trigger them. For most widget tests, this level of detail isn't needed.
+  // --- ChangeNotifier implementation ---
   final List<VoidCallback> _listeners = [];
 
   @override
   void addListener(VoidCallback listener) {
     _listeners.add(listener);
-    // super.noSuchMethod(Invocation.method(#addListener, [listener])); // if using pure mockito
   }
 
   @override
   void removeListener(VoidCallback listener) {
     _listeners.remove(listener);
-    // super.noSuchMethod(Invocation.method(#removeListener, [listener]));
   }
 
   @override
   void notifyListeners() {
-    for (var listener in _listeners) {
+    for (final listener in List<VoidCallback>.from(_listeners)) { // Iterate over a copy
       listener();
     }
-    // super.noSuchMethod(Invocation.method(#notifyListeners, []));
   }
-   @override
-  bool get hasListeners => _listeners.isNotEmpty; // Basic implementation
+
+  @override
+  bool get hasListeners => _listeners.isNotEmpty;
 
   @override
   void dispose() {
     _listeners.clear();
-    // super.noSuchMethod(Invocation.method(#dispose, []));
+    super.dispose(); // Important if extending a class that has a dispose method
   }
 }

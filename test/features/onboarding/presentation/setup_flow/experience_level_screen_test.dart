@@ -84,7 +84,7 @@ void main() {
     await tester.pumpAndSettle();
 
     verify(mockSetupFlowViewModel.updateExperienceLevel(targetLevelName)).called(1);
-    
+
     // Check text style (bold)
     final textWidget = tester.widget<Text>(find.text(targetLevelName));
     expect(textWidget.style?.fontWeight, FontWeight.bold);
@@ -108,7 +108,7 @@ void main() {
     when(mockSetupFlowViewModel.experienceLevel).thenReturn(experienceLevelNames[0]);
 
     await pumpExperienceLevelScreen(tester);
-    
+
     await tester.tap(find.widgetWithText(ElevatedButton, 'Next'));
     await tester.pumpAndSettle();
 

@@ -97,15 +97,15 @@ void main() {
     await tester.pumpAndSettle(); // For dialog animation
 
     expect(find.byType(CalendarDatePicker), findsOneWidget); // Or find.byType(DatePickerDialog)
-    
+
     // Select a date (e.g., today for simplicity, though screen logic might prevent it)
     // For real date picking, need to interact with CalendarDatePicker, then tap "OK"
     // This example just confirms picker appears.
     await tester.tap(find.text('OK')); // Assuming an OK button on the dialog
-    await tester.pumpAndSettle(); 
+    await tester.pumpAndSettle();
     // Verification of date update is in another test.
   });
-  
+
   testWidgets('selecting a Date of Birth updates ViewModel and TextFormField', (WidgetTester tester) async {
     await pumpAdditionalInfoScreen(tester);
     final testDate = DateTime(2000, 5, 15);
@@ -190,7 +190,7 @@ void main() {
   testWidgets('"Finish Setup" button calls repo and auth manager on success, then navigates', (WidgetTester tester) async {
     final selectedDate = DateTime(1990, 1, 1);
     final selectedGender = "Male";
-    
+
     when(mockSetupFlowViewModel.dateOfBirth).thenReturn(selectedDate);
     when(mockSetupFlowViewModel.gender).thenReturn(selectedGender);
     when(mockUserRepository.updateUserProfileSetup(
@@ -231,7 +231,7 @@ void main() {
     verify(mockGoRouter.go('/main')).called(1);
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
-  
+
   testWidgets('"Finish Setup" shows SnackBar on repository failure', (WidgetTester tester) async {
     final selectedDate = DateTime(1990, 1, 1);
     final selectedGender = "Male";

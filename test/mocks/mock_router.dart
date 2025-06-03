@@ -92,7 +92,7 @@ Widget pumpWidgetWithProvidersAndRouter({
       GoRoute(path: '/main', builder: (context, state) => const Material(child: Scaffold(body: Text("Mock Main")))),
     ]
   );
-  
+
   return MaterialApp.router(routerConfig: testRouter);
 
   // Fallback if RouterConfig is too complex for simple widget test:

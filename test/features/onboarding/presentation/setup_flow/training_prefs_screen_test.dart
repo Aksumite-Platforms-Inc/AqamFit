@@ -28,17 +28,20 @@ void main() {
     mockSetupFlowViewModel = MockSetupFlowViewModel();
     mockGoRouter = MockGoRouter();
 
-    // Initial state: no days selected
+    // Initial state for ViewModel
     when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn([]);
-    
+    when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(null);
+
     when(mockGoRouter.canPop()).thenReturn(true);
   });
 
-  Future<void> pumpTrainingPrefsScreen(WidgetTester tester) async {
+  // Helper to provide the screen with necessary mocks
+  Future<void> pumpTrainingPrefsScreen(WidgetTester tester, {MockSetupFlowViewModel? viewModel}) async {
+    final vmToUse = viewModel ?? mockSetupFlowViewModel;
     await tester.pumpWidget(
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<SetupFlowViewModel>.value(value: mockSetupFlowViewModel),
+          ChangeNotifierProvider<SetupFlowViewModel>.value(value: vmToUse),
         ],
         child: MaterialApp.router(
           routerConfig: GoRouter(
@@ -55,7 +58,6 @@ void main() {
                 ),
               ),
               GoRoute(path: '/setup/additional-info', builder: (context, state) => const Scaffold(body: Text("Mock Additional Info"))),
-              // Add previous route if needed for back button testing, e.g. /setup/experience-level
             ],
           ),
         ),
@@ -63,100 +65,195 @@ void main() {
     );
   }
 
-  testWidgets('renders circular weekday buttons', (WidgetTester tester) async {
-    await pumpTrainingPrefsScreen(tester);
+  group('Original Day Selection Tests', () {
+    testWidgets('renders circular weekday buttons', (WidgetTester tester) async {
+      await pumpTrainingPrefsScreen(tester);
 
-    for (final dayMap in dayPreferences) {
-      // Need to be careful with duplicate abbreviations "S" and "T"
-      // Finding by text might find multiple. We expect one for each instance.
-      expect(find.widgetWithText(AnimatedContainer, dayMap["abbr"]!), findsWidgets);
-    }
-    // Check total count of day buttons
-    expect(find.byType(GestureDetector).descendantOf(find.byType(Row).first), findsNWidgets(dayPreferences.length));
-    expect(find.widgetWithText(ElevatedButton, 'Next'), findsOneWidget);
-    expect(find.widgetWithText(TextButton, 'Back'), findsOneWidget);
+      // Find the Row containing the day buttons. This assumes it's the only Row directly under the main Column's children that contains GestureDetectors.
+      // Or, be more specific if other Rows are added.
+      // The preset chips are in a Wrap, day buttons in a Row.
+      final dayButtonsRowFinder = find.descendant(
+        of: find.byType(Column), // Main column
+        matching: find.byType(Row) // Find Row specifically for day buttons
+      );
+      // Ensure we find the correct Row (there's only one for day buttons)
+      expect(dayButtonsRowFinder, findsOneWidget);
+
+
+      for (final dayMap in dayPreferences) {
+        expect(find.widgetWithText(AnimatedContainer, dayMap["abbr"]!).
+          matching((finder) => finder.evaluate().any((e) => dayButtonsRowFinder.evaluate().contains(e.visitAncestorElements((element) => element == dayButtonsRowFinder.evaluate().first.widget ? false : true) as Element?))),
+          findsWidgets); // Check they exist within the day buttons row
+      }
+      expect(find.descendant(of: dayButtonsRowFinder, matching: find.byType(GestureDetector)), findsNWidgets(dayPreferences.length));
+      expect(find.widgetWithText(ElevatedButton, 'Next'), findsOneWidget);
+      expect(find.widgetWithText(TextButton, 'Back'), findsOneWidget);
+    });
+
+    testWidgets('tapping a day button toggles selection, updates ViewModel, and clears preset', (WidgetTester tester) async {
+      // Initially, a preset is selected
+      const initialPreset = "3 days/week";
+      final presetDays = SetupFlowViewModel.frequencyPresets[initialPreset]!;
+      when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(initialPreset);
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(List.from(presetDays));
+
+      await pumpTrainingPrefsScreen(tester);
+
+      final mondayFullName = "Monday"; // A day part of "3 days/week" preset
+
+      // Find Monday button
+      final dayButtonFinders = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector));
+      final mondayButtonFinder = dayButtonFinders.at(1); // Monday
+
+      // Tap Monday (which is already selected by preset) to deselect it
+      // ViewModel should now have Monday removed and preset cleared
+      final expectedDaysAfterToggle = List<String>.from(presetDays)..remove(mondayFullName);
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(expectedDaysAfterToggle);
+      when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(null); // toggleDay clears preset
+
+      await tester.tap(mondayButtonFinder);
+      await tester.pumpAndSettle();
+
+      verify(mockSetupFlowViewModel.toggleTrainingDay(mondayFullName)).called(1);
+      // The mock's toggleTrainingDay already sets selectedFrequencyPreset to null.
+
+      // Verify Monday is now visually unselected
+      AnimatedContainer mondayContainer = tester.widget<AnimatedContainer>(
+        find.descendant(of: mondayButtonFinder, matching: find.byType(AnimatedContainer))
+      );
+      BoxDecoration decoration = mondayContainer.decoration as BoxDecoration;
+      expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.surfaceVariant.withOpacity(0.5));
+
+      // Verify preset chip is unselected
+      final presetChipFinder = find.widgetWithText(ChoiceChip, initialPreset);
+      final ChoiceChip presetChipWidget = tester.widget(presetChipFinder);
+      expect(presetChipWidget.selected, isFalse);
+    });
   });
 
-  testWidgets('tapping a day button toggles selection and updates ViewModel', (WidgetTester tester) async {
-    await pumpTrainingPrefsScreen(tester);
+  group('Preset Frequency Tests', () {
+    testWidgets('renders predefined frequency ChoiceChips', (WidgetTester tester) async {
+      await pumpTrainingPrefsScreen(tester);
+      for (final presetName in SetupFlowViewModel.frequencyPresets.keys) {
+        expect(find.widgetWithText(ChoiceChip, presetName), findsOneWidget);
+      }
+    });
 
-    final mondayAbbr = dayPreferences[1]["abbr"]!; // "M"
-    final mondayFullName = dayPreferences[1]["fullName"]!; // "Monday"
+    testWidgets('selecting a preset updates ViewModel, chip appearance, and day buttons', (WidgetTester tester) async {
+      await pumpTrainingPrefsScreen(tester);
 
-    // Simulate ViewModel returning empty list initially for "isSelected" check
-    when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn([]);
-    await tester.pumpAndSettle(); // Re-pump after stubbing if needed, or ensure initial stub is set.
+      final presetToSelect = SetupFlowViewModel.frequencyPresets.keys.first; // "3 days/week"
+      final expectedDaysForPreset = SetupFlowViewModel.frequencyPresets[presetToSelect]!;
 
-    // Find the specific GestureDetector for Monday
-    // This is tricky due to duplicate abbreviations. We might need more specific finders if this fails.
-    // A safer way is to find all GestureDetectors in the Row and tap the Nth one.
-    final dayButtonFinders = find.descendant(
-      of: find.byType(Row).at(0), // Assuming days are in the first Row
-      matching: find.byType(GestureDetector)
-    );
-    expect(dayButtonFinders, findsNWidgets(7));
-    final mondayButtonFinder = dayButtonFinders.at(1); // Monday is the 2nd item (index 1)
+      // Mock ViewModel behavior after preset selection
+      when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(presetToSelect);
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(List.from(expectedDaysForPreset));
 
-    // Initial state: Monday is not selected
-    // We check the color of the AnimatedContainer's decoration
-    AnimatedContainer mondayContainer = tester.widget<AnimatedContainer>(
-      find.descendant(of: mondayButtonFinder, matching: find.byType(AnimatedContainer))
-    );
-    BoxDecoration decoration = mondayContainer.decoration as BoxDecoration;
-    expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.surfaceVariant.withOpacity(0.5));
+      await tester.tap(find.widgetWithText(ChoiceChip, presetToSelect));
+      await tester.pumpAndSettle();
+
+      verify(mockSetupFlowViewModel.selectFrequencyPreset(presetToSelect)).called(1);
+
+      // Verify preset chip is selected
+      final ChoiceChip selectedChipWidget = tester.widget(find.widgetWithText(ChoiceChip, presetToSelect));
+      expect(selectedChipWidget.selected, isTrue);
+
+      // Verify day buttons reflect the preset
+      for (final dayPref in dayPreferences) {
+        final dayButtonFinder = find.descendant(
+          of: find.byType(Row).last, // Day buttons are in the last Row
+          matching: find.byElementPredicate((element) {
+            // Find by text inside the AnimatedContainer
+            if (element.widget is AnimatedContainer) {
+              final textFinder = find.descendant(of: find.byWidget(element.widget), matching: find.text(dayPref.abbr));
+              return textFinder.evaluate().isNotEmpty;
+            }
+            return false;
+          })
+        ).first; // This finder is complex, ensure it works or simplify by index.
+
+        // A simpler way for day buttons, assuming fixed order S,M,T,W,T,F,S
+        final dayIndex = dayPreferences.indexWhere((dp) => dp.fullName == dayPref.fullName);
+        final specificDayButtonGestureDetector = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector)).at(dayIndex);
 
 
-    // Tap Monday to select it
-    // Simulate ViewModel updating and returning the new list
-    when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn([mondayFullName]);
-    await tester.tap(mondayButtonFinder);
-    await tester.pumpAndSettle(); // For animation and rebuild
+        final AnimatedContainer dayContainer = tester.widget(
+          find.descendant(of: specificDayButtonGestureDetector, matching: find.byType(AnimatedContainer))
+        );
+        final BoxDecoration decoration = dayContainer.decoration as BoxDecoration;
+        final bool isDayInPreset = expectedDaysForPreset.contains(dayPref.fullName);
 
-    verify(mockSetupFlowViewModel.toggleTrainingDay(mondayFullName)).called(1);
-    
-    // Verify Monday is selected (e.g., color change)
-    mondayContainer = tester.widget<AnimatedContainer>(
-      find.descendant(of: mondayButtonFinder, matching: find.byType(AnimatedContainer))
-    );
-    decoration = mondayContainer.decoration as BoxDecoration;
-    expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.primary);
+        expect(decoration.color == Theme.of(tester.element(specificDayButtonGestureDetector)).colorScheme.primary, isDayInPreset,
+               reason: "${dayPref.fullName} selection state is ${isDayInPreset ? '' : 'not '}as expected for preset $presetToSelect. Color was ${decoration.color}");
+      }
+    });
 
-    // Tap Monday again to deselect it
-    when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn([]); // Now it's empty again
-    await tester.tap(mondayButtonFinder);
-    await tester.pumpAndSettle();
-    
-    verify(mockSetupFlowViewModel.toggleTrainingDay(mondayFullName)).called(1); // Called again
+    testWidgets('transition from custom selection to preset selection', (WidgetTester tester) async {
+      // Initial: custom days selected, no preset
+      final customDays = ["Tuesday", "Saturday"];
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(customDays);
+      when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(null);
 
-    // Verify Monday is not selected
-     mondayContainer = tester.widget<AnimatedContainer>(
-      find.descendant(of: mondayButtonFinder, matching: find.byType(AnimatedContainer))
-    );
-    decoration = mondayContainer.decoration as BoxDecoration;
-    expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.surfaceVariant.withOpacity(0.5));
+      await pumpTrainingPrefsScreen(tester);
+
+      // Verify initial custom day selection
+      final tuesdayButton = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector)).at(2); // Tuesday
+      AnimatedContainer tueContainer = tester.widget(find.descendant(of: tuesdayButton, matching: find.byType(AnimatedContainer)));
+      expect((tueContainer.decoration as BoxDecoration).color, Theme.of(tester.element(tuesdayButton)).colorScheme.primary);
+
+      // Now, select a preset
+      final presetToSelect = "4 days/week";
+      final expectedDaysForPreset = SetupFlowViewModel.frequencyPresets[presetToSelect]!;
+
+      when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(presetToSelect);
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(List.from(expectedDaysForPreset));
+
+      await tester.tap(find.widgetWithText(ChoiceChip, presetToSelect));
+      await tester.pumpAndSettle();
+
+      verify(mockSetupFlowViewModel.selectFrequencyPreset(presetToSelect)).called(1);
+
+      // Verify preset chip is selected
+      expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, presetToSelect)).selected, isTrue);
+
+      // Verify day buttons now reflect the preset, not the old custom selection
+      tueContainer = tester.widget(find.descendant(of: tuesdayButton, matching: find.byType(AnimatedContainer)));
+      final isTuesdayInNewPreset = expectedDaysForPreset.contains("Tuesday");
+      expect((tueContainer.decoration as BoxDecoration).color == Theme.of(tester.element(tuesdayButton)).colorScheme.primary, isTuesdayInNewPreset);
+
+      final saturdayButton = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector)).at(6); // Saturday
+      AnimatedContainer satContainer = tester.widget(find.descendant(of: saturdayButton, matching: find.byType(AnimatedContainer)));
+      final isSaturdayInNewPreset = expectedDaysForPreset.contains("Saturday");
+      expect((satContainer.decoration as BoxDecoration).color == Theme.of(tester.element(saturdayButton)).colorScheme.primary, isSaturdayInNewPreset);
+
+    });
+
   });
 
-  testWidgets('"Next" button navigates to /setup/additional-info', (WidgetTester tester) async {
+
+  // Original navigation tests (should still pass)
+  testWidgets('Original "Next" button navigates to /setup/additional-info', (WidgetTester tester) async {
     await pumpTrainingPrefsScreen(tester);
-    
+
     await tester.tap(find.widgetWithText(ElevatedButton, 'Next'));
     await tester.pumpAndSettle();
 
     verify(mockGoRouter.go('/setup/additional-info')).called(1);
   });
 
-  testWidgets('TextButton "Back" button pops the current route', (WidgetTester tester) async {
-    await pumpTrainingPrefsScreen(tester);
-    
-    await tester.tap(find.widgetWithText(TextButton, 'Back'));
-    await tester.pumpAndSettle();
+  group('Navigation Tests (Bottom Buttons)', () {
+     testWidgets('TextButton "Back" button pops the current route', (WidgetTester tester) async {
+      await pumpTrainingPrefsScreen(tester);
 
-    verify(mockGoRouter.pop()).called(1);
-  });
+      await tester.tap(find.widgetWithText(TextButton, 'Back'));
+      await tester.pumpAndSettle();
 
-  testWidgets('AppBar "Back" button pops the current route', (WidgetTester tester) async {
+      verify(mockGoRouter.pop()).called(1);
+    });
+
+    testWidgets('AppBar "Back" button pops the current route', (WidgetTester tester) async {
     await pumpTrainingPrefsScreen(tester);
-    
+
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
 

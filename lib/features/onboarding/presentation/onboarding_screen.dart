@@ -74,95 +74,94 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         backgroundColor: colorScheme.surface, // Use theme background
         body: Stack( // Wrap SafeArea with Stack for Skip button
           children: [
-            SafeArea(
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemCount: _pages.length,
+                itemBuilder: (context, index) {
+                  return OnboardingPageWidget(page: _pages[index]);
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentPage = index;
-                        });
-                      },
-                      itemCount: _pages.length,
-                      itemBuilder: (context, index) {
-                        return OnboardingPageWidget(page: _pages[index]);
-                      },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _pages.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentPage == index ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: _currentPage == index
+                              ? theme.colorScheme.primary // Use theme primary color
+                              : theme.colorScheme.onSurface.withOpacity(0.3), // Use theme surface/variant
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(
-                            _pages.length,
-                            (index) => AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: _currentPage == index ? 24 : 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: _currentPage == index
-                                    ? theme.colorScheme.primary // Use theme primary color
-                                    : theme.colorScheme.onSurface.withOpacity(0.3), // Use theme surface/variant
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                          ),
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primary,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0), // More rounded
                         ),
-                        const SizedBox(height: 40),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: theme.colorScheme.onPrimary,
-                              padding: const EdgeInsets.symmetric(vertical: 16.0),
-                              textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0), // More rounded
-                              ),
-                              elevation: 5.0, // Add elevation
-                            ),
-                            onPressed: () {
-                              if (_currentPage == _pages.length - 1) {
-                                Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
-                                context.go('/register'); // Navigate to Register Screen
-                              } else {
-                                _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            },
-                            child: Text(
-                              _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                        elevation: 5.0, // Add elevation
+                      ),
+                      onPressed: () {
+                        if (_currentPage == _pages.length - 1) {
+                          Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
+                          context.go('/register'); // Navigate to Register Screen
+                        } else {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 400),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                      child: Text(
+                        _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
-            Positioned(
-              top: 16.0,
-              right: 16.0,
-              child: TextButton(
-                onPressed: () {
-                  Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
-                  context.go('/register');
-                },
-                child: Text('Skip', style: TextStyle(color: theme.colorScheme.primary)),
-              ),
-            ),
           ],
-        ),
+          ),
+          ),
+          Positioned(
+            top: 16.0,
+            right: 16.0,
+            child: TextButton(
+              onPressed: () {
+                Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
+                context.go('/register');
+              },
+              child: Text('Skip', style: TextStyle(color: theme.colorScheme.primary)),
+            ),
+          ),
+        ],
       ),
     );
   }

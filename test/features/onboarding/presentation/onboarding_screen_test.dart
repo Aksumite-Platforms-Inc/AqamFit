@@ -8,7 +8,7 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 // Assuming mocks are generated or defined in these files
-import '../../../mocks/mock_services.dart'; 
+import '../../../mocks/mock_services.dart';
 import '../../../mocks/mock_router.dart';
 
 void main() {
@@ -110,7 +110,7 @@ void main() {
     expect(find.text('Smart Meal Tracking'), findsOneWidget);
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
-    
+
     // Page 3
     expect(find.text('Stay Motivated'), findsOneWidget);
     expect(find.text('Get Started'), findsOneWidget);
@@ -142,7 +142,7 @@ void main() {
 
    testWidgets('Back button on first page shows exit confirmation dialog', (WidgetTester tester) async {
     await pumpOnboardingScreen(tester);
-    
+
     when(mockGoRouter.canPop()).thenReturn(false); // So that context.pop() doesn't make it disappear from stack
 
     // Ensure we are on the first page
@@ -180,7 +180,7 @@ void main() {
     // and that onWillPop would have returned true.
     await tester.tap(find.text('Exit'));
     await tester.pumpAndSettle();
-    
+
     // Dialog should be gone.
     expect(find.byType(AlertDialog), findsNothing);
     // Further action (app exit) is outside scope of this widget test to verify directly.
@@ -191,7 +191,7 @@ void main() {
 // Needed for CupertinoIcons.flame_fill etc.
 // If not using the real OnboardingPage model, this might not be directly needed.
 // However, OnboardingScreen uses it.
-// ignore: unused_import 
+// ignore: unused_import
 // import 'package:flutter/cupertino.dart'; // Already imported in main file.
 
 // The RouterScope.override is a bit of a hack for testing.
@@ -247,7 +247,7 @@ The paths are missing the parent directory `../` for `../../../mocks/`.
 
 ```dart
 // Assuming mocks are generated or defined in these files
-import '../../../mocks/mock_services.dart'; 
+import '../../../mocks/mock_services.dart';
 import '../../../mocks/mock_router.dart';
 ```
 
