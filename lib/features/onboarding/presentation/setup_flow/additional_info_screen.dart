@@ -178,7 +178,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0), // Reduced padding for ListTile
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: ListTile(
@@ -212,7 +212,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Wrap(

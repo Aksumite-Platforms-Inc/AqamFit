@@ -20,7 +20,7 @@ class DayPreference {
 }
 
 class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
-  final List<DayPreference> _days = [
+  final List<DayPreference> days = [
     DayPreference(abbr: "S", fullName: "Sunday"), // Assuming S M T W T F S order
     DayPreference(abbr: "M", fullName: "Monday"),
     DayPreference(abbr: "T", fullName: "Tuesday"),
@@ -115,7 +115,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
             // --- Custom Day Selection ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround, // Distribute days evenly
-              children: _days.map((day) {
+              children: days.map((day) {
                 final isSelected = viewModel.preferredTrainingDays.contains(day.fullName);
                 return GestureDetector(
                   onTap: () {
@@ -126,7 +126,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                     width: 44, // Circular button size
                     height: 44,
                     decoration: BoxDecoration(
-                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withOpacity(0.3),

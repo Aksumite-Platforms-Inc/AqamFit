@@ -23,10 +23,10 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
 
   // Default initial values for pickers if ViewModel is null
   // These should be in the selected unit.
-  double _initialWeightKg = 70.0;
-  double _initialWeightLbs = 154.0;
-  int _initialHeightCm = 170;
-  double _initialHeightFeet = 5.5; // Approx 168cm
+  final double _initialWeightKg = 70.0;
+  final double _initialWeightLbs = 154.0;
+  final int _initialHeightCm = 170;
+  final double _initialHeightFeet = 5.5; // Approx 168cm
 
   // Local display values for pickers, derived from ViewModel's base values
   double _currentDisplayWeight = 70.0;
@@ -148,7 +148,7 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
@@ -198,7 +198,7 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
@@ -270,6 +270,6 @@ class _WeightHeightScreenState extends State<WeightHeightScreen> {
           ),
         ),
       ),
-    );
+    )
   }
 }
