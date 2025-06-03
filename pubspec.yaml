@@ -61,7 +61,6 @@ dependencies:
   camera: ^0.10.5+9 # Added camera plugin
 
   uuid: any
-  numberpicker: ^2.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,6 +78,7 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
+  uuid: any
 flutter:
   generate: true # Add this line
 
@@ -118,3 +118,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+dependencies:
+  flutter:
+    sdk: flutter
+  numberpicker: ^2.1.2

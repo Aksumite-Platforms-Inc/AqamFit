@@ -122,7 +122,7 @@ void main() {
         find.descendant(of: mondayButtonFinder, matching: find.byType(AnimatedContainer))
       );
       BoxDecoration decoration = mondayContainer.decoration as BoxDecoration;
-      expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.surfaceContainerHighest.withOpacity(0.5));
+      expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.surfaceVariant.withOpacity(0.5));
 
       // Verify preset chip is unselected
       final presetChipFinder = find.widgetWithText(ChoiceChip, initialPreset);

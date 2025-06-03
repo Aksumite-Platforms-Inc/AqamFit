@@ -26,7 +26,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double kgToLbsFactor = 2.20462;
-  final double _initialWeightKg = 70.0;
+  double _initialWeightKg = 70.0;
   // double _initialWeightLbs = 154.0; // Not directly used for initialization in this screen's logic
 
   double _currentDisplayWeight = 70.0; // Local display value
@@ -104,57 +104,79 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
                 children: [
-                  Text('Weight (${_viewModel.weightUnit})', style: theme.textTheme.labelLarge),
+                  Text(
+                    '${_currentDisplayWeight.toStringAsFixed(displayWeightDecimalPlaces)} ${_viewModel.weightUnit}',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: theme.colorScheme.primary,
+                      inactiveTrackColor: theme.colorScheme.primary.withOpacity(0.3),
+                      trackShape: const RoundedRectSliderTrackShape(),
+                      trackHeight: 8.0,
+                      thumbColor: theme.colorScheme.primary,
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                      overlayColor: theme.colorScheme.primary.withOpacity(0.2),
+                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 24.0),
+                      tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 4.0),
+                      activeTickMarkColor: theme.colorScheme.onPrimary,
+                      inactiveTickMarkColor: theme.colorScheme.primary.withOpacity(0.5),
+                    ),
+                    child: Slider(
+                      min: minDisplayWeight,
+                      max: maxDisplayWeight,
+                      value: _currentDisplayWeight,
+                      divisions: ((maxDisplayWeight - minDisplayWeight) / (_viewModel.weightUnit == 'kg' ? 0.1 : 0.5)).round().clamp(1, 1000), // at least 1 division
+                      label: _currentDisplayWeight.toStringAsFixed(displayWeightDecimalPlaces),
+                      onChanged: (value) {
+                        double valueToStore = value;
+                        if (_viewModel.weightUnit == 'lbs') {
+                          valueToStore = value / kgToLbsFactor;
+                        }
+                        _viewModel.updateWeight(valueToStore.toPrecision(1));
+                        // _currentDisplayWeight is updated by viewModel watch in build method
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  _viewModel.weightUnit == 'kg'
-                      ? NumberPicker(
-                          minValue: minDisplayWeight.toInt(),
-                          maxValue: maxDisplayWeight.toInt(),
-                          value: _currentDisplayWeight.round(),
-                          onChanged: (value) {
-                            _viewModel.updateWeight(value.toDouble());
-                          },
-                          itemHeight: 70,
-                          itemWidth: 60,
-                          textStyle: TextStyle(fontSize: 20, color: theme.colorScheme.onSurfaceVariant),
-                          selectedTextStyle: TextStyle(fontSize: 28, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
-                          axis: Axis.horizontal,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: theme.colorScheme.outline),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        )
-                      : DecimalNumberPicker(
-                          minValue: minDisplayWeight.toInt(),
-                          maxValue: maxDisplayWeight.toInt(),
-                          value: _currentDisplayWeight,
-                          decimalPlaces: displayWeightDecimalPlaces,
-                          onChanged: (value) {
-                            double valueToStore = value;
-                            if (_viewModel.weightUnit == 'lbs') {
-                              valueToStore = value / kgToLbsFactor;
-                            }
-                            _viewModel.updateWeight(valueToStore.toPrecision(1));
-                          },
-                          itemHeight: 70,
-                          itemWidth: 60,
-                          textStyle: TextStyle(fontSize: 20, color: theme.colorScheme.onSurfaceVariant),
-                          selectedTextStyle: TextStyle(fontSize: 28, color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
-                          axis: Axis.horizontal,
-                          integerDecoration: BoxDecoration(
-                            border: Border.all(color: theme.colorScheme.outline),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          decimalDecoration: BoxDecoration(
-                            border: Border.all(color: theme.colorScheme.outline),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.remove_circle_outline, color: theme.colorScheme.secondary, size: 36),
+                        onPressed: () {
+                          double step = _viewModel.weightUnit == 'kg' ? 0.1 : 0.5;
+                          double newValue = (_currentDisplayWeight - step).clamp(minDisplayWeight, maxDisplayWeight);
+                          double valueToStore = newValue;
+                          if (_viewModel.weightUnit == 'lbs') {
+                            valueToStore = newValue / kgToLbsFactor;
+                          }
+                          _viewModel.updateWeight(valueToStore.toPrecision(1));
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.add_circle_outline, color: theme.colorScheme.secondary, size: 36),
+                        onPressed: () {
+                          double step = _viewModel.weightUnit == 'kg' ? 0.1 : 0.5;
+                          double newValue = (_currentDisplayWeight + step).clamp(minDisplayWeight, maxDisplayWeight);
+                          double valueToStore = newValue;
+                           if (_viewModel.weightUnit == 'lbs') {
+                            valueToStore = newValue / kgToLbsFactor;
+                          }
+                          _viewModel.updateWeight(valueToStore.toPrecision(1));
+                        },
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   CupertinoSlidingSegmentedControl<String>(
                     groupValue: _viewModel.weightUnit,

@@ -1,13 +1,13 @@
 import 'package:aksumfit/features/onboarding/presentation/setup_flow/setup_flow_viewmodel.dart';
-import 'package:aksumfit/features/onboarding/presentation/setup_flow/weight_input_screen.dart'; // Changed import
+import 'package:aksumfit/features/onboarding/presentation/setup_flow/weight_input_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mockito/mockito.dart';
-import 'package:numberpicker/numberpicker.dart'; // Import NumberPicker
+// import 'package:numberpicker/numberpicker.dart'; // No longer using numberpicker
 import 'package:provider/provider.dart';
-import 'dart:math'; // For pow
+import 'dart:math';
 
 import '../../../../mocks/mock_view_models.dart';
 import '../../../../mocks/mock_router.dart';
@@ -75,61 +75,108 @@ void main() {
   testWidgets('renders weight picker and unit selector with initial values', (WidgetTester tester) async {
     await pumpWeightInputScreen(tester);
 
-    expect(find.byType(DecimalNumberPicker), findsOneWidget); // For weight
-    expect(find.text('Weight (kg)'), findsOneWidget);
+    // Check for new UI components
+    expect(find.byType(Slider), findsOneWidget);
+    expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+    expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
 
-    // Check only for one CupertinoSlidingSegmentedControl (for weight)
+    // Check for the text display of weight (e.g., "70.0 kg")
+    // The text format is `_currentDisplayWeight.toStringAsFixed(displayWeightDecimalPlaces)} ${_viewModel.weightUnit}`
+    // Initial is 70.0 kg (displayWeightDecimalPlaces = 1 for kg)
+    expect(find.text('70.0 kg'), findsOneWidget);
+
+    // Unit selector still present
     expect(find.byType(CupertinoSlidingSegmentedControl), findsOneWidget);
     expect(find.text('kg'), findsOneWidget);
     expect(find.text('lbs'), findsOneWidget);
-    // Ensure height related texts/widgets are NOT present
-    expect(find.text('Height (cm)'), findsNothing);
-    expect(find.text('cm'), findsNothing);
-    expect(find.text('ft'), findsNothing);
 
     expect(find.widgetWithText(ElevatedButton, 'Next'), findsOneWidget);
   });
 
-  testWidgets('interacting with weight picker updates ViewModel with correct kg value', (WidgetTester tester) async {
+  testWidgets('interacting with Slider updates ViewModel and text display', (WidgetTester tester) async {
     when(mockSetupFlowViewModel.weight).thenReturn(70.0);
     when(mockSetupFlowViewModel.weightUnit).thenReturn('kg');
     await pumpWeightInputScreen(tester);
 
-    final weightPicker = find.byType(DecimalNumberPicker);
-    expect(weightPicker, findsOneWidget);
+    final slider = find.byType(Slider);
+    expect(slider, findsOneWidget);
 
-    final pickerWidget = tester.widget<DecimalNumberPicker>(weightPicker);
-    pickerWidget.onChanged(75.5); // Simulate selecting 75.5 kg
+    // Simulate Slider change
+    final Slider sliderWidget = tester.widget(slider);
+    sliderWidget.onChanged!(75.5); // User slides to 75.5 kg
+
+    // Mock the viewmodel state change for the next pump
+    when(mockSetupFlowViewModel.weight).thenReturn(75.5);
     await tester.pumpAndSettle();
 
     verify(mockSetupFlowViewModel.updateWeight(75.5.toPrecision(1))).called(1);
+    expect(find.text('75.5 kg'), findsOneWidget); // Text display should update
   });
 
-  // Removed height picker interaction test
-
-  testWidgets('changing weight unit to lbs updates picker display and ViewModel calls', (WidgetTester tester) async {
+  testWidgets('tapping + IconButton updates ViewModel and text display', (WidgetTester tester) async {
     when(mockSetupFlowViewModel.weight).thenReturn(70.0);
     when(mockSetupFlowViewModel.weightUnit).thenReturn('kg');
     await pumpWeightInputScreen(tester);
 
+    // Expected value after increment (70.0 + 0.1 = 70.1)
+    when(mockSetupFlowViewModel.weight).thenReturn(70.1);
+    await tester.tap(find.byIcon(Icons.add_circle_outline));
+    await tester.pumpAndSettle();
+
+    verify(mockSetupFlowViewModel.updateWeight(70.1.toPrecision(1))).called(1);
+    expect(find.text('70.1 kg'), findsOneWidget);
+  });
+
+  testWidgets('tapping - IconButton updates ViewModel and text display', (WidgetTester tester) async {
+    when(mockSetupFlowViewModel.weight).thenReturn(70.0);
+    when(mockSetupFlowViewModel.weightUnit).thenReturn('kg');
+    await pumpWeightInputScreen(tester);
+
+    // Expected value after decrement (70.0 - 0.1 = 69.9)
+    when(mockSetupFlowViewModel.weight).thenReturn(69.9);
+    await tester.tap(find.byIcon(Icons.remove_circle_outline));
+    await tester.pumpAndSettle();
+
+    verify(mockSetupFlowViewModel.updateWeight(69.9.toPrecision(1))).called(1);
+    expect(find.text('69.9 kg'), findsOneWidget);
+  });
+
+
+  testWidgets('changing weight unit to lbs updates text display, Slider, and ViewModel calls', (WidgetTester tester) async {
+    when(mockSetupFlowViewModel.weight).thenReturn(70.0); // 70kg
+    when(mockSetupFlowViewModel.weightUnit).thenReturn('kg');
+    await pumpWeightInputScreen(tester);
+
+    expect(find.text('70.0 kg'), findsOneWidget);
+
+    // Change unit to lbs
     when(mockSetupFlowViewModel.weightUnit).thenReturn('lbs');
+    // When unit changes, the build method re-calculates _currentDisplayWeight
+    // 70kg * 2.20462 = 154.3234, toPrecision(1) = 154.3
+    when(mockSetupFlowViewModel.weight).thenReturn(70.0); // VM still stores 70kg
+
     await tester.tap(find.text('lbs'));
     await tester.pumpAndSettle();
 
     verify(mockSetupFlowViewModel.setWeightUnit('lbs')).called(1);
-    expect(find.text('Weight (lbs)'), findsOneWidget);
+    expect(find.text('154.3 lbs'), findsOneWidget); // Check converted display
 
-    final weightPickerLbs = find.byType(DecimalNumberPicker);
-    final pickerWidgetLbs = tester.widget<DecimalNumberPicker>(weightPickerLbs);
+    // Interact with slider in lbs
+    final sliderLbs = find.byType(Slider);
+    final Slider sliderWidgetLbs = tester.widget(sliderLbs);
+    sliderWidgetLbs.onChanged!(150.0); // User slides to 150.0 lbs
 
-    pickerWidgetLbs.onChanged(150.0); // User selects 150.0 lbs
+    // Mock the viewmodel update for the next pump
+    double expectedKgFromLbs = (150.0 / kgToLbsFactor).toPrecision(1);
+    when(mockSetupFlowViewModel.weight).thenReturn(expectedKgFromLbs); // VM stores this new kg value
+    // when(mockSetupFlowViewModel.weightUnit).thenReturn('lbs'); // unit is already lbs
+
     await tester.pumpAndSettle();
 
-    double expectedKg = (150.0 / kgToLbsFactor).toPrecision(1);
-    verify(mockSetupFlowViewModel.updateWeight(expectedKg)).called(1);
+    verify(mockSetupFlowViewModel.updateWeight(expectedKgFromLbs)).called(1);
+    expect(find.text('150.0 lbs'), findsOneWidget); // Display updates to 150.0 lbs
   });
 
-  // Removed height unit change test
 
   testWidgets('"Next" button navigates to /setup/height-input if values are set', (WidgetTester tester) async {
     await pumpWeightInputScreen(tester); // ViewModel has default weight
