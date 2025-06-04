@@ -34,6 +34,9 @@ import '../features/onboarding/presentation/setup_flow/additional_info_screen.da
 import '../features/explore/presentation/screens/browse_workouts_screen.dart';
 // Progress Screens
 import '../features/progress/presentation/screens/detailed_progress_screen.dart';
+// Challenges Screens
+import '../features/challenges/presentation/screens/challenges_screen.dart';
+
 
 // Example of a simple "Not Authorized" screen
 class NotAuthorizedScreen extends StatelessWidget {
@@ -126,6 +129,13 @@ final GoRouter router = GoRouter(
       pageBuilder: (context, state) => CupertinoPage(
         key: state.pageKey,
         child: const OnboardingScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/challenges', // New Challenges Route
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const ChallengesScreen(),
       ),
     ),
     GoRoute(

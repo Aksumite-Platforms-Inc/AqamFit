@@ -97,21 +97,21 @@ class _NutritionScreenState extends State<NutritionScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context); // Get Material theme
 
-    return Scaffold( // Changed to Scaffold
-      appBar: AppBar( // Changed to AppBar
+    return Scaffold(
+      appBar: AppBar(
         title: const Text('Nutrition Dashboard'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: _showAddMealActionSheet, // Call the new method
-          ),
-        ],
+        // Removed actions IconButton
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddMealActionSheet,
+        tooltip: 'Log Meal',
+        child: const Icon(Icons.add),
       ),
       body: _userId == null
           ? Center(child: Text("Please login to view nutrition data.", style: theme.textTheme.titleMedium))
-          : RefreshIndicator( // Added RefreshIndicator
+          : RefreshIndicator(
               onRefresh: () async => _loadDailyLogForDate(_selectedDate),
-              child: ListView( // Changed CustomScrollView to ListView for simplicity with these elements
+              child: ListView(
                 padding: const EdgeInsets.all(16.0),
                 children: [
                   _buildDateHeaderMaterial(theme),
@@ -120,7 +120,7 @@ class _NutritionScreenState extends State<NutritionScreen> {
                     future: _dailyLogFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator()); // Changed to CircularProgressIndicator
+                        return const Center(child: CircularProgressIndicator());
                       }
                       if (snapshot.hasError) {
                         return Center(
@@ -133,6 +133,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
                         children: [
                           _buildSummaryCardMaterial(theme, dailyLog),
                           const SizedBox(height: 24),
+                          _buildWeeklySummaryCard(theme), // Added Weekly Summary Card
+                          const SizedBox(height: 24),
                           _buildMealsSectionMaterial(theme, dailyLog),
                         ],
                       );
@@ -141,6 +143,41 @@ class _NutritionScreenState extends State<NutritionScreen> {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildWeeklySummaryCard(ThemeData theme) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Weekly Summary", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(Icons.show_chart, color: theme.colorScheme.secondary),
+                const SizedBox(width: 8),
+                Expanded(child: Text("Weekly Calorie Trend Chart - Coming Soon!", style: theme.textTheme.bodyMedium)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.pie_chart_outline, color: theme.colorScheme.tertiary),
+                const SizedBox(width: 8),
+                Expanded(child: Text("Weekly Macros Distribution - Coming Soon!", style: theme.textTheme.bodyMedium)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Optional: Add a button to view more detailed weekly stats if planned
+            // TextButton(onPressed: () {}, child: const Text("View Weekly Details")),
+          ],
+        ),
+      ),
     );
   }
 
@@ -184,7 +221,21 @@ class _NutritionScreenState extends State<NutritionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Daily Summary", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Daily Summary", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                IconButton(
+                  icon: Icon(Icons.qr_code_scanner_outlined, color: theme.colorScheme.primary),
+                  tooltip: "Scan Barcode (Coming Soon)",
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Barcode Scanner feature is coming soon!")),
+                    );
+                  },
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             _buildMacroProgressMaterial("Calories", currentCalories, _targetCalories, "kcal", theme.colorScheme.primary, theme),
             const SizedBox(height: 12),
@@ -216,8 +267,8 @@ class _NutritionScreenState extends State<NutritionScreen> {
           value: progress,
           backgroundColor: progressColor.withOpacity(0.2),
           valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-          minHeight: 8,
-          borderRadius: BorderRadius.circular(4),
+          minHeight: 10, // Increased minHeight
+          borderRadius: BorderRadius.circular(5), // Adjusted borderRadius
         ),
       ],
     );

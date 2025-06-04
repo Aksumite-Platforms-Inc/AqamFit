@@ -127,7 +127,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
-          TextButton(onPressed: () {
+          ElevatedButton(onPressed: () { // Changed to ElevatedButton
             final quantity = double.tryParse(quantityController.text) ?? 0;
             _addFoodItemToMeal(foodItem, quantity, unitController.text);
             Navigator.of(context).pop();
@@ -157,7 +157,7 @@ class _LogMealScreenState extends State<LogMealScreen> {
         ])),
         actions: [
             TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
-            TextButton(onPressed: () {
+            ElevatedButton(onPressed: () { // Changed to ElevatedButton
                 if (_customFoodNameController.text.isEmpty || _customCaloriesController.text.isEmpty || _customProteinController.text.isEmpty ||
                     _customCarbsController.text.isEmpty || _customFatController.text.isEmpty || _customServingSizeQtyController.text.isEmpty ||
                     _customServingSizeUnitController.text.isEmpty) {
@@ -284,12 +284,13 @@ class _LogMealScreenState extends State<LogMealScreen> {
   }
 
   IconData _getMealTypeIcon(MealType type) {
+    // Using Material Design Icons for better visual variety and common Flutter styling
     switch (type) {
-      case MealType.breakfast: return CupertinoIcons.sunrise_fill;
-      case MealType.lunch: return CupertinoIcons.sun_max_fill;
-      case MealType.dinner: return CupertinoIcons.moon_stars_fill;
-      case MealType.snack: return CupertinoIcons.cube_box_fill;
-      default: return CupertinoIcons.square_fill_on_square_fill;
+      case MealType.breakfast: return Icons.breakfast_dining_outlined;
+      case MealType.lunch: return Icons.lunch_dining_outlined;
+      case MealType.dinner: return Icons.dinner_dining_outlined;
+      case MealType.snack: return Icons.fastfood_outlined;
+      default: return Icons.restaurant_outlined; // A generic fallback
     }
   }
 }

@@ -5,9 +5,17 @@ import 'package:aksumfit/models/weight_entry.dart';
 import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
+import 'package:aksumfit/models/daily_meal_log.dart';
+// import 'package:aksumfit/models/goal.dart'; // Not used in new structure
+import 'package:aksumfit/models/user.dart';
+import 'package:aksumfit/models/weight_entry.dart';
+import 'package:aksumfit/models/workout_plan.dart';
+import 'package:aksumfit/services/api_service.dart';
+import 'package:aksumfit/services/auth_manager.dart';
 import 'package:flutter/material.dart'; // Changed from Cupertino
 import 'package:go_router/go_router.dart';
 import 'package:aksumfit/features/home/widgets/streak_tracker_widget.dart';
+import 'package:aksumfit/features/home/widgets/muscle_heatmap_widget.dart'; // Import the new widget
 // Removed unused old widgets
 // import 'package:aksumfit/features/home/widgets/hero_workout_banner.dart';
 // import 'package:aksumfit/features/home/widgets/quick_action_tile.dart';
@@ -152,9 +160,21 @@ class _HomeScreenState extends State<HomeScreen> {
               future: _latestWeightFuture,
               builder: (context, snapshot) {
                  if (snapshot.connectionState == ConnectionState.waiting && snapshot.data == null) {
-                  return _buildPlaceholderCard("Loading Progress...");
+                  // Show placeholder for the weight card AND heatmap card while loading overall progress
+                  return Column(children: [
+                     _buildPlaceholderCard("Loading Progress Highlights..."),
+                     const SizedBox(height: 16),
+                     _buildPlaceholderCard("Loading Muscle Activity..."),
+                  ]);
                 }
-                return _buildProgressChartCard(snapshot.data);
+                // Once data (or lack thereof) for weight is known, build both cards.
+                // _buildMuscleHeatmapCard doesn't depend on _latestWeightFuture directly,
+                // but we group them for layout flow.
+                return Column(children: [
+                  _buildProgressChartCard(snapshot.data), // Existing card for weight etc.
+                  const SizedBox(height: 16),
+                  _buildMuscleHeatmapCard(theme), // New card for heatmap
+                ]);
               },
             ),
             const SizedBox(height: 16),
@@ -201,38 +221,78 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Today's Workout", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            Text("Let’s crush today’s set!", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             if (plan != null) ...[
-              Text(plan.name, style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Text(plan.description ?? 'No description available.', style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 16),
-              // Example progress, replace with actual logic if available
-              if(plan.estimatedDurationMinutes != null && plan.estimatedDurationMinutes! > 0) ...[
-                LinearProgressIndicator(
-                  value: 0.3, // Placeholder: (completed exercises / total exercises)
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                  minHeight: 6,
-                  borderRadius: BorderRadius.circular(3),
+              Card( // Inner card for the workout details
+                elevation: 1,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                color: theme.colorScheme.surfaceContainerLowest, // Slightly different background for the inner card
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.fitness_center, size: 24, color: theme.colorScheme.primary), // Placeholder icon
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(plan.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold))),
+                        ],
+                      ),
+                      if (plan.description != null && plan.description!.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(plan.description!, style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      ],
+                      const SizedBox(height: 16),
+                      if(plan.estimatedDurationMinutes != null && plan.estimatedDurationMinutes! > 0 && (plan.exercises.isNotEmpty) ) ...[
+                        // Example progress, replace with actual logic if available
+                        // Assuming progress is 0 for now if not tracked
+                        LinearProgressIndicator(
+                          value: 0.0, // Placeholder: (completed exercises / total exercises)
+                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                          minHeight: 6,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        const SizedBox(height: 8),
+                        Text("0 of ${plan.exercises.length} exercises completed", style: theme.textTheme.bodySmall), // Updated to reflect actual exercise count
+                        const SizedBox(height: 16),
+                      ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Edit Tapped (Placeholder)")));
+                            },
+                            child: const Text("Edit"),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Track Tapped (Placeholder)")));
+                            },
+                            child: const Text("Track"),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
+                            ),
+                            onPressed: () {
+                              if (plan.id.isNotEmpty) {
+                                context.go('/workout-plans/${plan.id}');
+                              }
+                            },
+                            child: const Text("Start"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text("3 of ${plan.exercises.length ?? 10} exercises completed", style: theme.textTheme.bodySmall),
-                const SizedBox(height: 16),
-              ],
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
-                    minimumSize: const Size(double.infinity, 40)
-                ),
-                onPressed: () {
-                  if (plan.id.isNotEmpty) {
-                     context.go('/workout-plans/${plan.id}');
-                  }
-                },
-                child: const Text("Start Workout"),
               ),
             ] else ...[
               Text("No workout scheduled for today. Rest up or pick one from your plans!", style: theme.textTheme.bodyMedium),
@@ -241,9 +301,9 @@ class _HomeScreenState extends State<HomeScreen> {
                  style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.secondary,
                     foregroundColor: theme.colorScheme.onSecondary,
-                    minimumSize: const Size(double.infinity, 40)
+                    minimumSize: const Size(double.infinity, 40) // Keep button full width
                 ),
-                onPressed: () => context.go('/browse-workouts'), // Navigate to new browse workouts screen
+                onPressed: () => context.go('/browse-workouts'),
                 child: const Text("Browse Workouts"),
               ),
             ],
@@ -345,6 +405,28 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             TextButton(onPressed: () => context.go('/progress'), child: const Text("View Detailed Progress"))
 
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChallengesCard() {
+    final theme = Theme.of(context);
+    // This card remains focused on weight and general progress link
+  Widget _buildMuscleHeatmapCard(ThemeData theme) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Muscle Activity Heatmap", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            const MuscleHeatmapWidget(), // The new widget
+            // The "View Detailed Progress" button is now part of MuscleHeatmapWidget
           ],
         ),
       ),

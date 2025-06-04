@@ -78,21 +78,24 @@ class ExploreScreen extends StatelessWidget {
                   ),
                   CupertinoListSection.insetGrouped(
                     header: const Text("Active Challenges"),
-                    children: const [
-                      ChallengeTile(
+                    children: [ // Removed const
+                      const ChallengeTile( // Keep existing tiles for a preview
                         title: "30-Day Abs Challenge",
                         description: "Get ready to sculpt your core with daily targeted workouts.",
                         participationStats: "1.5k active",
                       ),
-                      ChallengeTile(
+                      const ChallengeTile(
                         title: "Mindfulness Journey",
                         description: "Join our 2-week meditation and mindfulness program.",
                         participationStats: "950 joined",
                       ),
-                      ChallengeTile(
-                        title: "Run Your First 5K",
-                        description: "A guided plan to get you across the finish line.",
-                        participationStats: "780 runners",
+                      // Add a tile to navigate to the full challenges screen
+                      CupertinoListTile(
+                        title: const Text("View All Challenges"),
+                        trailing: const Icon(CupertinoIcons.forward),
+                        onTap: () {
+                          context.go('/challenges');
+                        },
                       ),
                     ],
                   ),

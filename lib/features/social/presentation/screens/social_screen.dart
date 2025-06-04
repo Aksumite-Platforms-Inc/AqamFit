@@ -158,16 +158,115 @@ class _SocialScreenState extends State<SocialScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            // Placeholder for Social Feed
-            Text("Social Feed", style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
-            Container(
-              height: 200, alignment: Alignment.center, margin: const EdgeInsets.symmetric(vertical: 12.0),
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: theme.dividerColor.withOpacity(0.5)),
+            // Enhanced Community Feed Section
+            Text("Community Feed", style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 12),
+
+            // 1. Post Update Input Card
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: "Share your workout or thoughts...",
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        filled: true,
+                        fillColor: theme.colorScheme.surfaceContainerLowest,
+                      ),
+                      maxLines: 3,
+                      readOnly: true, // Placeholder
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Post functionality coming soon!")),
+                          );
+                        },
+                        child: const Text("Post")
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: const Text("Feed items will appear here..."),
+            ),
+            const SizedBox(height: 16),
+
+            // 2. Example Group Discussion Post
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      const CircleAvatar(child: Icon(Icons.person)),
+                      const SizedBox(width: 8),
+                      Text("UserA_FitnessFan", style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    ]),
+                    const SizedBox(height: 8),
+                    Text("Anyone tried the new HIIT challenge? Looking for tips on pacing myself for the full 30 minutes!", style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Text("Reactions: 👍 (12) 🔥 (5) | Comments: 4", style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 3. Example Daily Motivational Thread
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      CircleAvatar(backgroundColor: theme.colorScheme.primaryContainer, child: Icon(Icons.star, color: theme.colorScheme.onPrimaryContainer)),
+                      const SizedBox(width: 8),
+                      Text("AksumFit Bot", style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    ]),
+                    const SizedBox(height: 8),
+                    Text("Daily Motivation ✨: What's one small victory you're aiming for today, big or small?", style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Text("Reactions: ❤️ (30) 💪 (15) | Comments: 18", style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // 4. Example User Workout Post
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      const CircleAvatar(child: Icon(Icons.person_outline)),
+                      const SizedBox(width: 8),
+                      Text("RunnerGal_77", style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    ]),
+                    const SizedBox(height: 8),
+                    Text("Just crushed my morning 5k! 🏃‍♀️ Feeling energized and ready for the day. #running #fitnessjourney", style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 8),
+                    Text("Reactions: 🎉 (8) | Comments: 3", style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline)),
+                  ],
+                ),
+              ),
             ),
             const Divider(height: 30, thickness: 1),
 

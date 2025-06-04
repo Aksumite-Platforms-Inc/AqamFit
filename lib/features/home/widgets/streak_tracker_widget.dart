@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart'; // Import Lottie
 
 class StreakTrackerWidget extends StatefulWidget {
   final int streakCount;
@@ -11,46 +11,29 @@ class StreakTrackerWidget extends StatefulWidget {
   State<StreakTrackerWidget> createState() => _StreakTrackerWidgetState();
 }
 
-class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
+class _StreakTrackerWidgetState extends State<StreakTrackerWidget> {
+  // AnimationController and ScaleAnimation are removed as Lottie will handle its own animation.
+  // If specific control over Lottie playback is needed (e.g., start/stop based on streak),
+  // an AnimationController for Lottie can be added here.
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate( // Reduced scale slightly
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    // Play animation only if streak is active
-    if (widget.streakCount > 0) {
-      _animationController.repeat(reverse: true);
-    }
+    // If you need to control Lottie animation (e.g. play once, then stop)
+    // you might initialize a Lottie controller here.
+    // For a simple looping flame, Lottie's default behavior might be sufficient.
   }
 
   @override
   void didUpdateWidget(covariant StreakTrackerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.streakCount != oldWidget.streakCount) {
-      if (widget.streakCount > 0 && !_animationController.isAnimating) {
-        _animationController.repeat(reverse: true);
-      } else if (widget.streakCount == 0 && _animationController.isAnimating) {
-        _animationController.stop();
-        _animationController.reset(); // Reset to initial scale
-      }
-    }
+    // Logic related to _animationController is removed.
+    // If Lottie animation needs to change based on streakCount, add logic here.
   }
-
 
   @override
   void dispose() {
-    _animationController.dispose();
+    // Dispose Lottie controller if it was initialized.
     super.dispose();
   }
 
@@ -58,87 +41,67 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
-    final TextTheme textTheme = theme.textTheme;
-    const double cardBorderRadius = 12.0; // Define for consistency
+    // final TextTheme textTheme = theme.textTheme; // Kept for potential future use
+    const double cardBorderRadius = 12.0;
+
+    String subtitleText;
+    if (widget.streakCount > 0) {
+      subtitleText =
+          "You’ve worked out ${widget.streakCount} days in a row – Keep the fire burning!";
+    } else {
+      subtitleText = "Log a workout to start a streak!";
+    }
 
     return Card(
-      clipBehavior: Clip.antiAlias, // Ensures content respects card's shape
-      shape: RoundedRectangleBorder( // Ensure Card shape is defined if not default
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(cardBorderRadius),
       ),
-      child: Stack(
-        children: [
-          // Layer 1: Background Image
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(cardBorderRadius),
-              child: Image.asset(
-                'assets/images/streak_background.png', // Path to your image
-                fit: BoxFit.cover,
-                // Optional: Add errorBuilder for placeholder if image fails to load
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(color: Colors.grey[300], child: const Center(child: Icon(Icons.image_not_supported)));
-                },
+      // Consider adding a subtle background color to the card if needed,
+      // e.g., color: colorScheme.surfaceVariant.withOpacity(0.5),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+          crossAxisAlignment: CrossAxisAlignment.center, // Center content horizontally
+          children: [
+            Lottie.asset(
+              'assets/lottie/flame_animation.json',
+              width: 100,
+              height: 100,
+              fit: BoxFit.contain,
+              // controller: _lottieController, // Add if you need specific Lottie animation control
+              // repeat: true, // Ensure it loops, Lottie might do this by default
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "Current Streak", // This title can remain or be removed if Lottie is self-explanatory
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface, // Adjusted for card background
               ),
             ),
-          ),
-          // Layer 2: Semi-transparent Overlay
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(cardBorderRadius),
-              child: Container(
-                color: Colors.black.withOpacity(0.4), // Adjust opacity as needed
+            const SizedBox(height: 8),
+            Text(
+              "${widget.streakCount} Day${widget.streakCount == 1 ? '' : 's'}",
+              style: GoogleFonts.inter(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary, // Use primary color for emphasis
               ),
             ),
-          ),
-          // Layer 3: Content
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    ScaleTransition(
-                      scale: _scaleAnimation,
-                      child: const Icon(
-                        CupertinoIcons.flame_fill,
-                        color: Colors.orangeAccent, // Changed for better visibility
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Current Streak",
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white, // Changed for better visibility
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  "${widget.streakCount} Day${widget.streakCount == 1 ? '' : 's'}",
-                  style: GoogleFonts.inter(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // Changed for better visibility (or a light primary shade)
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.streakCount > 0 ? "Keep the fire alive!" : "Log a workout to start a streak!",
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: Colors.white.withOpacity(0.85), // Changed for better visibility
-                  ),
-                ),
-              ],
+            const SizedBox(height: 6),
+            Text(
+              subtitleText,
+              textAlign: TextAlign.center, // Ensure subtitle is centered
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                color: colorScheme.onSurfaceVariant, // Adjusted for card background
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
