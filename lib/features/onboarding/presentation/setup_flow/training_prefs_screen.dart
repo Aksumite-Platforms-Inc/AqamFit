@@ -41,7 +41,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             // No need to save here as selections are updated instantly
-            context.pop();
+            context.go('/setup/experience-level');
           },
         ),
         centerTitle: true, // Center AppBar title
@@ -179,19 +179,19 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
               ),
               child: const Text('Next'),
             ),
-            const SizedBox(height: 8), // Space for back button or other elements
-             TextButton( // Using TextButton for "Back" for a less prominent look if preferred
-              onPressed: () {
-                context.pop();
-              },
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: Text(
-                'Back',
-                style: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
-              ),
-            ),
+            // const SizedBox(height: 8), // Space for back button or other elements
+            //  TextButton( // Using TextButton for "Back" for a less prominent look if preferred
+            //   onPressed: () {
+            //     context.pop();
+            //   },
+            //   style: TextButton.styleFrom(
+            //     padding: const EdgeInsets.symmetric(vertical: 12),
+            //   ),
+            //   child: Text(
+            //     'Back',
+            //     style: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
+            //   ),
+            // ),
           ],
         ),
       ),
