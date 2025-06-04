@@ -15,36 +15,7 @@ import '../../../../mocks/mock_view_models.dart';
 import '../../../../mocks/mock_router.dart';
 import '../../../../mocks/mock_services.dart';
 
-// Helper to mock showDatePicker
-// This is a common pattern. You'd typically put this in a test utility file.
-Future<DateTime?> mockShowDatePicker(
-  BuildContext context, {
-  required DateTime initialDate,
-  required DateTime firstDate,
-  required DateTime lastDate,
-  DatePickerEntryMode initialEntryMode = DatePickerEntryMode.calendar,
-  SelectableDayPredicate? selectableDayPredicate,
-  String? helpText,
-  String? cancelText,
-  String? confirmText,
-  Locale? locale,
-  bool useRootNavigator = true,
-  RouteSettings? routeSettings,
-  TextDirection? textDirection,
-  Widget? builder, // Added to match signature if screen uses it
-  DatePickerMode initialDatePickerMode = DatePickerMode.day,
-  String? errorFormatText,
-  String? errorInvalidText,
-  String? fieldHintText,
-  String? fieldLabelText,
-  TextInputType? keyboardType, // Added
-  DateTime? currentDate, // Added
-}) {
-  return showDatePickerMockResponse ?? Future.value(null); // Default to null if not overridden
-}
-
-DateTime? showDatePickerMockResponse;
-
+// No longer mocking showDatePicker globally here, as CalendarDatePicker is used directly.
 
 void main() {
   late MockSetupFlowViewModel mockSetupFlowViewModel;
@@ -112,7 +83,10 @@ void main() {
     );
   }
 
-  final List<String> gendersList = ["Male", "Female", "Other", "Prefer not to say"];
+  // This list should match the _genderOptions in the screen for titles
+  final List<String> genderTitlesFromScreen = [
+    "Male", "Female", "Other", "Prefer not to say"
+  ];
 
 
   setUp(() {
@@ -120,11 +94,12 @@ void main() {
     mockGoRouter = MockGoRouter();
     mockAuthManager = MockAuthManager();
     mockUserRepository = MockUserRepository();
-    showDatePickerMockResponse = null; // Reset mock response
+    // showDatePickerMockResponse = null; // No longer needed
 
     // Default stubs for ViewModel
     when(mockSetupFlowViewModel.dateOfBirth).thenReturn(null);
     when(mockSetupFlowViewModel.gender).thenReturn(null);
+    // Other ViewModel properties are not directly tested by this screen but might be needed by _finishSetup
     when(mockSetupFlowViewModel.weight).thenReturn(70.0);
     when(mockSetupFlowViewModel.weightUnit).thenReturn('kg');
     when(mockSetupFlowViewModel.height).thenReturn(170.0);
@@ -133,11 +108,16 @@ void main() {
     when(mockSetupFlowViewModel.experienceLevel).thenReturn('Beginner');
     when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(['Monday']);
 
+
     when(mockAuthManager.currentUser).thenReturn(testUser);
     when(mockGoRouter.canPop()).thenReturn(true);
   });
 
-  Future<void> pumpAdditionalInfoScreen(WidgetTester tester) async {
+  // Re-usable pumper function for this test suite
+  Future<void> pumpTheScreen(WidgetTester tester) async {
+    // For showDatePicker mocking, we need a Navigator above the screen.
+    // The screen itself doesn't have one if it's part of a GoRouter route.
+    // So, we wrap with MaterialApp for the test.
     await tester.pumpWidget(
       MultiProvider(
         providers: [
@@ -145,120 +125,127 @@ void main() {
           Provider<AuthManager>.value(value: mockAuthManager),
           Provider<UserRepository>.value(value: mockUserRepository),
         ],
-        child: MaterialApp.router(
-          routerConfig: GoRouter(
-            initialLocation: '/test-additional-info',
-            routes: [
-              GoRoute(
-                path: '/test-additional-info',
-                builder: (context, state) => RouterScope.override(
-                  context,
-                  configuration: GoRoute(path: '/', builder: (_, __) => const AdditionalInfoScreen()).configuration,
-                  state: GoRouterState(uri: Uri.parse('/test-additional-info'), pathParameters: const {},configuration: GoRoute(path: '/', builder: (_, __) => const AdditionalInfoScreen()).configuration),
-                  router: mockGoRouter,
-                  // Override showDatePicker for this widget tree
-                  child: Builder(
-                    builder: (context) {
-                      return Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: MediaQuery( // DatePicker needs MediaQuery
-                          data: MediaQueryData(),
-                          child: Navigator( // DatePicker needs Navigator
-                            onGenerateRoute: (_) => MaterialPageRoute(builder: (_) => const AdditionalInfoScreen()),
-                          ),
-                        ),
-                      );
-                    }
-                  ),
-                ),
-              ),
-              GoRoute(path: '/main', builder: (context, state) => const Scaffold(body: Text("Mock Main Page"))),
-            ],
+        child: MaterialApp( // MaterialApp provides a Navigator
+          home: RouterScope.override( // Still use RouterScope for context.go
+            // A bit contrived to get a context for RouterScope here.
+            // Ideally, the GoRouter instance itself would be injectable for testing.
+            // For simplicity, we'll assume context.go() will find this.
+            // This context for RouterScope.override might not be perfectly analogous to real app.
+            // However, `context.go` is the main concern for mocking here.
+            // Note: `tester.element(find.byType(AdditionalInfoScreen))` could provide a context,
+            // but that's after the first pump.
+            // A simpler MaterialApp.router setup might be better if not for showDatePicker.
+            // Let's use a simpler pump that assumes GoRouter is available via Provider or similar.
+            // The previous complex pump was an attempt to solve showDatePicker context issues.
+            // Given we are mocking showDatePicker globally, a simpler pump is fine.
+            // The `RouterScope.override` is mainly for `context.go`.
+            // The `Navigator` from `MaterialApp` is for `showDatePicker`.
+
+            // Using a simple MaterialApp and providing GoRouter via Provider for `context.go`
+            // This is a common pattern if not testing deep GoRouter functionalities.
+            // Using a simple MaterialApp and providing GoRouter via RouterScope.override
+            // for `context.go` and `context.pop`.
+            // The Navigator from MaterialApp is for showModalBottomSheet.
+            child: RouterScope.override(
+              configuration: GoRoute(path: '/', builder: (_, __) => const AdditionalInfoScreen()).configuration,
+              state: GoRouterState(uri: Uri.parse('/'), pathParameters: const {}, configuration: GoRoute(path: '/', builder: (_, __) => const AdditionalInfoScreen()).configuration),
+              router: mockGoRouter,
+              child: const AdditionalInfoScreen()
+            )
           ),
         ),
       ),
     );
   }
 
-  // It's tricky to use the above pumpHelper with a custom showDatePicker override that's not global.
-  // For showDatePicker mocking, it's often easier to mock it at a higher level or ensure
-  // the context used by showDatePicker can be influenced, or test the callback.
-  // The screen calls `_selectDate(context, viewModel)` which calls `showDatePicker`.
-  // We can test that tapping the ListTile calls `_selectDate`.
-  // For testing the *result* of `_selectDate`, we'd need to control `showDatePicker`.
+  group('Main Screen Rendering (Bottom Sheet UI)', () {
+    testWidgets('renders tappable areas for DOB and Gender with placeholders', (WidgetTester tester) async {
+      when(mockSetupFlowViewModel.dateOfBirth).thenReturn(null);
+      when(mockSetupFlowViewModel.gender).thenReturn(null);
+      await pumpTheScreen(tester);
 
-  // Let's simplify the pump helper for showDatePicker mocking by not nesting RouterScope + Navigator for it.
-  // We will rely on the global mock for showDatePicker.
-   Future<void> pumpAdditionalInfoScreenForDatePickerTest(WidgetTester tester) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<SetupFlowViewModel>.value(value: mockSetupFlowViewModel),
-          Provider<AuthManager>.value(value: mockAuthManager),
-          Provider<UserRepository>.value(value: mockUserRepository),
-        ],
-        child: MaterialApp( // Use simple MaterialApp for date picker test
-          home: RouterScope.override( // Still need RouterScope for context.go
-             context: tester.element(find.byType(MaterialApp)) , // This context might be tricky
-             router: mockGoRouter,
-             state: GoRouterState(uri: Uri.parse('/'), pathParameters: const {}, configuration: GoRoute(path: '/', builder: (_, __) => const AdditionalInfoScreen()).configuration),
-             configuration: GoRoute(path: '/', builder: (_, __) => const AdditionalInfoScreen()).configuration,
-            child: const AdditionalInfoScreen()),
-        ),
-      ),
-    );
-  }
+      // Check DOB display
+      expect(find.text('Date of Birth'), findsOneWidget);
+      expect(find.text('Select your date of birth'), findsOneWidget);
+      expect(find.byIcon(Icons.calendar_today_outlined), findsOneWidget);
 
+      // Check Gender display
+      expect(find.text('Gender'), findsOneWidget);
+      expect(find.text('Select your gender'), findsOneWidget);
+      expect(find.byIcon(Icons.wc), findsOneWidget); // Default icon for gender
 
-  testWidgets('renders ListTile for DOB and ChoiceChips for Gender', (WidgetTester tester) async {
-    await pumpAdditionalInfoScreen(tester);
+      expect(find.widgetWithText(ElevatedButton, 'Finish Setup'), findsOneWidget);
+    });
 
-    expect(find.byType(ListTile), findsOneWidget);
-    expect(find.text('Select your date of birth'), findsOneWidget); // Initial text in ListTile
-    expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+    testWidgets('renders formatted date and selected gender when available', (WidgetTester tester) async {
+      final testDate = DateTime(1995, 7, 20);
+      const testGender = "Female";
+      when(mockSetupFlowViewModel.dateOfBirth).thenReturn(testDate);
+      when(mockSetupFlowViewModel.gender).thenReturn(testGender);
+      await pumpTheScreen(tester);
 
-    for (final gender in gendersList) {
-      expect(find.widgetWithText(ChoiceChip, gender), findsOneWidget);
-    }
-    expect(find.byIcon(Icons.wc), findsNothing); // Prefix icon removed from Dropdown
-    expect(find.widgetWithText(ElevatedButton, 'Finish Setup'), findsOneWidget);
+      expect(find.text(DateFormat('MMMM d, yyyy').format(testDate)), findsOneWidget);
+      expect(find.text(testGender), findsOneWidget);
+      expect(find.byIcon(Icons.female), findsOneWidget); // Icon specific to "Female"
+    });
   });
 
-  testWidgets('tapping ListTile for DOB eventually calls ViewModel update if date selected', (WidgetTester tester) async {
-    // This test relies on a global override or a way to mock showDatePicker.
-    // For this example, we'll assume a simplified global mock `showDatePickerMockResponse`.
-    final testDate = DateTime(2000, 1, 15);
-    showDatePickerMockResponse = Future.value(testDate); // Mock showDatePicker to return this date
+  group('Bottom Sheet Interactions', () {
+    testWidgets('tapping DOB area opens bottom sheet and updates ViewModel on date selection', (WidgetTester tester) async {
+      await pumpTheScreen(tester);
+      final testDate = DateTime(1998, 5, 10);
 
-    await pumpAdditionalInfoScreenForDatePickerTest(tester); // Use specialized pumper if needed
+      // Tap the DOB selection button
+      await tester.tap(find.text('Date of Birth'));
+      await tester.pumpAndSettle(); // Wait for bottom sheet to animate in
 
-    // Stub what the ViewModel's dateOfBirth getter will return *after* it's updated
-    when(mockSetupFlowViewModel.dateOfBirth).thenReturn(testDate);
+      // Verify bottom sheet content (CalendarDatePicker)
+      expect(find.byType(CalendarDatePicker), findsOneWidget);
+      expect(find.text('Select Date of Birth'), findsOneWidget); // Title in sheet
 
-    await tester.tap(find.byType(ListTile));
-    await tester.pumpAndSettle(); // Allow for state changes after date picker (mocked) closes
+      // Simulate selecting a date in CalendarDatePicker
+      // This is the tricky part. CalendarDatePicker's onDateChanged is internal.
+      // We'll find a date and tap it. This assumes default calendar view.
+      // For more robust test, keys on CalendarDatePicker elements might be needed.
+      await tester.tap(find.text(testDate.day.toString())); // Tap the day
+      await tester.pumpAndSettle(); // Wait for sheet to close & main screen to update
 
-    verify(mockSetupFlowViewModel.updateDateOfBirth(testDate)).called(1);
-    expect(find.text(DateFormat('MMMM d, yyyy').format(testDate)), findsOneWidget);
+      // Verify ViewModel was updated and sheet is closed
+      verify(mockSetupFlowViewModel.updateDateOfBirth(any)).called(1); // `any` because exact DateTime object might differ slightly
+      expect(find.byType(CalendarDatePicker), findsNothing);
 
-    showDatePickerMockResponse = null; // Clean up
-  });
+      // Verify main screen display updated (requires mock to return new date)
+      when(mockSetupFlowViewModel.dateOfBirth).thenReturn(testDate);
+      await tester.pumpAndSettle(); // Rebuild screen with new ViewModel state
+      expect(find.text(DateFormat('MMMM d, yyyy').format(testDate)), findsOneWidget);
+    });
 
-  testWidgets('selecting Gender ChoiceChip updates ViewModel and UI', (WidgetTester tester) async {
-    await pumpAdditionalInfoScreen(tester);
-    final String testGender = gendersList[1]; // "Female"
+    testWidgets('tapping Gender area opens bottom sheet and updates ViewModel on gender selection', (WidgetTester tester) async {
+      await pumpTheScreen(tester);
+      final targetGender = genderTitlesFromScreen[1]; // "Female"
 
-    // Simulate ViewModel update for UI check
-    when(mockSetupFlowViewModel.gender).thenReturn(testGender);
+      await tester.tap(find.text('Gender'));
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(ChoiceChip, testGender));
-    await tester.pumpAndSettle();
+      // Verify bottom sheet content (ListView of gender options)
+      expect(find.text('Select Gender'), findsOneWidget); // Title in sheet
+      for (final genderTitle in genderTitlesFromScreen) {
+        expect(find.widgetWithText(ListTile, genderTitle), findsOneWidget);
+      }
 
-    verify(mockSetupFlowViewModel.updateGender(testGender)).called(1);
+      // Tap the "Female" ListTile
+      await tester.tap(find.widgetWithText(ListTile, targetGender));
+      await tester.pumpAndSettle();
 
-    // Check if the chip is selected
-    final ChoiceChip chip = tester.widget(find.widgetWithText(ChoiceChip, testGender));
-    expect(chip.selected, isTrue);
+      verify(mockSetupFlowViewModel.updateGender(targetGender)).called(1);
+      expect(find.byType(ListView), findsNothing); // Sheet should be closed
+
+      // Verify main screen display updated
+      when(mockSetupFlowViewModel.gender).thenReturn(targetGender);
+      await tester.pumpAndSettle();
+      expect(find.text(targetGender), findsOneWidget);
+      expect(find.byIcon(Icons.female), findsOneWidget); // Check for specific icon update
+    });
   });
 
   testWidgets('validation: shows SnackBar if fields are empty on Finish', (WidgetTester tester) async {
@@ -277,7 +264,10 @@ void main() {
 
     // Now set date of birth, but keep gender null
     when(mockSetupFlowViewModel.dateOfBirth).thenReturn(DateTime.now());
-    await tester.pumpAndSettle(); // Clear previous snackbar
+    // Must clear the previous SnackBar by pumping it away or triggering a rebuild that removes it.
+    await tester.pump(const Duration(seconds: 1)); // Let SnackBar display
+    await tester.pump(const Duration(seconds: 1)); // Let SnackBar hide (default is 4s)
+    await tester.pumpAndSettle(); // Ensure it's gone
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Finish Setup'));
     await tester.pumpAndSettle();

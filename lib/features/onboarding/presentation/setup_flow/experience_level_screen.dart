@@ -68,7 +68,7 @@ class _ExperienceLevelScreenState extends State<ExperienceLevelScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0), // Consistent padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

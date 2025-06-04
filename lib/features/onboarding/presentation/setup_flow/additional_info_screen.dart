@@ -14,76 +14,154 @@ class AdditionalInfoScreen extends StatefulWidget {
   State<AdditionalInfoScreen> createState() => _AdditionalInfoScreenState();
 }
 
-class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
-  // _formKey might still be useful if we want to trigger all validations at once,
-  // but individual field validators are removed.
-  final _formKey = GlobalKey<FormState>();
-  final List<String> _genders = ["Male", "Female", "Other", "Prefer not to say"];
-  bool _isFinishing = false;
+// _GenderOption can be kept if we want icons in the bottom sheet list tiles too.
+// For simplicity, the bottom sheet might just use text.
+// Let's keep it for now, can decide in the _showGenderPickerBottomSheet implementation.
+class _GenderOption {
+  final String title;
+  final IconData icon; // Icon for the card, maybe also for list tile
+  _GenderOption({required this.title, required this.icon});
+}
 
-  // No TextEditingController needed for DOB anymore
-  // late TextEditingController _dateOfBirthController;
+class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
+  // This list is used for the bottom sheet options now
+  final List<_GenderOption> _genderOptions = [
+    _GenderOption(title: "Male", icon: Icons.male),
+    _GenderOption(title: "Female", icon: Icons.female),
+    _GenderOption(title: "Other", icon: Icons.transgender),
+    _GenderOption(title: "Prefer not to say", icon: Icons.question_mark),
+  ];
+  bool _isFinishing = false;
 
   @override
   void initState() {
     super.initState();
-    // ViewModel is accessed via context.read or context.watch in build/methods
   }
 
   @override
   void dispose() {
-    // No controllers to dispose
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context, SetupFlowViewModel viewModel) async {
-    final DateTime? picked = await showDatePicker(
+  // --- Date of Birth Bottom Sheet ---
+  Future<void> _showDobPickerBottomSheet(BuildContext context, SetupFlowViewModel viewModel) async {
+    final DateTime? picked = await showModalBottomSheet<DateTime>(
       context: context,
-      initialDate: viewModel.dateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 18)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) { // Optional: Theme the date picker
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Theme.of(context).colorScheme.onPrimary,
+      isScrollControlled: true, // Allows content to determine height
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (sheetContext) {
+        // Use a local variable to hold the picked date within the sheet
+        // until "OK" or selection is made. CalendarDatePicker updates immediately.
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Date of Birth',
+                  style: Theme.of(sheetContext).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                CalendarDatePicker(
+                  initialDate: viewModel.dateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 18)),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                  onDateChanged: (newDate) {
+                    viewModel.updateDateOfBirth(newDate);
+                    Navigator.pop(sheetContext); // Close sheet after selection
+                  },
+                ),
+                // Optionally, add OK/Cancel buttons if onDateChanged doesn't pop immediately
+              ],
             ),
           ),
-          child: child!,
         );
       },
     );
-    if (picked != null && picked != viewModel.dateOfBirth) {
-      viewModel.updateDateOfBirth(picked);
-      // No controller to update, UI will rebuild via watch(viewModel)
-    }
+    // 'picked' will be null if dismissed without selection through onDateChanged pop.
+    // If using OK/Cancel, picked would be set by Navigator.pop(context, date).
   }
 
+  // --- Gender Bottom Sheet ---
+  Future<void> _showGenderPickerBottomSheet(BuildContext context, SetupFlowViewModel viewModel) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Select Gender',
+                  style: Theme.of(sheetContext).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 10),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _genderOptions.length,
+                  itemBuilder: (context, index) {
+                    final option = _genderOptions[index];
+                    final bool isSelected = viewModel.gender == option.title;
+                    return ListTile(
+                      leading: Icon(option.icon, color: isSelected ? Theme.of(sheetContext).colorScheme.primary : null),
+                      title: Text(
+                        option.title,
+                        style: TextStyle(
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? Theme.of(sheetContext).colorScheme.primary : null,
+                        ),
+                      ),
+                      trailing: isSelected ? Icon(Icons.check, color: Theme.of(sheetContext).colorScheme.primary) : null,
+                      onTap: () {
+                        viewModel.updateGender(option.title);
+                        Navigator.pop(sheetContext);
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   Future<void> _finishSetup() async {
-    final viewModel = context.read<SetupFlowViewModel>(); // Use read for one-off actions
-    bool valid = true;
+    final viewModel = context.read<SetupFlowViewModel>();
+    // bool valid = true; // Not strictly needed due to early returns
     if (viewModel.dateOfBirth == null) {
-      valid = false;
+      // valid = false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select your date of birth.')),
       );
-      return; // Exit early if first validation fails
+      return;
     }
     if (viewModel.gender == null) {
-      valid = false;
+      // valid = false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select your gender.')),
       );
-      return; // Exit early
+      return;
     }
 
-    if (!valid) return; // Should have been caught by early returns
+    // if (!valid) return; // Not needed
 
     setState(() {
       _isFinishing = true;
     });
 
+    // ViewModel already obtained with context.read earlier in this method.
+    // final viewModel = context.read<SetupFlowViewModel>();
     final authManager = context.read<AuthManager>();
     final userRepository = context.read<UserRepository>();
 
@@ -153,108 +231,48 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Consistent padding
-        child: Form(
-          key: _formKey,
-          child: Column( // Changed to Column for better control with Spacer
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Text(
-                'Just a few more details...', // Main screen title
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                'Just a few more details...',
+                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // Date of Birth Card
-              Center(
-                child: Text(
-                  'Your Birthday',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0), // Reduced padding for ListTile
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: ListTile(
-                  leading: Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.primary),
-                  title: Text(
-                    viewModel.dateOfBirth != null
-                        ? DateFormat('MMMM d, yyyy').format(viewModel.dateOfBirth!)
-                        : 'Select your date of birth',
-                    style: TextStyle(
-                      color: viewModel.dateOfBirth != null
-                             ? Theme.of(context).colorScheme.onSurface
-                             : Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
-                      fontSize: 16, // Consistent font size
-                    ),
-                    textAlign: viewModel.dateOfBirth == null ? TextAlign.start : TextAlign.start, // Align text to start
-                  ),
-                  trailing: Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                  onTap: () => _selectDate(context, viewModel),
-                ),
+              // --- Date of Birth Tappable Area ---
+              _buildSelectionButton(
+                context: context,
+                icon: Icons.calendar_today_outlined,
+                label: 'Date of Birth',
+                value: viewModel.dateOfBirth != null
+                    ? DateFormat('MMMM d, yyyy').format(viewModel.dateOfBirth!)
+                    : 'Select your date of birth',
+                onTap: () => _showDobPickerBottomSheet(context, viewModel),
               ),
               const SizedBox(height: 24),
 
-              // Gender Card
-              Center(
-                child: Text(
-                  'Your Gender',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+              // --- Gender Tappable Area ---
+              _buildSelectionButton(
+                context: context,
+                icon: viewModel.gender == "Male" ? Icons.male :
+                      viewModel.gender == "Female" ? Icons.female :
+                      viewModel.gender == "Other" ? Icons.transgender :
+                      viewModel.gender == "Prefer not to say" ? Icons.question_mark :
+                      Icons.wc, // Default/placeholder icon
+                label: 'Gender',
+                value: viewModel.gender ?? 'Select your gender',
+                onTap: () => _showGenderPickerBottomSheet(context, viewModel),
               ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  alignment: WrapAlignment.center,
-                  children: _genders.map((gender) {
-                    final isSelected = viewModel.gender == gender;
-                    return ChoiceChip(
-                      label: Text(gender),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        if (selected) {
-                          viewModel.updateGender(gender);
-                        }
-                        // Optional: allow deselecting by tapping again, though ChoiceChip typically doesn't.
-                        // else { viewModel.updateGender(null); }
-                      },
-                      selectedColor: Theme.of(context).colorScheme.primary,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                               ? Theme.of(context).colorScheme.onPrimary
-                               : Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                        side: BorderSide(
-                          color: isSelected
-                                 ? Theme.of(context).colorScheme.primary
-                                 : Theme.of(context).colorScheme.outline.withOpacity(0.5),
-                        )
-                      ),
-                      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                    );
-                  }).toList(),
-                ),
-              ),
+
               const Spacer(), // Pushes buttons to the bottom
 
-              ElevatedButton(
-                onPressed: _isFinishing ? null : _finishSetup,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ElevatedButton(
+                  onPressed: _isFinishing ? null : _finishSetup,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

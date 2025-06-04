@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:numberpicker/numberpicker.dart';
 import 'setup_flow_viewmodel.dart';
 import 'dart:math'; // For pow in DoublePrecision
 
@@ -25,7 +26,7 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double cmToFeetFactor = 1 / 30.48;
-  final int _initialHeightCm = 170;
+  int _initialHeightCm = 170;
   // double _initialHeightFeet = 5.57; // Not directly used for init, derived from cm.
 
   double _currentDisplayHeight = 170.0; // Local display value
@@ -93,34 +94,38 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Select Your Height',
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
-             const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            Expanded( // Wrap content in Expanded and SingleChildScrollView
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Text(
+                        'Select Your Height',
+                        style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
-                children: [
-                  Text(
-                    '${_currentDisplayHeight.toStringAsFixed(displayHeightDecimalPlaces)} ${_viewModel.heightUnit}',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: theme.colorScheme.primary,
+                        children: [
+                          Text(
+                            '${_currentDisplayHeight.toStringAsFixed(displayHeightDecimalPlaces)} ${_viewModel.heightUnit}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: theme.colorScheme.primary,
                       inactiveTrackColor: theme.colorScheme.primary.withOpacity(0.3),
                       trackShape: const RoundedRectSliderTrackShape(),
                       trackHeight: 8.0,
@@ -181,23 +186,29 @@ class _HeightInputScreenState extends State<HeightInputScreen> {
                   const SizedBox(height: 24),
                   CupertinoSlidingSegmentedControl<String>(
                     groupValue: _viewModel.heightUnit,
-                    children: const {
-                      'cm': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('cm')),
-                      'ft': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('ft')),
-                    },
-                    onValueChanged: (value) {
-                      if (value != null) {
-                         _viewModel.setHeightUnit(value);
-                      }
-                    },
-                  ),
-                ],
+                            children: const {
+                              'cm': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('cm')),
+                              'ft': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('ft')),
+                            },
+                            onValueChanged: (value) {
+                              if (value != null) {
+                                 _viewModel.setHeightUnit(value);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: _onNext,
-              style: ElevatedButton.styleFrom(
+            // Spacer removed, button wrapped in Padding outside Expanded
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: ElevatedButton(
+                onPressed: _onNext,
+                style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 backgroundColor: theme.colorScheme.primary,

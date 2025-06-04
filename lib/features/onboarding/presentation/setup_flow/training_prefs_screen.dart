@@ -10,6 +10,7 @@ class TrainingPrefsScreen extends StatefulWidget {
   State<TrainingPrefsScreen> createState() => _TrainingPrefsScreenState();
 }
 
+class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
 // Helper class for day data
 class DayPreference {
   final String abbr; // e.g., "M"
@@ -19,7 +20,7 @@ class DayPreference {
 }
 
 class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
-  final List<DayPreference> days = [
+  final List<DayPreference> _days = [
     DayPreference(abbr: "S", fullName: "Sunday"), // Assuming S M T W T F S order
     DayPreference(abbr: "M", fullName: "Monday"),
     DayPreference(abbr: "T", fullName: "Tuesday"),
@@ -112,48 +113,58 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
 
 
             // --- Custom Day Selection ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround, // Distribute days evenly
-              children: days.map((day) {
-                final isSelected = viewModel.preferredTrainingDays.contains(day.fullName);
-                return GestureDetector(
-                  onTap: () {
-                    viewModel.toggleTrainingDay(day.fullName);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 44, // Circular button size
-                    height: 44,
+            Expanded( // Use Expanded to allow ListView/Wrap to take available space
+              child: ListView( // Or Wrap, if horizontal space is an issue for too many pills
+                children: _days.map((day) {
+                  final isSelected = viewModel.preferredTrainingDays.contains(day.fullName);
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
                     decoration: BoxDecoration(
-                      color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                      shape: BoxShape.circle,
+                      color: isSelected
+                          ? theme.colorScheme.primaryContainer.withOpacity(0.6)
+                          : theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(25.0), // Pill shape
                       border: Border.all(
-                        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withOpacity(0.3),
-                        width: isSelected ? 2.0 : 1.0,
-                      ),
-                      boxShadow: isSelected ? [
-                        BoxShadow(
-                          color: theme.colorScheme.primary.withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        )
-                      ] : [],
+                        color: isSelected
+                               ? theme.colorScheme.primaryContainer
+                               : theme.colorScheme.outline.withOpacity(0.2),
+                        width: 1.0,
+                      )
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      day.abbr,
-                      style: TextStyle(
-                        color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 16,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0), // Add some padding to the left of the text
+                          child: Text(
+                            day.fullName,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: isSelected
+                                     ? theme.colorScheme.onPrimaryContainer
+                                     : theme.colorScheme.onSurfaceVariant,
+                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                        Switch(
+                          value: isSelected,
+                          onChanged: (bool value) {
+                            viewModel.toggleTrainingDay(day.fullName);
+                          },
+                          activeColor: theme.colorScheme.primary,
+                          activeTrackColor: theme.colorScheme.primary.withOpacity(0.5),
+                          inactiveThumbColor: theme.colorScheme.onSurfaceVariant,
+                          inactiveTrackColor: theme.colorScheme.surfaceVariant,
+                        ),
+                      ],
                     ),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
-            const Spacer(), // Pushes navigation buttons to the bottom
+            // const Spacer(), // Spacer might not be needed if ListView is in Expanded
+            const SizedBox(height: 24), // Ensure space before buttons
             ElevatedButton(
               onPressed: () {
                 context.go('/setup/additional-info');
