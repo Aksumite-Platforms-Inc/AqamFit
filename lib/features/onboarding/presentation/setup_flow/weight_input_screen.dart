@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:numberpicker/numberpicker.dart';
 import 'setup_flow_viewmodel.dart';
 import 'dart:math'; // For pow in DoublePrecision
 
@@ -26,7 +25,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double kgToLbsFactor = 2.20462;
-  double _initialWeightKg = 70.0;
+  final double _initialWeightKg = 70.0;
   // double _initialWeightLbs = 154.0; // Not directly used for initialization in this screen's logic
 
   double _currentDisplayWeight = 70.0; // Local display value
@@ -108,7 +107,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
                     Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
@@ -203,20 +202,21 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
             ),
             // Spacer is removed as Expanded takes available space. Button is outside Expanded.
             // const Spacer(),
-            Padding( // Add padding around the button for separation if content scrolls close
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
                 onPressed: _onNext,
                 style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
                 ),
+                child: const Text('Next'),
               ),
-              child: const Text('Next'),
             ),
             const SizedBox(height: 16),
           ],

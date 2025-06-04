@@ -44,7 +44,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
   }
 
   // --- Date of Birth Bottom Sheet ---
-  Future<void> _showDobPickerBottomSheet(BuildContext context, SetupFlowViewModel viewModel) async {
+  Future<void> _showDobPickerBottomSheet(
+      BuildContext context, SetupFlowViewModel viewModel) async {
     final DateTime? picked = await showModalBottomSheet<DateTime>(
       context: context,
       isScrollControlled: true, // Allows content to determine height
@@ -66,7 +67,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                 ),
                 const SizedBox(height: 16),
                 CalendarDatePicker(
-                  initialDate: viewModel.dateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 18)),
+                  initialDate: viewModel.dateOfBirth ??
+                      DateTime.now().subtract(const Duration(days: 365 * 18)),
                   firstDate: DateTime(1900),
                   lastDate: DateTime.now(),
                   onDateChanged: (newDate) {
@@ -86,7 +88,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
   }
 
   // --- Gender Bottom Sheet ---
-  Future<void> _showGenderPickerBottomSheet(BuildContext context, SetupFlowViewModel viewModel) async {
+  Future<void> _showGenderPickerBottomSheet(
+      BuildContext context, SetupFlowViewModel viewModel) async {
     await showModalBottomSheet<void>(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -111,15 +114,24 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                     final option = _genderOptions[index];
                     final bool isSelected = viewModel.gender == option.title;
                     return ListTile(
-                      leading: Icon(option.icon, color: isSelected ? Theme.of(sheetContext).colorScheme.primary : null),
+                      leading: Icon(option.icon,
+                          color: isSelected
+                              ? Theme.of(sheetContext).colorScheme.primary
+                              : null),
                       title: Text(
                         option.title,
                         style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Theme.of(sheetContext).colorScheme.primary : null,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? Theme.of(sheetContext).colorScheme.primary
+                              : null,
                         ),
                       ),
-                      trailing: isSelected ? Icon(Icons.check, color: Theme.of(sheetContext).colorScheme.primary) : null,
+                      trailing: isSelected
+                          ? Icon(Icons.check,
+                              color: Theme.of(sheetContext).colorScheme.primary)
+                          : null,
                       onTap: () {
                         viewModel.updateGender(option.title);
                         Navigator.pop(sheetContext);
@@ -134,7 +146,6 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       },
     );
   }
-
 
   Future<void> _finishSetup() async {
     final viewModel = context.read<SetupFlowViewModel>();
@@ -169,9 +180,12 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: User not logged in. Please restart.')),
+        const SnackBar(
+            content: Text('Error: User not logged in. Please restart.')),
       );
-      setState(() { _isFinishing = false; });
+      setState(() {
+        _isFinishing = false;
+      });
       // Potentially navigate to login: context.go('/login');
       return;
     }
@@ -180,7 +194,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       final updatedUser = await userRepository.updateUserProfileSetup(
         userId: userId,
         weight: viewModel.weight,
-        weightUnit: viewModel.weightUnit, // Ensure this is the one you want (e.g. from viewModel.weightUnit)
+        weightUnit: viewModel
+            .weightUnit, // Ensure this is the one you want (e.g. from viewModel.weightUnit)
         height: viewModel.height,
         heightUnit: viewModel.heightUnit,
         fitnessGoal: viewModel.fitnessGoal,
@@ -191,14 +206,16 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       );
 
       if (updatedUser != null) {
-        await authManager.completeOnboardingSetup(updatedUser); // Pass the updated user
+        await authManager
+            .completeOnboardingSetup(updatedUser); // Pass the updated user
         if (mounted) {
           context.go('/main');
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to save profile. Please try again.')),
+            const SnackBar(
+                content: Text('Failed to save profile. Please try again.')),
           );
         }
       }
@@ -220,86 +237,139 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<SetupFlowViewModel>();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Almost There!'), // Updated AppBar title
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/setup/training-prefs'),
         ),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                'Just a few more details...',
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              'Just a few more details...',
+              style: theme.textTheme.headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
 
-              // --- Date of Birth Tappable Area ---
-              _buildSelectionButton(
-                context: context,
-                icon: Icons.calendar_today_outlined,
-                label: 'Date of Birth',
-                value: viewModel.dateOfBirth != null
-                    ? DateFormat('MMMM d, yyyy').format(viewModel.dateOfBirth!)
-                    : 'Select your date of birth',
-                onTap: () => _showDobPickerBottomSheet(context, viewModel),
-              ),
-              const SizedBox(height: 24),
+            // --- Date of Birth Tappable Area ---
+            _buildSelectionButton(
+              context: context,
+              icon: Icons.calendar_today_outlined,
+              label: 'Date of Birth',
+              value: viewModel.dateOfBirth != null
+                  ? DateFormat('MMMM d, yyyy').format(viewModel.dateOfBirth!)
+                  : 'Select your date of birth',
+              onTap: () => _showDobPickerBottomSheet(context, viewModel),
+            ),
+            const SizedBox(height: 24),
 
-              // --- Gender Tappable Area ---
-              _buildSelectionButton(
-                context: context,
-                icon: viewModel.gender == "Male" ? Icons.male :
-                      viewModel.gender == "Female" ? Icons.female :
-                      viewModel.gender == "Other" ? Icons.transgender :
-                      viewModel.gender == "Prefer not to say" ? Icons.question_mark :
-                      Icons.wc, // Default/placeholder icon
-                label: 'Gender',
-                value: viewModel.gender ?? 'Select your gender',
-                onTap: () => _showGenderPickerBottomSheet(context, viewModel),
-              ),
+            // --- Gender Tappable Area ---
+            _buildSelectionButton(
+              context: context,
+              icon: viewModel.gender == "Male"
+                  ? Icons.male
+                  : viewModel.gender == "Female"
+                      ? Icons.female
+                      : viewModel.gender == "Other"
+                          ? Icons.transgender
+                          : viewModel.gender == "Prefer not to say"
+                              ? Icons.question_mark
+                              : Icons.wc, // Default/placeholder icon
+              label: 'Gender',
+              value: viewModel.gender ?? 'Select your gender',
+              onTap: () => _showGenderPickerBottomSheet(context, viewModel),
+            ),
 
-              const Spacer(), // Pushes buttons to the bottom
+            const Spacer(), // Pushes buttons to the bottom
 
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: ElevatedButton(
-                  onPressed: _isFinishing ? null : _finishSetup,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: ElevatedButton(
+                onPressed: _isFinishing ? null : _finishSetup,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  textStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                 ),
                 child: _isFinishing
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Text('Finish Setup'),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: _isFinishing ? null : () => context.pop(),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: Text(
-                  'Back',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16),
-                ),
+            ),
+          //   const SizedBox(height: 8),
+          //   TextButton(
+          //     onPressed: _isFinishing
+          //         ? null
+          //         : () => context.go('/setup/training-prefs'),
+          //     style: TextButton.styleFrom(
+          //       padding: const EdgeInsets.symmetric(vertical: 12),
+          //     ),
+          //     child: Text(
+          //       'Back',
+          //       style:
+          //           TextStyle(color: theme.colorScheme.primary, fontSize: 16),
+          //     ),
+          //   ),
+          //   const SizedBox(height: 8), // Some bottom padding
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+        child: Row(
+          children: [
+            Icon(icon, color: theme.colorScheme.primary),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: theme.textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8), // Some bottom padding
-            ],
-          ),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
         ),
       ),
     );

@@ -163,7 +163,7 @@ void main() {
         final bool isDayInPreset = expectedDaysForPreset.contains(dayPref.fullName);
 
         expect(daySwitch.value, isDayInPreset,
-               reason: "${dayPref.fullName} Switch state is ${daySwitch.value}, expected ${isDayInPreset} for preset $presetToSelect");
+               reason: "${dayPref.fullName} Switch state is ${daySwitch.value}, expected $isDayInPreset for preset $presetToSelect");
       }
     });
 

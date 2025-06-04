@@ -3,14 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'setup_flow_viewmodel.dart';
 
-class TrainingPrefsScreen extends StatefulWidget {
-  const TrainingPrefsScreen({super.key});
-
-  @override
-  State<TrainingPrefsScreen> createState() => _TrainingPrefsScreenState();
-}
-
-class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
 // Helper class for day data
 class DayPreference {
   final String abbr; // e.g., "M"
@@ -19,8 +11,15 @@ class DayPreference {
   DayPreference({required this.abbr, required this.fullName});
 }
 
+class TrainingPrefsScreen extends StatefulWidget {
+  const TrainingPrefsScreen({super.key});
+
+  @override
+  State<TrainingPrefsScreen> createState() => _TrainingPrefsScreenState();
+}
+
 class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
-  final List<DayPreference> _days = [
+  final List<DayPreference> days = [
     DayPreference(abbr: "S", fullName: "Sunday"), // Assuming S M T W T F S order
     DayPreference(abbr: "M", fullName: "Monday"),
     DayPreference(abbr: "T", fullName: "Tuesday"),
@@ -41,25 +40,22 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // No need to save here as selections are updated instantly
-            context.pop();
+            context.go('/setup/experience-level');
           },
         ),
-        centerTitle: true, // Center AppBar title
+        centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Increased padding
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch, // For button to stretch
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Text(
-              'Which days do you typically train?', // New centered title
+              'Which days do you typically train?',
               style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24), // Adjusted spacing
-
-            // --- Preset Frequency Selection ---
+            const SizedBox(height: 24),
             Text(
               'Choose a preset or select days below:',
               style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -79,12 +75,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                     if (selected) {
                       viewModel.selectFrequencyPreset(presetName);
                     } else {
-                      // If a chip is deselected by tapping it again (some ChoiceChip behaviors allow this)
-                      // or if we want explicit deselection to clear days:
                       viewModel.selectFrequencyPreset(null);
-                      // This will set _selectedFrequencyPreset to null.
-                      // Days will remain as they were from the preset, allowing custom edits.
-                      // Or, if desired, clear days: viewModel.setPreferredTrainingDays([]);
                     }
                   },
                   selectedColor: theme.colorScheme.secondaryContainer,
@@ -93,7 +84,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0), // More rounded than default
+                    borderRadius: BorderRadius.circular(20.0),
                     side: BorderSide(
                       color: isSelected ? theme.colorScheme.secondary : theme.colorScheme.outline.withOpacity(0.3),
                     )
@@ -101,21 +92,18 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 28), // Spacing before custom day selection
+            const SizedBox(height: 28),
             Divider(height: 1, color: theme.colorScheme.outline.withOpacity(0.5)),
             const SizedBox(height: 20),
-            Text( // Sub-header for clarity
+            Text(
               "Or select individual days:",
               style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-
-
-            // --- Custom Day Selection ---
-            Expanded( // Use Expanded to allow ListView/Wrap to take available space
-              child: ListView( // Or Wrap, if horizontal space is an issue for too many pills
-                children: _days.map((day) {
+            Expanded(
+              child: ListView(
+                children: days.map((day) {
                   final isSelected = viewModel.preferredTrainingDays.contains(day.fullName);
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 6.0),
@@ -123,8 +111,8 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? theme.colorScheme.primaryContainer.withOpacity(0.6)
-                          : theme.colorScheme.surfaceVariant.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(25.0), // Pill shape
+                          : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(25.0),
                       border: Border.all(
                         color: isSelected
                                ? theme.colorScheme.primaryContainer
@@ -136,7 +124,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(left: 8.0), // Add some padding to the left of the text
+                          padding: const EdgeInsets.only(left: 8.0),
                           child: Text(
                             day.fullName,
                             style: theme.textTheme.titleMedium?.copyWith(
@@ -155,7 +143,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                           activeColor: theme.colorScheme.primary,
                           activeTrackColor: theme.colorScheme.primary.withOpacity(0.5),
                           inactiveThumbColor: theme.colorScheme.onSurfaceVariant,
-                          inactiveTrackColor: theme.colorScheme.surfaceVariant,
+                          inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
                         ),
                       ],
                     ),
@@ -163,8 +151,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                 }).toList(),
               ),
             ),
-            // const Spacer(), // Spacer might not be needed if ListView is in Expanded
-            const SizedBox(height: 24), // Ensure space before buttons
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 context.go('/setup/additional-info');
@@ -180,19 +167,19 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
               ),
               child: const Text('Next'),
             ),
-            const SizedBox(height: 8), // Space for back button or other elements
-             TextButton( // Using TextButton for "Back" for a less prominent look if preferred
-              onPressed: () {
-                context.pop();
-              },
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: Text(
-                'Back',
-                style: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
-              ),
-            ),
+            // const SizedBox(height: 8),
+            // TextButton(
+            //   onPressed: () {
+            //     context.go('/setup/experience-level');
+            //   },
+            //   style: TextButton.styleFrom(
+            //     padding: const EdgeInsets.symmetric(vertical: 12),
+            //   ),
+            //   child: Text(
+            //     'Back',
+            //     style: TextStyle(color: theme.colorScheme.primary, fontSize: 16),
+            //   ),
+            // ),
           ],
         ),
       ),

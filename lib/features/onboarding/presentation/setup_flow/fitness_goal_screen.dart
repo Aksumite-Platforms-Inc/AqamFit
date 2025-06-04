@@ -53,7 +53,7 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
       GoRouter.of(context).pop();
     } else {
       // Fallback if direct navigation or deep link
-      context.go('/setup/height-input'); // Corrected fallback route
+      context.go('/setup/height-input');
     }
   }
 
@@ -74,7 +74,6 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Consistent padding
         padding: const EdgeInsets.all(20.0), // Consistent padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
