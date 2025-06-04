@@ -94,9 +94,12 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: User not logged in. Please restart.')),
+        const SnackBar(
+            content: Text('Error: User not logged in. Please restart.')),
       );
-      setState(() { _isFinishing = false; });
+      setState(() {
+        _isFinishing = false;
+      });
       // Potentially navigate to login: context.go('/login');
       return;
     }
@@ -105,7 +108,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       final updatedUser = await userRepository.updateUserProfileSetup(
         userId: userId,
         weight: viewModel.weight,
-        weightUnit: viewModel.weightUnit, // Ensure this is the one you want (e.g. from viewModel.weightUnit)
+        weightUnit: viewModel
+            .weightUnit, // Ensure this is the one you want (e.g. from viewModel.weightUnit)
         height: viewModel.height,
         heightUnit: viewModel.heightUnit,
         fitnessGoal: viewModel.fitnessGoal,
@@ -116,14 +120,16 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       );
 
       if (updatedUser != null) {
-        await authManager.completeOnboardingSetup(updatedUser); // Pass the updated user
+        await authManager
+            .completeOnboardingSetup(updatedUser); // Pass the updated user
         if (mounted) {
           context.go('/main');
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to save profile. Please try again.')),
+            const SnackBar(
+                content: Text('Failed to save profile. Please try again.')),
           );
         }
       }
@@ -158,91 +164,160 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Text(
-                'Just a few more details...',
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              'Just a few more details...',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
 
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 16),
-                      // --- Date of Birth Section ---
-                      _buildDobHeaderPanel(context, viewModel, theme),
-                      AnimatedVisibility(
-                        visible: _isDobExpanded,
-                        child: Material( // Material for elevation and theming of CalendarDatePicker
-                          elevation: 2,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(12.0),
-                            bottomRight: Radius.circular(12.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: CalendarDatePicker(
-                              initialDate: viewModel.dateOfBirth ?? DateTime.now().subtract(const Duration(days: 365 * 18)),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now(),
-                              onDateChanged: (newDate) => _handleDateSelection(newDate, viewModel),
-                            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    // --- Date of Birth Section ---
+                    // --- Date of Birth Section ---
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListTile(
+                        title: Text(
+                          'Date of Birth',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          viewModel.dateOfBirth != null
+                              ? DateFormat('yMMMd')
+                                  .format(viewModel.dateOfBirth!)
+                              : 'Select your date of birth',
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(_isDobExpanded
+                              ? Icons.expand_less
+                              : Icons.expand_more),
+                          onPressed: () {
+                            setState(() {
+                              _isDobExpanded = !_isDobExpanded;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: _isDobExpanded,
+                      child: Material(
+                        elevation: 2,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(12.0),
+                          bottomRight: Radius.circular(12.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: CalendarDatePicker(
+                            initialDate: viewModel.dateOfBirth ??
+                                DateTime.now()
+                                    .subtract(const Duration(days: 365 * 18)),
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime.now(),
+                            onDateChanged: (newDate) =>
+                                _handleDateSelection(newDate, viewModel),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                    ),
+                    const SizedBox(height: 24),
 
-                      // --- Gender Section ---
-                      _buildGenderHeaderPanel(context, viewModel, theme),
-                      AnimatedVisibility(
-                        visible: _isGenderExpanded,
-                        child: Material( // Material for elevation
-                           elevation: 2,
-                           borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(12.0),
-                            bottomRight: Radius.circular(12.0),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                            child: Column( // Using Column for ListTiles
-                              children: _genderOptions.map((option) {
-                                final isSelected = viewModel.gender == option.title;
-                                return ListTile(
-                                  leading: Icon(option.icon,
-                                                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant),
-                                  title: Text(
-                                    option.title,
-                                    style: TextStyle(
-                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                      color: isSelected ? theme.colorScheme.primary : null,
-                                    ),
+                    // --- Gender Section ---
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListTile(
+                        title: Text(
+                          'Gender',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          viewModel.gender ?? 'Select your gender',
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(_isGenderExpanded
+                              ? Icons.expand_less
+                              : Icons.expand_more),
+                          onPressed: () {
+                            setState(() {
+                              _isGenderExpanded = !_isGenderExpanded;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: _isGenderExpanded,
+                      child: Material(
+                        elevation: 2,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(12.0),
+                          bottomRight: Radius.circular(12.0),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16.0, horizontal: 8.0),
+                          child: Column(
+                            children: _genderOptions.map((option) {
+                              final isSelected =
+                                  viewModel.gender == option.title;
+                              final theme = Theme.of(context);
+                              return ListTile(
+                                leading: Icon(option.icon,
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onSurfaceVariant),
+                                title: Text(
+                                  option.title,
+                                  style: TextStyle(
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: isSelected
+                                        ? theme.colorScheme.primary
+                                        : null,
                                   ),
-                                  trailing: isSelected ? Icon(Icons.check_circle, color: theme.colorScheme.primary) : null,
-                                  onTap: () => _handleGenderSelection(option.title, viewModel),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  selected: isSelected,
-                                  selectedTileColor: theme.colorScheme.primary.withOpacity(0.1),
-                                );
-                              }).toList(),
-                            ),
+                                ),
+                                trailing: isSelected
+                                    ? Icon(Icons.check_circle,
+                                        color: theme.colorScheme.primary)
+                                    : null,
+                                onTap: () => _handleGenderSelection(
+                                    option.title, viewModel),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                selected: isSelected,
+                                selectedTileColor:
+                                    theme.colorScheme.primary.withOpacity(0.1),
+                              );
+                            }).toList(),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24), // Padding at the end of scrollable content
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                        height: 24), // Padding at the end of scrollable content
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: ElevatedButton(
-                  onPressed: _isFinishing ? null : _finishSetup,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+              child: ElevatedButton(
+                onPressed: _isFinishing ? null : _finishSetup,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  textStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
@@ -250,23 +325,28 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                   ),
                 ),
                 child: _isFinishing
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Text('Finish Setup'),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: _isFinishing ? null : () => context.pop(),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: Text(
-                  'Back',
-                  style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16),
-                ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: _isFinishing ? null : () => context.pop(),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                foregroundColor: Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(height: 8), // Some bottom padding
-            ],
-          ),
+              child: const Text(
+                'Back',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            const SizedBox(height: 8), // Some bottom padding
+          ],
         ),
       ),
     );

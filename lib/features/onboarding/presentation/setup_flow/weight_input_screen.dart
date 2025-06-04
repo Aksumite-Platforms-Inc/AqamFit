@@ -203,20 +203,21 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
             ),
             // Spacer is removed as Expanded takes available space. Button is outside Expanded.
             // const Spacer(),
-            Padding( // Add padding around the button for separation if content scrolls close
+            Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
                 onPressed: _onNext,
                 style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
                 ),
+                child: const Text('Next'),
               ),
-              child: const Text('Next'),
             ),
             const SizedBox(height: 16),
           ],

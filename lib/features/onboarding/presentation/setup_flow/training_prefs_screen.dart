@@ -10,7 +10,6 @@ class TrainingPrefsScreen extends StatefulWidget {
   State<TrainingPrefsScreen> createState() => _TrainingPrefsScreenState();
 }
 
-class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
 // Helper class for day data
 class DayPreference {
   final String abbr; // e.g., "M"
