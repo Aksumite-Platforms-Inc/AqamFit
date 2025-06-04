@@ -40,7 +40,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final ThemeData theme = Theme.of(context);
     final ColorScheme colorScheme = theme.colorScheme;
 
-    Future<bool> onWillPop() async {
+    Future<bool> _onWillPop() async {
       if (_pageController.page?.round() != 0) {
         _pageController.previousPage(
           duration: const Duration(milliseconds: 400),
@@ -69,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
 
     return WillPopScope(
-      onWillPop: onWillPop,
+      onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: colorScheme.surface, // Use theme background
         body: Stack( // Wrap SafeArea with Stack for Skip button
@@ -87,7 +87,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       },
                       itemCount: _pages.length,
                       itemBuilder: (context, index) {
-                        return OnboardingPageWidget(page: _pages[index]);
+                        return AnimatedBuilder(
+                          animation: _pageController,
+                          builder: (context, child) {
+                            double factor = 1.0;
+                            if (_pageController.position.hasContentDimensions) {
+                              double page = _pageController.page ?? _currentPage.toDouble();
+                              factor = (page - index).abs();
+                            }
+                            final double scaleFactor = (1 - (factor.clamp(0.0, 1.0) * 0.25)).toDouble();
+                            final double opacityFactor = (1 - (factor.clamp(0.0, 1.0) * 0.5)).toDouble();
+                            return Opacity(
+                              opacity: opacityFactor,
+                              child: Transform.scale(
+                                scale: scaleFactor,
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: OnboardingPageWidget(page: _pages[index]),
+                        );
                       },
                     ),
                   ),
@@ -106,8 +125,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               height: 8,
                               decoration: BoxDecoration(
                                 color: _currentPage == index
-                                    ? theme.colorScheme.primary // Use theme primary color
-                                    : theme.colorScheme.onSurface.withOpacity(0.3), // Use theme surface/variant
+                                    ? theme.colorScheme.primary
+                                    : theme.colorScheme.onSurface.withOpacity(0.3),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -123,14 +142,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 16.0),
                               textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30.0), // More rounded
+                                borderRadius: BorderRadius.circular(30.0),
                               ),
-                              elevation: 5.0, // Add elevation
+                              elevation: 5.0,
                             ),
                             onPressed: () {
                               if (_currentPage == _pages.length - 1) {
                                 Provider.of<SettingsService>(context, listen: false).setHasCompletedOnboarding(true);
-                                context.go('/register'); // Navigate to Register Screen
+                                context.go('/register');
                               } else {
                                 _pageController.nextPage(
                                   duration: const Duration(milliseconds: 400),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:numberpicker/numberpicker.dart';
 import 'setup_flow_viewmodel.dart';
 import 'dart:math'; // For pow in DoublePrecision
 
@@ -25,7 +26,7 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
 
   // Conversion factors & defaults (copied and adjusted)
   static const double kgToLbsFactor = 2.20462;
-  final double _initialWeightKg = 70.0;
+  double _initialWeightKg = 70.0;
   // double _initialWeightLbs = 154.0; // Not directly used for initialization in this screen's logic
 
   double _currentDisplayWeight = 70.0; // Local display value
@@ -88,37 +89,41 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column( // Changed to Column for simpler structure for single input
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const SizedBox(height: 16),
-            Center(
-              child: Text(
-                'Select Your Weight',
-                style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            Expanded( // Wrap content that might overflow in Expanded & SingleChildScrollView
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Text(
+                        'Select Your Weight',
+                        style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Column(
-                children: [
-                  Text(
-                    '${_currentDisplayWeight.toStringAsFixed(displayWeightDecimalPlaces)} ${_viewModel.weightUnit}',
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: theme.colorScheme.primary,
+                        children: [
+                          Text(
+                            '${_currentDisplayWeight.toStringAsFixed(displayWeightDecimalPlaces)} ${_viewModel.weightUnit}',
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: theme.colorScheme.primary,
                       inactiveTrackColor: theme.colorScheme.primary.withOpacity(0.3),
                       trackShape: const RoundedRectSliderTrackShape(),
                       trackHeight: 8.0,
@@ -179,32 +184,40 @@ class _WeightInputScreenState extends State<WeightInputScreen> {
                   const SizedBox(height: 24),
                   CupertinoSlidingSegmentedControl<String>(
                     groupValue: _viewModel.weightUnit,
-                    children: const {
-                      'kg': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('kg')),
-                      'lbs': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('lbs')),
-                    },
-                    onValueChanged: (value) {
-                      if (value != null) {
-                        _viewModel.setWeightUnit(value);
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(), // Push button to bottom
-            ElevatedButton(
-              onPressed: _onNext,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                            children: const {
+                              'kg': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('kg')),
+                              'lbs': Padding(padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8), child: Text('lbs')),
+                            },
+                            onValueChanged: (value) {
+                              if (value != null) {
+                                _viewModel.setWeightUnit(value);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: const Text('Next'),
+            ),
+            // Spacer is removed as Expanded takes available space. Button is outside Expanded.
+            // const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: ElevatedButton(
+                onPressed: _onNext,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: const Text('Next'),
+              ),
             ),
             const SizedBox(height: 16),
           ],

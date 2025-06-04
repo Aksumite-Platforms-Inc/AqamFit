@@ -65,69 +65,68 @@ void main() {
     );
   }
 
-  group('Original Day Selection Tests', () {
-    testWidgets('renders circular weekday buttons', (WidgetTester tester) async {
+  group('Pill & Switch Day Selection Tests', () {
+    testWidgets('renders day pills with text and switch', (WidgetTester tester) async {
       await pumpTrainingPrefsScreen(tester);
 
-      // Find the Row containing the day buttons. This assumes it's the only Row directly under the main Column's children that contains GestureDetectors.
-      // Or, be more specific if other Rows are added.
-      // The preset chips are in a Wrap, day buttons in a Row.
-      final dayButtonsRowFinder = find.descendant(
-        of: find.byType(Column), // Main column
-        matching: find.byType(Row) // Find Row specifically for day buttons
-      );
-      // Ensure we find the correct Row (there's only one for day buttons)
-      expect(dayButtonsRowFinder, findsOneWidget);
-
-
       for (final dayMap in dayPreferences) {
-        expect(find.widgetWithText(AnimatedContainer, dayMap["abbr"]!).
-          matching((finder) => finder.evaluate().any((e) => dayButtonsRowFinder.evaluate().contains(e.visitAncestorElements((element) => element == dayButtonsRowFinder.evaluate().first.widget ? false : true) as Element?))),
-          findsWidgets); // Check they exist within the day buttons row
+        final dayPillFinder = find.widgetWithText(Container, dayMap["fullName"]!);
+        expect(dayPillFinder, findsOneWidget); // Finds the Container (pill)
+        expect(find.descendant(of: dayPillFinder, matching: find.byType(Switch)), findsOneWidget);
       }
-      expect(find.descendant(of: dayButtonsRowFinder, matching: find.byType(GestureDetector)), findsNWidgets(dayPreferences.length));
       expect(find.widgetWithText(ElevatedButton, 'Next'), findsOneWidget);
       expect(find.widgetWithText(TextButton, 'Back'), findsOneWidget);
     });
 
-    testWidgets('tapping a day button toggles selection, updates ViewModel, and clears preset', (WidgetTester tester) async {
-      // Initially, a preset is selected
+    testWidgets('tapping a Switch toggles selection, updates ViewModel, and clears preset', (WidgetTester tester) async {
       const initialPreset = "3 days/week";
       final presetDays = SetupFlowViewModel.frequencyPresets[initialPreset]!;
       when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(initialPreset);
-      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(List.from(presetDays));
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(List.from(presetDays)); // e.g., Mon, Wed, Fri
 
       await pumpTrainingPrefsScreen(tester);
 
-      final mondayFullName = "Monday"; // A day part of "3 days/week" preset
+      final mondayFullName = "Monday";
+      final mondaySwitchFinder = find.ancestor(
+        of: find.text(mondayFullName),
+        matching: find.byType(Row), // The Switch is in a Row with the Text
+      ).last; // find the Row, then find the Switch in it.
+      final switchFinder = find.descendant(of: mondaySwitchFinder, matching: find.byType(Switch));
 
-      // Find Monday button
-      final dayButtonFinders = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector));
-      final mondayButtonFinder = dayButtonFinders.at(1); // Monday
+      // Initial state: Monday is selected via preset
+      Switch mondaySwitch = tester.widget<Switch>(switchFinder);
+      expect(mondaySwitch.value, isTrue);
 
-      // Tap Monday (which is already selected by preset) to deselect it
-      // ViewModel should now have Monday removed and preset cleared
+      // Tap Monday's Switch to deselect it
       final expectedDaysAfterToggle = List<String>.from(presetDays)..remove(mondayFullName);
       when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(expectedDaysAfterToggle);
       when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(null); // toggleDay clears preset
 
-      await tester.tap(mondayButtonFinder);
+      await tester.tap(switchFinder);
       await tester.pumpAndSettle();
 
       verify(mockSetupFlowViewModel.toggleTrainingDay(mondayFullName)).called(1);
-      // The mock's toggleTrainingDay already sets selectedFrequencyPreset to null.
 
-      // Verify Monday is now visually unselected
-      AnimatedContainer mondayContainer = tester.widget<AnimatedContainer>(
-        find.descendant(of: mondayButtonFinder, matching: find.byType(AnimatedContainer))
-      );
-      BoxDecoration decoration = mondayContainer.decoration as BoxDecoration;
-      expect(decoration.color, Theme.of(tester.element(mondayButtonFinder)).colorScheme.surfaceContainerHighest.withOpacity(0.5));
+      // Verify Monday Switch is now off
+      mondaySwitch = tester.widget<Switch>(switchFinder);
+      expect(mondaySwitch.value, isFalse);
 
       // Verify preset chip is unselected
       final presetChipFinder = find.widgetWithText(ChoiceChip, initialPreset);
-      final ChoiceChip presetChipWidget = tester.widget(presetChipFinder);
+      ChoiceChip presetChipWidget = tester.widget(presetChipFinder);
       expect(presetChipWidget.selected, isFalse);
+
+      // Tap Monday's Switch again to select it
+      final expectedDaysAfterSecondToggle = List<String>.from(expectedDaysAfterToggle)..add(mondayFullName);
+      when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(expectedDaysAfterSecondToggle);
+      // selectedFrequencyPreset should still be null (custom selection)
+
+      await tester.tap(switchFinder);
+      await tester.pumpAndSettle();
+      verify(mockSetupFlowViewModel.toggleTrainingDay(mondayFullName)).called(1); // Called again
+
+      mondaySwitch = tester.widget<Switch>(switchFinder);
+      expect(mondaySwitch.value, isTrue);
     });
   });
 
@@ -139,13 +138,12 @@ void main() {
       }
     });
 
-    testWidgets('selecting a preset updates ViewModel, chip appearance, and day buttons', (WidgetTester tester) async {
+    testWidgets('selecting a preset updates ViewModel, chip appearance, and day Switches', (WidgetTester tester) async {
       await pumpTrainingPrefsScreen(tester);
 
       final presetToSelect = SetupFlowViewModel.frequencyPresets.keys.first; // "3 days/week"
       final expectedDaysForPreset = SetupFlowViewModel.frequencyPresets[presetToSelect]!;
 
-      // Mock ViewModel behavior after preset selection
       when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(presetToSelect);
       when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(List.from(expectedDaysForPreset));
 
@@ -154,54 +152,33 @@ void main() {
 
       verify(mockSetupFlowViewModel.selectFrequencyPreset(presetToSelect)).called(1);
 
-      // Verify preset chip is selected
       final ChoiceChip selectedChipWidget = tester.widget(find.widgetWithText(ChoiceChip, presetToSelect));
       expect(selectedChipWidget.selected, isTrue);
 
-      // Verify day buttons reflect the preset
+      // Verify day Switches reflect the preset
       for (final dayPref in dayPreferences) {
-        final dayButtonFinder = find.descendant(
-          of: find.byType(Row).last, // Day buttons are in the last Row
-          matching: find.byElementPredicate((element) {
-            // Find by text inside the AnimatedContainer
-            if (element.widget is AnimatedContainer) {
-              final textFinder = find.descendant(of: find.byWidget(element.widget), matching: find.text(dayPref.abbr));
-              return textFinder.evaluate().isNotEmpty;
-            }
-            return false;
-          })
-        ).first; // This finder is complex, ensure it works or simplify by index.
-
-        // A simpler way for day buttons, assuming fixed order S,M,T,W,T,F,S
-        final dayIndex = dayPreferences.indexWhere((dp) => dp.fullName == dayPref.fullName);
-        final specificDayButtonGestureDetector = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector)).at(dayIndex);
-
-
-        final AnimatedContainer dayContainer = tester.widget(
-          find.descendant(of: specificDayButtonGestureDetector, matching: find.byType(AnimatedContainer))
-        );
-        final BoxDecoration decoration = dayContainer.decoration as BoxDecoration;
+        final dayPillFinder = find.widgetWithText(Container, dayPref.fullName!);
+         final switchFinder = find.descendant(of: dayPillFinder, matching: find.byType(Switch));
+        final Switch daySwitch = tester.widget<Switch>(switchFinder);
         final bool isDayInPreset = expectedDaysForPreset.contains(dayPref.fullName);
 
-        expect(decoration.color == Theme.of(tester.element(specificDayButtonGestureDetector)).colorScheme.primary, isDayInPreset,
-               reason: "${dayPref.fullName} selection state is ${isDayInPreset ? '' : 'not '}as expected for preset $presetToSelect. Color was ${decoration.color}");
+        expect(daySwitch.value, isDayInPreset,
+               reason: "${dayPref.fullName} Switch state is ${daySwitch.value}, expected ${isDayInPreset} for preset $presetToSelect");
       }
     });
 
     testWidgets('transition from custom selection to preset selection', (WidgetTester tester) async {
-      // Initial: custom days selected, no preset
       final customDays = ["Tuesday", "Saturday"];
       when(mockSetupFlowViewModel.preferredTrainingDays).thenReturn(customDays);
       when(mockSetupFlowViewModel.selectedFrequencyPreset).thenReturn(null);
 
       await pumpTrainingPrefsScreen(tester);
 
-      // Verify initial custom day selection
-      final tuesdayButton = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector)).at(2); // Tuesday
-      AnimatedContainer tueContainer = tester.widget(find.descendant(of: tuesdayButton, matching: find.byType(AnimatedContainer)));
-      expect((tueContainer.decoration as BoxDecoration).color, Theme.of(tester.element(tuesdayButton)).colorScheme.primary);
+      // Verify initial custom day Switch selection
+      final tuesdayPill = find.widgetWithText(Container, "Tuesday");
+      final tueSwitch = tester.widget<Switch>(find.descendant(of: tuesdayPill, matching: find.byType(Switch)));
+      expect(tueSwitch.value, isTrue);
 
-      // Now, select a preset
       final presetToSelect = "4 days/week";
       final expectedDaysForPreset = SetupFlowViewModel.frequencyPresets[presetToSelect]!;
 
@@ -212,27 +189,22 @@ void main() {
       await tester.pumpAndSettle();
 
       verify(mockSetupFlowViewModel.selectFrequencyPreset(presetToSelect)).called(1);
-
-      // Verify preset chip is selected
       expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, presetToSelect)).selected, isTrue);
 
-      // Verify day buttons now reflect the preset, not the old custom selection
-      tueContainer = tester.widget(find.descendant(of: tuesdayButton, matching: find.byType(AnimatedContainer)));
+      // Verify day Switches now reflect the preset
+      final updatedTuesdayPill = find.widgetWithText(Container, "Tuesday");
+      final updatedTueSwitch = tester.widget<Switch>(find.descendant(of: updatedTuesdayPill, matching: find.byType(Switch)));
       final isTuesdayInNewPreset = expectedDaysForPreset.contains("Tuesday");
-      expect((tueContainer.decoration as BoxDecoration).color == Theme.of(tester.element(tuesdayButton)).colorScheme.primary, isTuesdayInNewPreset);
+      expect(updatedTueSwitch.value, isTuesdayInNewPreset);
 
-      final saturdayButton = find.descendant(of: find.byType(Row).last, matching: find.byType(GestureDetector)).at(6); // Saturday
-      AnimatedContainer satContainer = tester.widget(find.descendant(of: saturdayButton, matching: find.byType(AnimatedContainer)));
+      final saturdayPill = find.widgetWithText(Container, "Saturday");
+      final updatedSatSwitch = tester.widget<Switch>(find.descendant(of: saturdayPill, matching: find.byType(Switch)));
       final isSaturdayInNewPreset = expectedDaysForPreset.contains("Saturday");
-      expect((satContainer.decoration as BoxDecoration).color == Theme.of(tester.element(saturdayButton)).colorScheme.primary, isSaturdayInNewPreset);
-
+      expect(updatedSatSwitch.value, isSaturdayInNewPreset);
     });
-
   });
 
-
-  // Original navigation tests (should still pass)
-  testWidgets('Original "Next" button navigates to /setup/additional-info', (WidgetTester tester) async {
+  testWidgets('"Next" button navigates to /setup/additional-info', (WidgetTester tester) async {
     await pumpTrainingPrefsScreen(tester);
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Next'));

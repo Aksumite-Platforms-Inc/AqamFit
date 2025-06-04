@@ -53,7 +53,7 @@ class _FitnessGoalScreenState extends State<FitnessGoalScreen> {
       GoRouter.of(context).pop();
     } else {
       // Fallback if direct navigation or deep link
-      context.go('/setup/weight-height');
+      context.go('/setup/height-input'); // Corrected fallback route
     }
   }
 

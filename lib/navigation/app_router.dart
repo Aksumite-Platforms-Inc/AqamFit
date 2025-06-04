@@ -308,3 +308,33 @@ final GoRouter router = GoRouter(
     ),
   ],
 );
+
+// Helper function for custom page transitions
+Page<dynamic> buildPageWithCustomTransition<T>({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Slide from right
+      const end = Offset.zero;
+      const curve = Curves.easeInOutQuad; // A common easing curve
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      // Combine with FadeTransition
+      return SlideTransition(
+        position: offsetAnimation,
+        child: FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeIn), // Fade in as it slides
+          child: child,
+        ),
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 350), // Adjust duration as needed
+  );
+}
