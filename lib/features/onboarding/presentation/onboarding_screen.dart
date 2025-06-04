@@ -87,7 +87,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
-                  return OnboardingPageWidget(page: _pages[index]);
+                  return AnimatedBuilder(
+                    animation: _pageController,
+                    builder: (context, child) {
+                      double factor = 1.0;
+                      if (_pageController.position.hasContentDimensions) {
+                        // Calculate the difference between the current page and the item's index
+                        // Use _pageController.page for a double value representing current scroll position
+                        double page = _pageController.page ?? _currentPage.toDouble();
+                        factor = (page - index).abs();
+                      }
+
+                      // Apply scale and opacity based on the factor
+                      // Scale down and fade out pages that are not in focus
+                      // Clamp factor to avoid over-scaling/fading if using non-clamped page value
+                      final double scaleFactor = (1 - (factor.clamp(0.0, 1.0) * 0.25)).toDouble(); // e.g. scale down to 75%
+                      final double opacityFactor = (1 - (factor.clamp(0.0, 1.0) * 0.5)).toDouble(); // e.g. fade to 50%
+
+                      return Opacity(
+                        opacity: opacityFactor,
+                        child: Transform.scale(
+                          scale: scaleFactor,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: OnboardingPageWidget(page: _pages[index]),
+                  );
                 },
               ),
             ),

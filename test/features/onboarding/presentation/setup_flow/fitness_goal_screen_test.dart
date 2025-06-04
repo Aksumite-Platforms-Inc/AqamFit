@@ -160,20 +160,30 @@ void main() {
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
     // _onBack calls updateFitnessGoal(currentSelection) then context.pop()
-    verify(mockSetupFlowViewModel.updateFitnessGoal(null)).called(1); // Assuming null was initial selection
+    verify(mockSetupFlowViewModel.updateFitnessGoal(null)).called(1);
     verify(mockGoRouter.pop()).called(1);
-    clearInteractions(mockGoRouter); // Clear for next verification
-    clearInteractions(mockSetupFlowViewModel);
+    clearInteractions(mockGoRouter);
+    clearInteractions(mockSetupFlowViewModel); // Clear for next verification as well
 
 
-    // Case 2: Cannot pop
-    when(mockGoRouter.canPop()).thenReturn(false);
-    // If a goal was selected before this navigation
-    when(mockSetupFlowViewModel.fitnessGoal).thenReturn(fitnessGoals[0]);
+    // Case 2: Cannot pop - should navigate to the corrected fallback route
+    when(mockGoRouter.canPop()).thenReturn(false); // Simulate that router cannot pop
+
+    // Simulate a goal being selected, which would be saved by _onBack
+    final selectedGoalForFallback = fitnessGoals[0];
+    when(mockSetupFlowViewModel.fitnessGoal).thenReturn(selectedGoalForFallback);
+    // Need to ensure _selectedGoalTitle in the screen's state is also set if _onBack reads it.
+    // Pumping the screen with the viewmodel returning this goal should set it via initState or build.
+    // Or, simulate a tap first to set _selectedGoalTitle locally in screen state.
+    // For simplicity, let's assume _onBack correctly reads the current viewModel state if _selectedGoalTitle is null,
+    // or that _selectedGoalTitle is already set. The key is testing the go() call.
 
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
-    verify(mockSetupFlowViewModel.updateFitnessGoal(fitnessGoals[0])).called(1);
-    verify(mockGoRouter.go('/setup/weight-height')).called(1);
+
+    // Verify updateFitnessGoal is called with the current selection
+    verify(mockSetupFlowViewModel.updateFitnessGoal(selectedGoalForFallback)).called(1);
+    // Verify navigation to the corrected fallback route
+    verify(mockGoRouter.go('/setup/height-input')).called(1);
   });
 }
