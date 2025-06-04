@@ -157,7 +157,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
         title: const Text('Almost There!'), // Updated AppBar title
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/setup/training-prefs'),
         ),
         centerTitle: true,
       ),
@@ -333,19 +333,19 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                     : const Text('Finish Setup'),
               ),
             ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: _isFinishing ? null : () => context.pop(),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                foregroundColor: Theme.of(context).colorScheme.primary,
-              ),
-              child: const Text(
-                'Back',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-            const SizedBox(height: 8), // Some bottom padding
+        //     const SizedBox(height: 8),
+        //     TextButton(
+        //       onPressed: _isFinishing ? null : () => context.pop(),
+        //       style: TextButton.styleFrom(
+        //         padding: const EdgeInsets.symmetric(vertical: 12),
+        //         foregroundColor: Theme.of(context).colorScheme.primary,
+        //       ),
+        //       child: const Text(
+        //         'Back',
+        //         style: TextStyle(fontSize: 16),
+        //       ),
+        //     ),
+        //     const SizedBox(height: 8), // Some bottom padding
           ],
         ),
       ),
