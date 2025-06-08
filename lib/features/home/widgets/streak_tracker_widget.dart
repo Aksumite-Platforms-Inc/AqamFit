@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StreakTrackerWidget extends StatefulWidget {
@@ -65,7 +66,7 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
     const double radius = 20;
 
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, "/streak"), // Navigation link
+      onTap: () => context.go('/streak-details'), // Navigation link updated
       child: Card(
         elevation: 5,
         shape: RoundedRectangleBorder(

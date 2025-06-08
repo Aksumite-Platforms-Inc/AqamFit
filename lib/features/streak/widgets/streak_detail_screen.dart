@@ -10,8 +10,20 @@ class StreakDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text('Streak Details'),
         backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {
+              // TODO: Implement share functionality
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [
@@ -26,11 +38,16 @@ class StreakDetailScreen extends StatelessWidget {
           const SizedBox(height: 24), // Spacing before new section
           const _InviteFriendsSection(), // Add the new section
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32.0, horizontal: 16.0), // Adjust padding for final message
+            padding: const EdgeInsets.symmetric(
+                vertical: 32.0,
+                horizontal: 16.0), // Adjust padding for final message
             child: Center(
               child: Text(
                 'Keep pushing your limits!', // Updated final message
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: Colors.grey[600]),
               ),
             ),
           ),
@@ -57,7 +74,6 @@ class _StreakHeaderSection extends StatefulWidget {
 
 class _StreakHeaderSectionState extends State<_StreakHeaderSection>
     with TickerProviderStateMixin {
-
   late AnimationController _flameAnimationController;
   late Animation<double> _flameScaleAnimation;
   late Animation<double> _flameFadeAnimation;
@@ -70,10 +86,12 @@ class _StreakHeaderSectionState extends State<_StreakHeaderSection>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    _flameScaleAnimation = Tween<double>(begin: 1.0, end: 1.15)
-        .animate(CurvedAnimation(parent: _flameAnimationController, curve: Curves.easeInOut));
-    _flameFadeAnimation = Tween<double>(begin: 0.8, end: 1.0)
-        .animate(CurvedAnimation(parent: _flameAnimationController, curve: Curves.easeInOut));
+    _flameScaleAnimation = Tween<double>(begin: 1.0, end: 1.15).animate(
+        CurvedAnimation(
+            parent: _flameAnimationController, curve: Curves.easeInOut));
+    _flameFadeAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+        CurvedAnimation(
+            parent: _flameAnimationController, curve: Curves.easeInOut));
 
     if (widget.isOnStreak) {
       _flameAnimationController.repeat(reverse: true);
@@ -89,16 +107,17 @@ class _StreakHeaderSectionState extends State<_StreakHeaderSection>
     if (_sparkWidgets.isEmpty && widget.isOnStreak) {
       for (int i = 0; i < 10; i++) {
         final double sparkSize = Random().nextDouble() * 3.5 + 3.5;
-        final Duration initialDelay = Duration(milliseconds: Random().nextInt(1500));
-        final Color sparkColor = Random().nextBool() ? Colors.amberAccent[100]! : Colors.orangeAccent[100]!.withOpacity(0.7);
-        _sparkWidgets.add(
-            _SparkWidget(
-              key: ValueKey('spark_$i'),
-              delay: initialDelay,
-              size: sparkSize,
-              color: sparkColor,
-            )
-        );
+        final Duration initialDelay =
+            Duration(milliseconds: Random().nextInt(1500));
+        final Color sparkColor = Random().nextBool()
+            ? Colors.amberAccent[100]!
+            : Colors.orangeAccent[100]!.withOpacity(0.7);
+        _sparkWidgets.add(_SparkWidget(
+          key: ValueKey('spark_$i'),
+          delay: initialDelay,
+          size: sparkSize,
+          color: sparkColor,
+        ));
       }
     }
   }
@@ -129,74 +148,73 @@ class _StreakHeaderSectionState extends State<_StreakHeaderSection>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Widget animatedFlameIcon = ScaleTransition(
-      scale: _flameScaleAnimation,
-      child: FadeTransition(
-        opacity: _flameFadeAnimation,
-        child: Icon(
-          CupertinoIcons.flame_fill,
-          color: Colors.deepOrangeAccent[200],
-          size: 48,
-        ),
-      ),
-    );
-
-    List<Widget> stackChildren = [];
-    if (widget.isOnStreak) {
-      for (int i = 0; i < _sparkWidgets.length; i++) {
-        stackChildren.add(
-            Positioned(
-              right: Random().nextDouble() * 60.0 + 0,
-              top: Random().nextDouble() * 60.0 + 0,
-              child: _sparkWidgets[i],
-            )
-        );
-      }
-    }
-
-    Widget mainHeaderContent = Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "🔥 You're on a ${widget.streakDurationText} streak!",
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Keep it up and unlock rewards!",
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.90),
-                ),
-              ),
-            ],
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.deepOrange, Colors.amberAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(24),
         ),
-        const SizedBox(width: 16),
-        if (widget.isOnStreak) animatedFlameIcon,
-      ],
-    );
-    stackChildren.insert(0, mainHeaderContent);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.orange[700]!, Colors.red[500]!],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: ClipRRect(
-        child: Stack(
-          children: stackChildren,
+        padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Optionally, you can arrange sparks in a circular fashion here for more visual interest
+                if (widget.isOnStreak) ..._sparkWidgets,
+                ScaleTransition(
+                  scale: _flameScaleAnimation,
+                  child: FadeTransition(
+                    opacity: _flameFadeAnimation,
+                    child: Icon(
+                      CupertinoIcons.flame_fill,
+                      color: Colors.white,
+                      size: 72,
+                      shadows: [
+                        Shadow(
+                          color: Colors.deepOrange.withOpacity(0.5),
+                          blurRadius: 16,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              "You're on a ${widget.streakDurationText} streak!",
+              textAlign: TextAlign.center,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: Colors.black26,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Keep it up and unlock rewards!",
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: Colors.white.withOpacity(0.95),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -220,7 +238,8 @@ class _SparkWidget extends StatefulWidget {
   _SparkWidgetState createState() => _SparkWidgetState();
 }
 
-class _SparkWidgetState extends State<_SparkWidget> with SingleTickerProviderStateMixin {
+class _SparkWidgetState extends State<_SparkWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<Offset> _positionAnimation;
@@ -239,7 +258,8 @@ class _SparkWidgetState extends State<_SparkWidget> with SingleTickerProviderSta
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.linear));
     _positionAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: Offset(Random().nextDouble() * 4 - 2, -widget.size * (2.5 + Random().nextDouble() * 1.5)),
+      end: Offset(Random().nextDouble() * 4 - 2,
+          -widget.size * (2.5 + Random().nextDouble() * 1.5)),
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
     Future.delayed(widget.delay, () {
@@ -276,8 +296,7 @@ class _SparkWidgetState extends State<_SparkWidget> with SingleTickerProviderSta
                       blurRadius: widget.size / 2,
                       spreadRadius: widget.size / 4,
                     )
-                  ]
-              ),
+                  ]),
             ),
           ),
         );
@@ -301,7 +320,8 @@ class _StreakCalendarWidgetState extends State<_StreakCalendarWidget> {
   @override
   void initState() {
     super.initState();
-    _today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    _today =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     _generateMockCalendarData();
   }
 
@@ -328,7 +348,10 @@ class _StreakCalendarWidgetState extends State<_StreakCalendarWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text(
             "Your Streak Journey",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         Container(
@@ -349,7 +372,8 @@ class _StreakCalendarWidgetState extends State<_StreakCalendarWidget> {
                   isMissedDay: dayData['isMissedDay'],
                   isToday: isToday,
                   onTap: () {
-                    print("Tapped on ${DateFormat.yMd().format(dayData['date'])}");
+                    print(
+                        "Tapped on ${DateFormat.yMd().format(dayData['date'])}");
                   },
                 ),
               );
@@ -381,7 +405,8 @@ class _DayPill extends StatefulWidget {
   State<_DayPill> createState() => _DayPillState();
 }
 
-class _DayPillState extends State<_DayPill> with SingleTickerProviderStateMixin {
+class _DayPillState extends State<_DayPill>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -430,7 +455,8 @@ class _DayPillState extends State<_DayPill> with SingleTickerProviderStateMixin 
     }
 
     if (widget.isToday) {
-      border = Border.all(color: Theme.of(context).colorScheme.primary, width: 2.5);
+      border =
+          Border.all(color: Theme.of(context).colorScheme.primary, width: 2.5);
     }
 
     return GestureDetector(
@@ -450,19 +476,27 @@ class _DayPillState extends State<_DayPill> with SingleTickerProviderStateMixin 
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 )
-              ]
-          ),
+              ]),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                DateFormat('E').format(widget.date).substring(0,3).toUpperCase(),
-                style: TextStyle(fontSize: 11, color: textColor.withOpacity(0.85), fontWeight: FontWeight.w600),
+                DateFormat('E')
+                    .format(widget.date)
+                    .substring(0, 3)
+                    .toUpperCase(),
+                style: TextStyle(
+                    fontSize: 11,
+                    color: textColor.withOpacity(0.85),
+                    fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 5),
               Text(
                 DateFormat('d').format(widget.date),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textColor),
               ),
             ],
           ),
@@ -532,7 +566,9 @@ class _StreakChallengeBarState extends State<_StreakChallengeBar> {
         foundActive = true;
       }
     }
-    if (!foundActive && definedStages.isNotEmpty && definedStages.every((s) => s.isCompleted)) {
+    if (!foundActive &&
+        definedStages.isNotEmpty &&
+        definedStages.every((s) => s.isCompleted)) {
       definedStages.last.isActive = true;
     }
     setState(() {
@@ -549,7 +585,10 @@ class _StreakChallengeBarState extends State<_StreakChallengeBar> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Text(
             "Streak Challenges",
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         Padding(
@@ -613,7 +652,8 @@ class _ChallengeStageTile extends StatelessWidget {
       gradientColors = [Colors.orange[500]!, Colors.amber[600]!];
       useGradient = true;
       textColor = Colors.white;
-      iconData = Icons.emoji_events_outlined; // Changed icon for active challenge stage
+      iconData = Icons
+          .emoji_events_outlined; // Changed icon for active challenge stage
       elevation = 5.0;
       border = Border.all(color: Colors.white.withOpacity(0.7), width: 2);
     } else {
@@ -634,7 +674,10 @@ class _ChallengeStageTile extends StatelessWidget {
           decoration: BoxDecoration(
             border: border,
             gradient: useGradient
-                ? LinearGradient(colors: gradientColors, begin: Alignment.topLeft, end: Alignment.bottomRight)
+                ? LinearGradient(
+                    colors: gradientColors,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight)
                 : null,
             color: useGradient ? null : tileColor,
           ),
@@ -646,7 +689,10 @@ class _ChallengeStageTile extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 13),
+                style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -696,10 +742,13 @@ class _InviteFriendsSectionState extends State<_InviteFriendsSection>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Consistent padding
+      padding: const EdgeInsets.symmetric(
+          horizontal: 16.0, vertical: 8.0), // Consistent padding
       child: Card(
         elevation: 3.0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)), // Slightly larger radius
+        shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(16.0)), // Slightly larger radius
         child: Padding(
           padding: const EdgeInsets.all(24.0), // Increased padding
           child: Column(
@@ -718,7 +767,8 @@ class _InviteFriendsSectionState extends State<_InviteFriendsSection>
               Text(
                 "Double the Gains, Double the Fuel! 🚀",
                 textAlign: TextAlign.center,
-                style: theme.textTheme.titleLarge?.copyWith( // Used titleLarge for more impact
+                style: theme.textTheme.titleLarge?.copyWith(
+                  // Used titleLarge for more impact
                   fontWeight: FontWeight.w600,
                   // color: theme.colorScheme.onSurface, // Default text color for cards
                 ),
@@ -730,8 +780,10 @@ class _InviteFriendsSectionState extends State<_InviteFriendsSection>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[600],
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Adjusted padding
-                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32, vertical: 16), // Adjusted padding
+                  textStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),

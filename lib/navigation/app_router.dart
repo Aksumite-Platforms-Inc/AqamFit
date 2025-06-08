@@ -34,7 +34,8 @@ import '../features/onboarding/presentation/setup_flow/additional_info_screen.da
 import '../features/explore/presentation/screens/browse_workouts_screen.dart';
 // Progress Screens
 import '../features/progress/presentation/screens/detailed_progress_screen.dart';
-import '../features/progress/presentation/screens/streak_detail_screen.dart'; // Added for StreakDetailScreen
+// import '../features/progress/presentation/screens/streak_detail_screen.dart'; // Commented out old import
+import '../features/streak/widgets/streak_detail_screen.dart'; // Added for new StreakDetailsScreen
 
 // Example of a simple "Not Authorized" screen
 class NotAuthorizedScreen extends StatelessWidget {
@@ -310,7 +311,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/streak-details',
       name: 'streakDetails', // Optional: add a name
-      builder: (context, state) => const StreakDetailScreen(),
+      builder: (context, state) => const StreakDetailScreen(), // Changed to new screen
     ),
   ],
 );

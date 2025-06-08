@@ -5,9 +5,11 @@ import 'package:aksumfit/models/weight_entry.dart';
 import 'package:aksumfit/models/workout_plan.dart';
 import 'package:aksumfit/services/api_service.dart';
 import 'package:aksumfit/services/auth_manager.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart'; // Changed from Cupertino
 import 'package:go_router/go_router.dart';
 import 'package:aksumfit/features/home/widgets/streak_tracker_widget.dart';
+import 'package:aksumfit/features/home/widgets/muscle_hit_map_card.dart'; // Import for MuscleHitMapCard
 // Removed unused old widgets
 // import 'package:aksumfit/features/home/widgets/hero_workout_banner.dart';
 // import 'package:aksumfit/features/home/widgets/quick_action_tile.dart';
@@ -66,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refreshData() async {
     final authManager = Provider.of<AuthManager>(context, listen: false);
     // Ensure _currentUser is updated if it can change.
-     if (mounted) {
+    if (mounted) {
       setState(() {
         _currentUser = authManager.currentUser;
         _greeting = _getGreeting(); // Re-calculate greeting if user name might change or for time of day
@@ -75,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (_currentUser != null) {
       final userId = _currentUser!.id;
-       if (mounted) {
+      if (mounted) {
         setState(() {
           _todaysWorkoutPlanFuture = ApiService().getTodaysWorkoutPlan(userId);
           _dailyMealLogFuture = ApiService().getDailyMealLog(userId, DateTime.now());
@@ -85,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     }
-     // Added a small delay to simulate network activity for refresh indicator
+    // Added a small delay to simulate network activity for refresh indicator
     return Future.delayed(const Duration(milliseconds: 500));
   }
 
@@ -107,6 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('$_greeting, $userName!', style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold)),
         actions: [
+          IconButton(
+            icon: Icon(CupertinoIcons.flame_fill, color: theme.colorScheme.onSurfaceVariant),
+            onPressed: () => context.go('/streak-details'),
+          ),
           IconButton(
             icon: Icon(Icons.notifications_outlined, color: theme.colorScheme.onSurfaceVariant),
             onPressed: () => context.go('/notifications'),
@@ -141,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
             FutureBuilder<DailyMealLog?>(
               future: _dailyMealLogFuture,
               builder: (context, snapshot) {
-                 if (snapshot.connectionState == ConnectionState.waiting && snapshot.data == null) {
+                if (snapshot.connectionState == ConnectionState.waiting && snapshot.data == null) {
                   return _buildPlaceholderCard("Loading Nutrition Log...");
                 }
                 return _buildMealTrackerCard(snapshot.data);
@@ -151,15 +157,17 @@ class _HomeScreenState extends State<HomeScreen> {
             FutureBuilder<WeightEntry?>(
               future: _latestWeightFuture,
               builder: (context, snapshot) {
-                 if (snapshot.connectionState == ConnectionState.waiting && snapshot.data == null) {
+                if (snapshot.connectionState == ConnectionState.waiting && snapshot.data == null) {
                   return _buildPlaceholderCard("Loading Progress...");
                 }
                 return _buildProgressChartCard(snapshot.data);
               },
             ),
             const SizedBox(height: 16),
+            const MuscleHitMapCard(), // Added MuscleHitMapCard
+            const SizedBox(height: 16),
             _buildChallengesCard(),
-             const SizedBox(height: 16),
+            const SizedBox(height: 16),
             // _buildAiRecommendationsPlaceholder(theme), // Optional: Can be added back if desired
             // const SizedBox(height: 16),
             // _buildRecentActivityPlaceholder(theme), // Optional: Can be added back if desired
@@ -181,9 +189,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 10),
-              Text(message, style: theme.textTheme.titleMedium),
+              const CircularProgressIndicator(), // Already const
+              const SizedBox(height: 10), // Already const
+              Text(message, style: theme.textTheme.titleMedium), // Cannot be const: message is dynamic, style is from theme
             ],
           ),
         ),
@@ -201,50 +209,50 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Today's Workout", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            Text("Today's Workout", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)), // Theme-dependent style
+            const SizedBox(height: 12), // Const
             if (plan != null) ...[
-              Text(plan.name, style: theme.textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Text(plan.description ?? 'No description available.', style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 16),
+              Text(plan.name, style: theme.textTheme.titleMedium), // Dynamic text, theme-dependent style
+              const SizedBox(height: 8), // Const
+              Text(plan.description ?? 'No description available.', style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis), // Dynamic text, theme-dependent style
+              const SizedBox(height: 16), // Const
               // Example progress, replace with actual logic if available
               if(plan.estimatedDurationMinutes != null && plan.estimatedDurationMinutes! > 0) ...[
-                LinearProgressIndicator(
-                  value: 0.3, // Placeholder: (completed exercises / total exercises)
+                LinearProgressIndicator( // Cannot be const due to theme colors and dynamic value (though value is placeholder here)
+                  value: 0.3,
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
                   minHeight: 6,
                   borderRadius: BorderRadius.circular(3),
                 ),
-                const SizedBox(height: 8),
-                Text("3 of ${plan.exercises.length ?? 10} exercises completed", style: theme.textTheme.bodySmall),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8), // Const
+                Text("3 of ${plan.exercises.length ?? 10} exercises completed", style: theme.textTheme.bodySmall), // Dynamic text, theme-dependent style
+                const SizedBox(height: 16), // Const
               ],
-              ElevatedButton(
+              ElevatedButton( // Cannot be const due to onPressed and style from theme
                 style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.primary,
                     foregroundColor: theme.colorScheme.onPrimary,
-                    minimumSize: const Size(double.infinity, 40)
+                    minimumSize: const Size(double.infinity, 40) // Size can be const
                 ),
                 onPressed: () {
                   if (plan.id.isNotEmpty) {
-                     context.go('/workout-plans/${plan.id}');
+                    context.go('/workout-plans/${plan.id}');
                   }
                 },
-                child: const Text("Start Workout"),
+                child: const Text("Start Workout"), // Const
               ),
             ] else ...[
-              Text("No workout scheduled for today. Rest up or pick one from your plans!", style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                 style: ElevatedButton.styleFrom(
+              Text("No workout scheduled for today. Rest up or pick one from your plans!", style: theme.textTheme.bodyMedium), // Theme-dependent style
+              const SizedBox(height: 16), // Const
+              ElevatedButton( // Cannot be const due to onPressed and style from theme
+                style: ElevatedButton.styleFrom(
                     backgroundColor: theme.colorScheme.secondary,
                     foregroundColor: theme.colorScheme.onSecondary,
-                    minimumSize: const Size(double.infinity, 40)
+                    minimumSize: const Size(double.infinity, 40) // Size can be const
                 ),
-                onPressed: () => context.go('/browse-workouts'), // Navigate to new browse workouts screen
-                child: const Text("Browse Workouts"),
+                onPressed: () => context.go('/browse-workouts'),
+                child: const Text("Browse Workouts"), // Const
               ),
             ],
           ],
@@ -266,56 +274,60 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Meal Tracker", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
+            Text("Meal Tracker", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)), // Theme-dependent style
+            const SizedBox(height: 12), // Const
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("${currentCalories.toStringAsFixed(0)} / ${_targetCalories.toStringAsFixed(0)} kcal", style: theme.textTheme.titleMedium),
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.camera_alt_outlined),
-                  label: const Text("Snap Meal"),
+                Text("${currentCalories.toStringAsFixed(0)} / ${_targetCalories.toStringAsFixed(0)} kcal", style: theme.textTheme.titleMedium), // Dynamic text, theme-dependent style
+                OutlinedButton.icon( // Cannot be const due to onPressed and style from theme
+                  icon: const Icon(Icons.camera_alt_outlined), // Const
+                  label: const Text("Snap Meal"), // Const
                   onPressed: () async {
                     final imagePath = await Navigator.of(context).push<String>(
-                      MaterialPageRoute(builder: (context) => const CameraScreen()),
+                      MaterialPageRoute(builder: (context) => const CameraScreen()), // CameraScreen can be const
                     );
                     if (imagePath != null && imagePath.isNotEmpty && context.mounted) {
-                      // Now navigate to LogMealScreen with the imagePath
-                      print('Captured image path: $imagePath'); // For now, just print
-                      // context.go('/log-meal', extra: <String, dynamic>{'imagePath': imagePath, 'date': DateTime.now()});
-                       // Temporary navigation to /log-meal-quick to verify flow, will pass imagePath later
+                      print('Captured image path: $imagePath');
                       context.go('/log-meal-quick', extra: <String, dynamic>{'imagePath': imagePath});
                     }
                   },
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: theme.colorScheme.outline),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
+                      side: BorderSide(color: theme.colorScheme.outline),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
+            const SizedBox(height: 8), // Const
+            LinearProgressIndicator( // Cannot be const due to theme colors and dynamic value
               value: progress,
               backgroundColor: theme.colorScheme.surfaceContainerHighest,
               valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.tertiary),
               minHeight: 8,
               borderRadius: BorderRadius.circular(4),
             ),
-            const SizedBox(height: 12),
-            Text(
+            const SizedBox(height: 12), // Const
+            Text( // Dynamic text, theme-dependent style
                 "Macros: P:${mealLog?.dailyTotalProteinGrams.toStringAsFixed(0) ?? 0}g  C:${mealLog?.dailyTotalCarbGrams.toStringAsFixed(0) ?? 0}g  F:${mealLog?.dailyTotalFatGrams.toStringAsFixed(0) ?? 0}g",
                 style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
-            TextButton(onPressed: () => context.go('/nutrition'), child: const Text("View Full Nutrition Details"))
+            const SizedBox(height: 8), // Const
+            TextButton(onPressed: () => context.go('/nutrition'), child: const Text("View Full Nutrition Details")) // Child Text can be const
           ],
         ),
       ),
     );
   }
 
- Widget _buildProgressChartCard(WeightEntry? latestWeight) {
+  Widget _buildProgressChartCard(WeightEntry? latestWeight) {
     final theme = Theme.of(context);
+
+    // Mock data for progress highlights
+    const int workoutsThisWeek = 3;
+    const int plannedWorkouts = 5;
+    const int totalActiveMinutes = 120;
+    const String personalRecordImprovement = "New Squat PR: 100kg (+5kg)";
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -324,26 +336,57 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Progress Highlights", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            // Placeholder for chart - e.g. a simple line or bar chart image/icon for now
-            Container(
-              height: 100,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Icon(Icons.show_chart_rounded, size: 40, color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5)),
-              ),
+            Text("Progress Highlights", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)), // Theme-dependent style
+            const SizedBox(height: 16), // Const
+
+            // Row for key stats to potentially make it more compact
+            Row( // Cannot be const because children are not const
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column( // Cannot be const because children are not const
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Workouts This Week:", style: theme.textTheme.titleMedium), // Theme-dependent style
+                    Text("$workoutsThisWeek / $plannedWorkouts sessions", style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)), // Dynamic text, theme-dependent style
+                    const SizedBox(height: 12), // Const
+                    Text("Total Active Minutes:", style: theme.textTheme.titleMedium), // Theme-dependent style
+                    Text("$totalActiveMinutes mins", style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)), // Dynamic text, theme-dependent style
+                  ],
+                ),
+                // Keeping the chart icon, perhaps smaller or integrated differently if needed
+                Container( // Cannot be const due to BoxDecoration and Icon color from theme
+                  padding: const EdgeInsets.all(8), // EdgeInsets can be const
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.show_chart_rounded, size: 36, color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6)),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            if (latestWeight != null)
-              Text("Latest Weight: ${latestWeight.weightKg.toStringAsFixed(1)} kg (Logged: ${DateFormat.yMd().format(latestWeight.date)})", style: theme.textTheme.bodyMedium)
-            else
-              Text("No weight logged yet. Start tracking your progress!", style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
-            TextButton(onPressed: () => context.go('/progress'), child: const Text("View Detailed Progress"))
+
+            const SizedBox(height: 16), // Const
+            const Divider(), // Const
+            const SizedBox(height: 12), // Const
+
+            Text("Recent Achievements:", style: theme.textTheme.titleMedium), // Theme-dependent style
+            const SizedBox(height: 4), // Const
+            Text(personalRecordImprovement, style: theme.textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic)), // Dynamic text, theme-dependent style
+
+            const SizedBox(height: 16), // Const
+
+            if (latestWeight != null) ...[
+              Text("Latest Weight: ${latestWeight.weightKg.toStringAsFixed(1)} kg (Logged: ${DateFormat.yMd().format(latestWeight.date)})", style: theme.textTheme.bodyMedium), // Dynamic text, theme-dependent style
+              const SizedBox(height: 4), // Const
+            ] else ...[
+              Text("No weight logged yet. Start tracking your progress!", style: theme.textTheme.bodyMedium), // Theme-dependent style
+              const SizedBox(height: 4), // Const
+            ],
+            const SizedBox(height: 8), // Const
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(onPressed: () => context.go('/progress'), child: const Text("View Detailed Progress")), // Child Text can be const
+            )
 
           ],
         ),
@@ -361,27 +404,27 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Challenges & Community", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
+            Text("Challenges & Community", style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)), // Theme-dependent style
+            const SizedBox(height: 12), // Const
+            ListTile( // Cannot be const due to onTap and dynamic elements + theme colors
+              contentPadding: EdgeInsets.zero, // EdgeInsets can be const
               leading: Icon(Icons.emoji_events_outlined, color: theme.colorScheme.secondary),
-              title: const Text("Summer Shred Challenge"),
-              subtitle: const Text("Ends in 12 days - 87 participants"),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              title: const Text("Summer Shred Challenge"), // Const
+              subtitle: const Text("Ends in 12 days - 87 participants"), // Const
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16), // Const
               onTap: () { /* TODO: Navigate to challenge details */ },
             ),
-            const Divider(),
-             ListTile(
-              contentPadding: EdgeInsets.zero,
+            const Divider(), // Const
+            ListTile( // Cannot be const due to onTap and dynamic elements + theme colors
+              contentPadding: EdgeInsets.zero, // EdgeInsets can be const
               leading: Icon(Icons.groups_outlined, color: theme.colorScheme.tertiary),
-              title: const Text("Local Running Group"),
-              subtitle: const Text("New post: 'Saturday Morning Run Route'"),
-               trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+              title: const Text("Local Running Group"), // Const
+              subtitle: const Text("New post: 'Saturday Morning Run Route'"), // Const
+              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16), // Const
               onTap: () { /* TODO: Navigate to group details */ },
             ),
-            const SizedBox(height: 8),
-            TextButton(onPressed: () => context.go('/social'), child: const Text("Explore More"))
+            const SizedBox(height: 8), // Const
+            TextButton(onPressed: () => context.go('/social'), child: const Text("Explore More")) // Child Text can be const
           ],
         ),
       ),
