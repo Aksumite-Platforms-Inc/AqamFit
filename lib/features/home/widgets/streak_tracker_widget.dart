@@ -99,7 +99,7 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
                           color: widget.streakCount > 0
                               ? Colors.white
                               : Colors.grey.shade500,
-                          size: 96,
+                          size: 60,
                         ),
                       ),
                     ),
@@ -108,7 +108,7 @@ class _StreakTrackerWidgetState extends State<StreakTrackerWidget>
                       "${widget.streakCount} Day${widget.streakCount == 1 ? '' : 's'}",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        fontSize: 34,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
