@@ -122,7 +122,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? theme.colorScheme.primaryContainer.withOpacity(0.6)
-                          : theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                          : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(25.0), // Pill shape
                       border: Border.all(
                         color: isSelected
@@ -154,7 +154,7 @@ class _TrainingPrefsScreenState extends State<TrainingPrefsScreen> {
                           activeColor: theme.colorScheme.primary,
                           activeTrackColor: theme.colorScheme.primary.withOpacity(0.5),
                           inactiveThumbColor: theme.colorScheme.onSurfaceVariant,
-                          inactiveTrackColor: theme.colorScheme.surfaceVariant,
+                          inactiveTrackColor: theme.colorScheme.surfaceContainerHighest,
                         ),
                       ],
                     ),

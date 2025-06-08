@@ -34,6 +34,7 @@ import '../features/onboarding/presentation/setup_flow/additional_info_screen.da
 import '../features/explore/presentation/screens/browse_workouts_screen.dart';
 // Progress Screens
 import '../features/progress/presentation/screens/detailed_progress_screen.dart';
+import '../features/progress/presentation/screens/streak_detail_screen.dart'; // Added for StreakDetailScreen
 
 // Example of a simple "Not Authorized" screen
 class NotAuthorizedScreen extends StatelessWidget {
@@ -110,7 +111,7 @@ final GoRouter router = GoRouter(
 
     // 4. Role-based redirection example (can be placed here or after other general checks)
     if (location == '/admin' && isLoggedIn && !authManager.hasRole(UserRole.trainer)) { // Assuming trainer is admin
-        return '/not-authorized';
+      return '/not-authorized';
     }
 
     // 5. No redirection needed
@@ -142,7 +143,7 @@ final GoRouter router = GoRouter(
         child: const RegistrationScreen(),
       ),
     ),
-     GoRoute(
+    GoRoute(
       path: '/not-authorized', // Simple screen for unauthorized access
       builder: (context, state) => const NotAuthorizedScreen(),
     ),
@@ -305,6 +306,11 @@ final GoRouter router = GoRouter(
         key: ValueKey('detailed_progress'),
         child: DetailedProgressScreen(),
       ),
+    ),
+    GoRoute(
+      path: '/streak-details',
+      name: 'streakDetails', // Optional: add a name
+      builder: (context, state) => const StreakDetailScreen(),
     ),
   ],
 );
