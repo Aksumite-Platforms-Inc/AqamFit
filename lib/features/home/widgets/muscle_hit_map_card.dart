@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:muscle_selector/muscle_selector.dart';
 
 class MuscleHitMapCard extends StatefulWidget {
   const MuscleHitMapCard({super.key});
@@ -9,160 +9,143 @@ class MuscleHitMapCard extends StatefulWidget {
 }
 
 class _MuscleHitMapCardState extends State<MuscleHitMapCard> {
-  bool showFront = true;
-
-  final Map<String, String> muscleIntensity = {
-    "Chest": "high",
-    "Biceps": "medium",
-    "Quadriceps": "high",
-    "Triceps": "low",
-    "Shoulders": "medium",
-    "Upper Back": "low",
-    "Abs": "high",
-    "Lats": "medium",
-    "Hamstrings": "none"
-  };
-
-  Color getColorForIntensity(String intensity) {
-    switch (intensity) {
-      case 'high':
-        return Colors.redAccent;
-      case 'medium':
-        return Colors.orangeAccent;
-      case 'low':
-        return Colors.blueAccent;
-      default:
-        return Colors.grey.shade400;
-    }
-  }
-
-  void onMuscleTap(String muscle) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text("$muscle Stats"),
-        content: Text("Weekly report for $muscle goes here."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Close"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildHeatmapLayer(String assetPath) {
-    return AspectRatio(
-      aspectRatio: 3 / 4,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned.fill(
-            child: SvgPicture.asset(
-              assetPath,
-              fit: BoxFit.contain,
-            ),
-          ),
-
-          // Example muscles overlay — adjust coords to match real SVG zones
-          Positioned(
-            top: 100,
-            left: 120,
-            child: GestureDetector(
-              onTap: () => onMuscleTap("Chest"),
-              child: CircleAvatar(
-                radius: 10,
-                backgroundColor: getColorForIntensity(muscleIntensity["Chest"]!),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 150,
-            left: 115,
-            child: GestureDetector(
-              onTap: () => onMuscleTap("Abs"),
-              child: CircleAvatar(
-                radius: 8,
-                backgroundColor: getColorForIntensity(muscleIntensity["Abs"]!),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Set<Muscle> selectedMuscles = {};
+  final GlobalKey<MusclePickerMapState> _mapKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 6,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      color: isDark ? Colors.grey[900] : Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    "Your Weekly Muscle Activity",
-                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                const Icon(Icons.fitness_center_rounded, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  "Weekly Muscle Heatmap",
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
-                IconButton(
-                  tooltip: 'Toggle View',
-                  icon: Icon(showFront ? Icons.rotate_90_degrees_ccw : Icons.rotate_90_degrees_cw),
-                  onPressed: () => setState(() => showFront = !showFront),
+                const Spacer(),
+                Tooltip(
+                  message: "View Data Overview",
+                  child: IconButton(
+                    icon: const Icon(Icons.bar_chart_rounded),
+                    onPressed: () {
+                      // TODO: Implement stats screen navigation
+                    },
+                  ),
                 ),
               ],
             ),
+
             const SizedBox(height: 16),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 400),
-              child: showFront
-                  ? buildHeatmapLayer('assets/images/muscles_front.svg')
-                  : buildHeatmapLayer('assets/images/muscles_back.svg'),
-            ),
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Activated Muscles",
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
+
+            // Muscle Picker
+            AspectRatio(
+              aspectRatio: 3 / 4,
+              child: InteractiveViewer(
+                minScale: 0.95,
+                maxScale: 1.4,
+                child: MusclePickerMap(
+                  key: _mapKey,
+                  width: MediaQuery.of(context).size.width,
+                  map: Maps.BODY,
+                  isEditing: false,
+                  actAsToggle: true,
+                  initialSelectedGroups: const [
+                    'chest',
+                    'glutes',
+                    'neck',
+                    'lower_back'
+                  ],
+                  onChanged: (muscles) {
+                    setState(() {
+                      selectedMuscles = muscles;
+                    });
+                  },
+                  dotColor: isDark ? Colors.white : Colors.black,
+                  selectedColor: Colors.lightBlueAccent,
+                  strokeColor: isDark ? Colors.white : Colors.black,
+                ),
               ),
             ),
-            const SizedBox(height: 8),
+
+            const SizedBox(height: 24),
+
+            // Muscle Chips Section
+            Text(
+              "Activated Muscles",
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 10),
             Wrap(
-              spacing: 8,
-              runSpacing: 6,
-              children: muscleIntensity.entries.map((entry) {
+              spacing: 10,
+              runSpacing: 8,
+              children: selectedMuscles.map((muscle) {
+                final name = muscle.toString().split('.').last.replaceAll('_', ' ');
                 return Chip(
-                  label: Text(entry.key),
-                  backgroundColor: getColorForIntensity(entry.value).withOpacity(0.2),
-                  labelStyle: TextStyle(
-                    color: getColorForIntensity(entry.value),
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  backgroundColor: Colors.blueAccent.withOpacity(0.1),
+                  label: Text(
+                    _capitalize(name),
+                    style: TextStyle(
+                      color: Colors.blueAccent.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 );
               }).toList(),
             ),
+
             const SizedBox(height: 16),
+
+            // Bottom Action
             Align(
               alignment: Alignment.centerRight,
-              child: TextButton.icon(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  backgroundColor: Colors.blueAccent,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                ),
                 onPressed: () {
-                  // Navigate to progress stats page
+                  // TODO: Implement progress page navigation
                 },
-                icon: const Icon(Icons.bar_chart),
-                label: const Text("View Detailed Progress"),
+                icon: const Icon(Icons.trending_up_rounded, size: 20),
+                label: const Text("Progress"),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _capitalize(String input) {
+    return input
+        .split(' ')
+        .map((e) => e[0].toUpperCase() + e.substring(1))
+        .join(' ');
   }
 }

@@ -15,7 +15,7 @@ class StreakDetailScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text('Streak Details'),
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
@@ -63,7 +63,6 @@ class _StreakHeaderSection extends StatefulWidget {
   final bool isOnStreak;
 
   const _StreakHeaderSection({
-    super.key,
     required this.streakDurationText,
     required this.isOnStreak,
   });
@@ -77,7 +76,7 @@ class _StreakHeaderSectionState extends State<_StreakHeaderSection>
   late AnimationController _flameAnimationController;
   late Animation<double> _flameScaleAnimation;
   late Animation<double> _flameFadeAnimation;
-  List<Widget> _sparkWidgets = [];
+  final List<Widget> _sparkWidgets = [];
 
   @override
   void initState() {
@@ -307,7 +306,7 @@ class _SparkWidgetState extends State<_SparkWidget>
 
 // Streak Calendar Widget (existing code)
 class _StreakCalendarWidget extends StatefulWidget {
-  const _StreakCalendarWidget({super.key});
+  const _StreakCalendarWidget();
 
   @override
   State<_StreakCalendarWidget> createState() => _StreakCalendarWidgetState();
@@ -393,7 +392,6 @@ class _DayPill extends StatefulWidget {
   final VoidCallback onTap;
 
   const _DayPill({
-    super.key,
     required this.date,
     required this.isStreakDay,
     required this.isMissedDay,
@@ -527,7 +525,7 @@ class ChallengeStage {
 class _StreakChallengeBar extends StatefulWidget {
   final int currentStreakDays;
 
-  const _StreakChallengeBar({super.key, required this.currentStreakDays});
+  const _StreakChallengeBar({required this.currentStreakDays});
 
   @override
   State<_StreakChallengeBar> createState() => _StreakChallengeBarState();
@@ -625,7 +623,6 @@ class _ChallengeStageTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ChallengeStageTile({
-    super.key,
     required this.label,
     required this.isCompleted,
     required this.isActive,
@@ -706,7 +703,7 @@ class _ChallengeStageTile extends StatelessWidget {
 
 // --- _InviteFriendsSection Widget ---
 class _InviteFriendsSection extends StatefulWidget {
-  const _InviteFriendsSection({super.key});
+  const _InviteFriendsSection();
 
   @override
   State<_InviteFriendsSection> createState() => _InviteFriendsSectionState();

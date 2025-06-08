@@ -52,6 +52,7 @@ dependencies:
   lottie: ^3.1.2
   flutter_form_builder: ^10.0.1
   form_builder_validators: ^11.1.2
+  muscle_selector: ^1.0.3
 
   # Added for state management and local storage
   flutter_riverpod: ^2.5.1
